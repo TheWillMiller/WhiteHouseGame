@@ -6,6 +6,8 @@ Source: https://github.com/TheWillMiller/WhiteHouseGame
 
 An unofficial browser game inspired by the supplied low-poly reference images. Play as Donald Trump, freely explore the modeled grounds, visit 32 furnished interior destinations on five floor maps, and talk to 14 NPCs. The grounds include the north and south lawns, gardens, pool, putting green, colonnades, and an illustrative East Wing ballroom construction site.
 
+The graphics pass adds beveled character models, sculpted facial features, layered hair, suit details, physically lit procedural materials, cloth flags, atmospheric sky, and closer character framing. Furnishings include carved desk panels, dimensional carpet emblems, pleated curtains, lamps, fireplace details, and raised wall molding. Facade trim, shutters, tree branches, flowers, lanterns, and construction equipment receive additional detail. Material tiles are generated locally; no image service or paid asset download is needed at runtime.
+
 ## Run
 
 Use Node 22.13 or newer. Run `npm install`, then `npm run dev`. `npm run build` creates the static export in `dist/client`. The site does not require a server database, API key, or external game assets. Audio is synthesized locally and begins muted.
