@@ -1,5 +1,9 @@
 # White House · Free Roam
 
+Play: https://thewillmiller.com/trumpgame/
+
+Source: https://github.com/TheWillMiller/WhiteHouseGame
+
 An unofficial browser game inspired by the supplied low-poly reference images. Play as Donald Trump, freely explore the modeled grounds, visit 32 furnished interior destinations on five floor maps, and talk to 14 NPCs. The grounds include the north and south lawns, gardens, pool, putting green, colonnades, and an illustrative East Wing ballroom construction site.
 
 ## Run
@@ -7,6 +11,12 @@ An unofficial browser game inspired by the supplied low-poly reference images. P
 Use Node 22.13 or newer. Run `npm install`, then `npm run dev`. `npm run build` creates the static export in `dist/client`. The site does not require a server database, API key, or external game assets. Audio is synthesized locally and begins muted.
 
 WASD / arrows move; Shift runs; Space jumps; drag looks around; Q / R turn; E interacts; M opens the map. Touch controls are available on phones and tablets. Use the map to travel directly to any modeled destination. Progress counters are per session.
+
+## Custom-domain deployment
+
+`npm run build:domain` exports the game for `/trumpgame` and stages its static assets in an ignored `.qa` folder. It generates `wrangler.trumpgame.jsonc`. With Cloudflare authentication configured, run `npm run deploy:domain` to rebuild and deploy the `white-house-game` static-assets Worker. The four routes cover `/trumpgame` and `/trumpgame/*` on both the apex and `www` hostnames. No server runtime, database, or paid API is required. Normal `npm run build` still produces the root-path export for Sites.
+
+The domain build includes a narrowly scoped workaround for vinext beta.5's missing base path in loopback prerender requests. It fails if the game HTML is missing. Generated credentials, staging files, and local configuration are excluded from Git.
 
 ## Scope and sources
 

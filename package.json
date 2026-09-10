@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "node --import ./scripts/windows-shutdown.mjs node_modules/vinext/dist/cli.js build",
+    "build:domain": "node scripts/build-domain.mjs",
+    "deploy:domain": "npm run build:domain && wrangler deploy --config wrangler.trumpgame.jsonc",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
     "format": "oxfmt"

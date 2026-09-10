@@ -39,3 +39,4 @@ next-env.d.ts
 
 /.qa/
 *.tsbuildinfo
+/wrangler.trumpgame.jsonc
