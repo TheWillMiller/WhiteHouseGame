@@ -15,7 +15,7 @@ export const destinations:Destination[]=[
   {id:'south-gate',name:'South grounds',zone:'grounds',x:0,z:113,description:'Walk the full southern perimeter'},
   {id:'east-path',name:'East grounds',zone:'grounds',x:87,z:59,description:'Tree-lined perimeter paths'},
   {id:'west-path',name:'West grounds',zone:'grounds',x:-89,z:-60,description:'The west side of the estate'},
-  {id:'oval',name:'Oval Office',zone:'west',x:20,z:13,spawn:[16.8,9.5],description:'Curved ivory walls, gold drapes and the Resolute desk',room:{w:12,d:13,color:0xf0ece1,style:'oval',doors:{}}},
+  {id:'oval',name:'Oval Office',zone:'west',x:22,z:15.6,spawn:[17,10.8],description:'Curved ivory walls, gold drapes and the Resolute desk',room:{w:16,d:17.2,color:0xf0ece1,style:'oval',doors:{}}},
   {id:'cabinet',name:'Cabinet Room',zone:'west',x:21,z:-2,spawn:[18,-2],description:'Meet members of the Cabinet',room:{w:10,d:14,color:0xd7c3a4,style:'meeting',doors:{west:[-2]}}},
   {id:'roosevelt',name:'Roosevelt Room',zone:'west',x:4,z:7,spawn:[4,3.7],description:'The West Wing meeting room',room:{w:12,d:10,color:0xc8b295,style:'meeting',doors:{north:[4]}}},
   {id:'chief',name:'Chief of Staff',zone:'west',x:-18,z:12,spawn:[-18,7.7],description:'Check in with Susie Wiles',room:{w:14,d:12,color:0xaabbb4,style:'office',doors:{north:[-18]}}},

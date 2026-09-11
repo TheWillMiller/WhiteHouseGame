@@ -4,16 +4,16 @@ import { material, detailedFlag, deskDetails, lamp } from './visuals';
 
 // Coordinates are local to the office. South is +Z; every seat faces local -Z.
 // Keep the floor, shell, openings and collision samples on the same ellipse.
-export const OVAL = { rx: 6, rz: 6.5, height: 5.4, thickness: .24,
-  door: [3.70, 4.16] as const, windows: [1.09, Math.PI / 2, Math.PI - 1.09], windowHalf: .151 };
+export const OVAL = { rx: 8, rz: 8.6, height: 5.4, thickness: .24,
+  door: [3.70, 4.16] as const, windows: [1.21, Math.PI / 2, Math.PI - 1.21], windowHalf: .112 };
 export const OVAL_SEATS = [
-  { name: 'West inward-facing sofa', x: -2.85, z: -.7, rotation: -Math.PI / 2, kind: 'sofa' },
-  { name: 'East inward-facing sofa', x: 2.85, z: -.7, rotation: Math.PI / 2, kind: 'sofa' },
-  { name: 'West fireplace armchair', x: -.94, z: -3.75, rotation: Math.PI, kind: 'wing' },
-  { name: 'East fireplace armchair', x: .94, z: -3.75, rotation: Math.PI, kind: 'wing' },
+  { name: 'West inward-facing sofa', x: -3.45, z: -1.45, rotation: -Math.PI / 2, kind: 'sofa' },
+  { name: 'East inward-facing sofa', x: 3.45, z: -1.45, rotation: Math.PI / 2, kind: 'sofa' },
+  { name: 'West fireplace armchair', x: -1.05, z: -5.4, rotation: Math.PI, kind: 'wing' },
+  { name: 'East fireplace armchair', x: 1.05, z: -5.4, rotation: Math.PI, kind: 'wing' },
   { name: 'West desk guest chair', x: -.65, z: 1.55, rotation: Math.PI, kind: 'guest' },
   { name: 'East desk guest chair', x: .65, z: 1.55, rotation: Math.PI, kind: 'guest' },
-  { name: 'President chair', x: 0, z: 4.85, rotation: 0, kind: 'president' },
+  { name: 'President chair', x: 0, z: 5.25, rotation: 0, kind: 'president' },
 ] as const;
 type Solid = { x: number; z: number; w: number; d: number };
 const C = { wall: 0xf0ece1, white: 0xf5f0df, gold: 0xd9b458, darkGold: 0xa78340,
@@ -58,7 +58,7 @@ function arcBand(g: T.Group, a: number, b: number, y: number, h: number, inset: 
   // Shape X/Y becomes room X/Z after rotation; extrusion spans exactly y..y+h.
   for (let i = 0; i <= n; i++) { const t = a + (b - a) * i / n, x = (OVAL.rx - inset) * Math.cos(t), z = (OVAL.rz - inset) * Math.sin(t); if (i) shape.lineTo(x, -z); else shape.moveTo(x, -z); }
   for (let i = n; i >= 0; i--) { const t = a + (b - a) * i / n; shape.lineTo((OVAL.rx - inset + depth) * Math.cos(t), -(OVAL.rz - inset + depth) * Math.sin(t)); }
-  shape.closePath(); const m = mesh(g, new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false, curveSegments: n }), color, 0, y, 0); m.rotation.x = -Math.PI / 2; return m;
+  shape.closePath(); const m = mesh(g, new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false, curveSegments: n }), color, 0, y, 0); m.rotation.x = -Math.PI / 2; m.userData.cameraBlocker = true; return m;
 }
 function frame(g: T.Group, x: number, y: number, z: number, w: number, h: number, gold = true) {
   for (const [border, depth, color] of [[.11, .12, gold ? C.darkGold : C.walnut], [.07, .17, gold ? C.gold : C.mahogany], [.025, .20, 0xf0d99d]]) {
@@ -94,9 +94,9 @@ function floor(g: T.Group) {
   const parquet = mesh(g, geo, new T.MeshStandardMaterial({ map: tx, roughness: .61 }), 0, .052, 0); parquet.rotation.x = -Math.PI / 2;
   // Cream oval rug and restrained rust/gold border, following the supplied photos.
   for (const [rx, rz, y, color] of [[4.95, 5.25, .072, 0xb58855], [4.86, 5.16, .079, 0xe7dbc1], [4.62, 4.91, .086, 0xc49567], [4.53, 4.82, .093, 0xeee3ca]]) {
-    const r = cyl(g, 0, y, 0, rx, .012, color); r.geometry.dispose(); r.geometry = new T.CylinderGeometry(rx, rx, .012, 128); r.scale.z = rz / rx;
+    const r = cyl(g, 0, y, 0, rx, .012, color); r.geometry.dispose(); r.geometry = new T.CylinderGeometry(rx, rx, .012, 128); r.scale.set(1.24, 1, rz / rx * 1.24);
   }
-  for (let i = 0; i < 64; i++) { const a = i * Math.PI / 32; const leaf = orb(g, Math.cos(a) * 4.74, .106, Math.sin(a) * 5.04, .12, .008, .045, 0xbfa371); leaf.rotation.y = -a; }
+  for (let i = 0; i < 64; i++) { const a = i * Math.PI / 32; const leaf = orb(g, Math.cos(a) * 4.74 * 1.24, .106, Math.sin(a) * 5.04 * 1.24, .12, .008, .045, 0xbfa371); leaf.rotation.y = -a; }
   const medallion = cyl(g, 0, .105, 0, 1.32, .01, 0xc39561); medallion.scale.z = 1.05; cyl(g, 0, .112, 0, 1.25, .01, 0xebd8b4);
 }
 function shell(g: T.Group, solids: Solid[]) {
@@ -121,7 +121,7 @@ function shell(g: T.Group, solids: Solid[]) {
 function windows(g: T.Group) {
   for (const a of OVAL.windows) {
     const p = anchor(g, a, -.025), width = 1.79;
-    const glass = mesh(p, new T.PlaneGeometry(width, 4.4), new T.MeshStandardMaterial({ color: 0x9db8b9, emissive: 0x9bb4aa, emissiveIntensity: .22, roughness: .2 }), 0, 2.53, -.03); glass.rotation.y = Math.PI;
+    const glass = mesh(p, new T.PlaneGeometry(width, 4.4), new T.MeshStandardMaterial({ color: 0x9db8b9, emissive: 0x9bb4aa, emissiveIntensity: .22, roughness: .2 }), 0, 2.53, -.03); glass.rotation.y = Math.PI; glass.userData.cameraBlocker = true;
     for (const side of [-1, 1]) box(p, side * width / 2, 2.53, -.10, .105, 4.5, .12, C.white);
     for (let row = 0; row <= 5; row++) box(p, 0, .33 + row * .88, -.12, width, .055, .13, C.white);
     box(p, 0, 2.53, -.12, .065, 4.4, .13, C.white); box(p, 0, .32, -.13, width + .22, .13, .4, C.white);
@@ -129,7 +129,7 @@ function windows(g: T.Group) {
     for (const side of [-1, 1]) {
       const geo = new T.PlaneGeometry(.55, 4.42, 18, 8), pos = geo.getAttribute('position');
       for (let i = 0; i < pos.count; i++) pos.setZ(i, Math.cos((pos.getX(i) + .275) * Math.PI * 18) * .065); geo.computeVertexNormals();
-      const curtain = mesh(p, geo, new T.MeshStandardMaterial({ color: 0xd9b768, side: T.DoubleSide, roughness: .95 }), side * 1.02, 2.52, -.28); curtain.name = 'Pleated gold drape';
+      const curtain = mesh(p, geo, new T.MeshStandardMaterial({ color: 0xd9b768, side: T.DoubleSide, roughness: .95 }), side * 1.02, 2.52, -.28); curtain.name = 'Pleated gold drape'; curtain.userData.cameraBlocker = true;
       box(p, side * 1.02, .35, -.30, .58, .035, .13, 0x7c7c63);
     }
     const swag = new T.PlaneGeometry(2.4, .65, 36, 8), pos = swag.getAttribute('position');
@@ -181,8 +181,8 @@ function fireplace(g: T.Group, solids: Solid[]) {
   box(p, 0, 1.43, -.47, 2.62, .16, .25, 0xe5d0a1); box(p, 0, 1.56, -.22, 2.98, .13, .85, C.white); box(p, 0, 1.64, -.24, 2.97, .035, .87, C.gold);
   for (const side of [-1, 1]) { cyl(p, side * .50, .15, -.49, .06, .27, C.gold); orb(p, side * .5, .35, -.49, .12, .12, .09, C.gold); }
   for (let i = 0; i < 5; i++) { cyl(p, -.93 + i * .46, 1.78, -.25, .055, .27, C.gold); cyl(p, -.93 + i * .46, 1.94, -.25, .13, .14, C.gold, .17); }
-  portrait(p, 'washington', 1.38, 2.22, 3.04); solids.push({ x: 0, z: -6.0, w: 3.0, d: .8 });
-  for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.10, 0, -4.82); g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut); lamp(table, 0, 1.04, 0); solids.push({ x: side * 2.10, z: -4.82, w: 1.03, d: .82 }); }
+  portrait(p, 'washington', 1.38, 2.22, 3.04); solids.push({ x: 0, z: -OVAL.rz + .5, w: 3.0, d: .8 });
+  for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.4, 0, -6.5); g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut); lamp(table, 0, 1.04, 0); solids.push({ x: side * 2.4, z: -6.5, w: 1.03, d: .82 }); }
 }
 function wallDecor(g: T.Group) {
   portrait(anchor(g, 4.39, .17), 'franklin', .93, 1.14, 3.14);
@@ -200,6 +200,6 @@ export function buildOvalOffice(parent: T.Group, cx: number, cz: number): Solid[
   const g = new T.Group(); g.name = 'Oval Office — continuous shell'; g.position.set(cx, 0, cz); parent.add(g);
   const solids: Solid[] = []; floor(g); shell(g, solids); windows(g); fireplace(g, solids); seating(g, solids); coffeeTable(g, solids); resoluteDesk(g, solids); wallDecor(g);
   solids.push({ x: (OVAL.rx - .52) * Math.cos(5.78), z: (OVAL.rz - .52) * Math.sin(5.78), w: .88, d: .88 });
-  for (const side of [-1, 1]) { const flag = new T.Group(); flag.position.set(side * 3.05, 0, 3.91); flag.rotation.y = side < 0 ? -.35 : Math.PI + .35; g.add(flag); detailedFlag(flag, 0, 0, 0, .70, side > 0); solids.push({ x: side * 3.05, z: 3.91, w: .42, d: .42 }); }
+  for (const side of [-1, 1]) { const flag = new T.Group(); flag.position.set(side * 4.65, 0, 6.1); flag.rotation.y = side < 0 ? -.35 : Math.PI + .35; g.add(flag); detailedFlag(flag, 0, 0, 0, .70, side > 0); solids.push({ x: side * 4.65, z: 6.1, w: .42, d: .42 }); }
   return solids.map(s => ({ ...s, x: cx + s.x, z: cz + s.z }));
 }

@@ -1,5 +1,11 @@
 # Oval Office reconstruction — September 11, 2026
 
+## Follow-up: room scale and camera
+
+Owner reported cramped circulation behind the desk and the camera showing the inside of Trump's torso. The playable ellipse is now 16 by 17.2 game units (previously 12 by 13), with furniture retaining its size. The office moves slightly southeast to preserve neighboring rooms. Sofa spacing, fireplace chairs and flags are repositioned; both desk-side approaches and the route behind the president's chair are tested continuously from the entry.
+
+The indoor camera uses a wider 66-degree field of view, architectural obstruction meshes preserved through batching, five clearance rays, immediate retraction and damped recovery. It hides the avatar below two units of camera distance rather than showing an interior cross-section. Camera orbit tests cover desk approaches and windows, and assert the view remains inside the room. Curtains remain camera blockers; movable-looking flags and chairs do not shove the Oval Office camera forward.
+
 Owner feedback: walls intersect and sofas face backwards. The two supplied photographs are the primary visual references: desk-to-fireplace and fireplace-to-desk views.
 
 Implemented in `lib/oval-office.ts`: continuous extruded ellipse, openings split from the same angular ranges, smooth curved crown/base mouldings, curved window arrangement with three tall sashes, pleated gold fabric and scalloped valances, a centered north fireplace, inward-facing upholstered sofas, a low coffee table, fireplace armchairs, guest chairs facing the desk, Resolute-style desk facing the room, parquet and cream bordered carpet. The northwest entry and walking dimensions are game adaptations. The ceiling remains open for the third-person camera.

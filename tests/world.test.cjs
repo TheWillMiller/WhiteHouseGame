@@ -7,9 +7,9 @@ const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.qa');
 fs.mkdirSync(output, { recursive: true });
-for (const file of ['world-data', 'visuals', 'architecture', 'oval-office', 'player-model', 'game', 'webmcp']) {
+for (const file of ['world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'game', 'webmcp']) {
  const source = fs.readFileSync(path.join(root, 'lib', file + '.ts'), 'utf8').replace("new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})", 'globalThis.__testRenderer()');
- const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(world-data|visuals|architecture|oval-office|player-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
+ const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(world-data|visuals|architecture|oval-office|follow-camera|player-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
  fs.writeFileSync(path.join(output, file + '.mjs'), built);
 }
 const ctx = new Proxy({}, { get: () => () => {}, set: () => true });
@@ -27,8 +27,9 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  for (const { id: zone } of floors) {
  const world = zone === 'grounds' ? grounds() : interior(zone);
  assert(world.group.children.some(o=>o.isMesh),'world has rendered geometry');
+ if(zone==='west')assert(world.group.children.filter(o=>o.isMesh&&o.userData.cameraBlocker).length>2,'architectural camera surfaces survive static batching');
   const minX = zone === 'grounds' ? -98 : -28.5, maxX = zone === 'west' ? 41 : -minX;
-  const minZ = zone === 'grounds' ? -95 : zone === 'west' ? -24 : -18.5, maxZ = zone === 'grounds' ? 126 : zone === 'west' ? 21 : 18.5;
+  const minZ = zone === 'grounds' ? -95 : zone === 'west' ? -24 : -18.5, maxZ = zone === 'grounds' ? 126 : zone === 'west' ? 29 : 18.5;
   const step = .5, width = Math.round((maxX-minX)/step)+1, height = Math.round((maxZ-minZ)/step)+1;
   const blocked = new Uint8Array(width*height), reached = new Uint8Array(width*height);
   const index = (x,z) => Math.round((z-minZ)/step)*width+Math.round((x-minX)/step);
