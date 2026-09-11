@@ -15,7 +15,7 @@ export const destinations:Destination[]=[
   {id:'south-gate',name:'South grounds',zone:'grounds',x:0,z:113,description:'Walk the full southern perimeter'},
   {id:'east-path',name:'East grounds',zone:'grounds',x:87,z:59,description:'Tree-lined perimeter paths'},
   {id:'west-path',name:'West grounds',zone:'grounds',x:-89,z:-60,description:'The west side of the estate'},
-  {id:'oval',name:'Oval Office',zone:'west',x:20,z:13,spawn:[20,8],description:'The desk, flags and oval carpet',room:{w:12,d:13,color:0xe6cb84,style:'oval',doors:{}}},
+  {id:'oval',name:'Oval Office',zone:'west',x:20,z:13,spawn:[16.8,9.5],description:'Curved ivory walls, gold drapes and the Resolute desk',room:{w:12,d:13,color:0xf0ece1,style:'oval',doors:{}}},
   {id:'cabinet',name:'Cabinet Room',zone:'west',x:21,z:-2,spawn:[18,-2],description:'Meet members of the Cabinet',room:{w:10,d:14,color:0xd7c3a4,style:'meeting',doors:{west:[-2]}}},
   {id:'roosevelt',name:'Roosevelt Room',zone:'west',x:4,z:7,spawn:[4,3.7],description:'The West Wing meeting room',room:{w:12,d:10,color:0xc8b295,style:'meeting',doors:{north:[4]}}},
   {id:'chief',name:'Chief of Staff',zone:'west',x:-18,z:12,spawn:[-18,7.7],description:'Check in with Susie Wiles',room:{w:14,d:12,color:0xaabbb4,style:'office',doors:{north:[-18]}}},
@@ -66,6 +66,7 @@ export const npcs:NPC[]=[
  {id:'docent',name:'Taylor, the curator',role:'Residence staff · fictional character',zone:'state',x:20,z:5,hair:0x574433,suit:0x696050,greeting:'Welcome to the East Room. It’s one of the great ceremonial spaces of the house.',topics:[{question:'How does this layout work?',answer:'The East Room occupies the eastern end. The Green, Blue, and Red Rooms run along the south side, with the State Dining Room at the west. The Cross Hall connects them.'},{question:'Is the game historically exact?',answer:'The main relationships come from public plans, but this is an adaptation. Furniture, passage widths, and upper-floor arrangements are simplified. The field guide has our references.'}]},
 ];
 export const sources=[
+ {title:'Oval Office artwork · Public-domain paintings and credits',url:'art/credits.txt'},
  {title:'National Park Service · White House rooms and grounds',url:'https://www.nps.gov/whho/planyourvisit/park-brochure.htm'},
  {title:'Archived White House · West Wing floor plan and tour',url:'https://obamawhitehouse.archives.gov/sites/default/files/docs/west-wing-tour-booklet.pdf'},
  {title:'White House Historical Association · Second floor',url:'https://www.whitehousehistory.org/white-house-tour/the-second-floor'},

@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { residenceExterior } from './architecture';
+import { buildOvalOffice } from './oval-office';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { loadPlayerModel, playerModelUrl, type PlayerModel, type Emote, type Locomotion } from './player-model';
@@ -107,22 +108,16 @@ function chandelier(g:T.Group,x:number,z:number){cyl(g,x,4.15,z,.055,1.2,C.gold,
 function rug(g:T.Group,x:number,z:number,rx:number,rz:number,color:number,oval=false){carpetDetail(g,x,z,rx,rz,oval);if(oval){const r=cyl(g,x,.075,z,rx,.04,C.gold,48);r.scale.z=rz/rx;const r2=cyl(g,x,.105,z,rx-.15,.025,color,48);r2.scale.z=(rz-.15)/(rx-.15);}else{box(g,x,.075,z,rx*2,.03,rz*2,C.gold);box(g,x,.097,z,rx*2-.25,.025,rz*2-.25,color);}for(let i=0;i<12;i++){const a=i/12*Math.PI*2;const star=ball(g,x+Math.cos(a)*rx*.78,.13,z+Math.sin(a)*rz*.78,.08,0xdfc985);star.scale.y=.1;}}
 function wall(w:World,x:number,z:number,length:number,vertical:boolean,color:number,doors:number[]){const start=(vertical?z:x)-length/2,end=start+length;const openings=doors.filter(d=>d>start+1.2&&d<end-1.2).sort((a,b)=>a-b);const parts:{a:number;b:number}[]=[];let p=start;for(const d of openings){if(d-1.6>p)parts.push({a:p,b:d-1.6});p=Math.max(p,d+1.6);}if(p<end)parts.push({a:p,b:end});const g=w.group;for(const {a,b}of parts){const px=vertical?x:(a+b)/2,pz=vertical?(a+b)/2:z;box(g,px,2.3,pz,vertical?.22:b-a,4.6,vertical?b-a:.22,color);box(g,px,.6,pz,vertical?.27:b-a,1.2,vertical?b-a:.27,0xe9e2cd);box(g,px,1.25,pz,vertical?.3:b-a,.07,vertical?b-a:.3,C.gold);box(g,px,4.45,pz,vertical?.38:b-a,.2,vertical?b-a:.38,C.white);solid(w,px,pz,vertical?.22:b-a,vertical?b-a:.22);}for(const d of openings){box(g,vertical?x:d,4.1,vertical?d:z,vertical?.25:3.2,1,vertical?3.2:.25,color);for(const sign of [-1,1])box(g,vertical?x:d+sign*1.6,1.85,vertical?d+sign*1.6:z,vertical?.33:.11,3.7,vertical?.11:.33,C.white);}}
 function furnish(w:World,d:Destination){const g=w.group,{x,z}=d,r=d.room!,{style}=r;const rx=r.w/2,rz=r.d/2;
+ if(style==='oval'){w.solids.push(...buildOvalOffice(g,x,z));return;}
  // Parquet strips and wall molding preserve readable rooms with an open camera ceiling.
  for(let i=0;i<Math.floor(r.w);i++)box(g,x-rx+.5+i,.047,z,.95,.016,r.d-.25,i%2?0xb69b70:0xbea377);
  const north=z-rz,south=z+rz;roomDetails(g,d);
- if(style==='oval'){
-   for(let i=0;i<40;i++){const a=(i+.5)/40*Math.PI*2;if(Math.abs(Math.cos(a))<.22)continue;const px=x+Math.cos(a)*(rx-.2),pz=z+Math.sin(a)*(rz-.2),segment=box(g,px,2.3,pz,1.4,4.6,.24,r.color);segment.rotation.y=-Math.atan2(-Math.cos(a)*(rz-.2),-Math.sin(a)*(rx-.2));solid(w,px,pz,.55,.55);const trim=box(g,px,.65,pz,1.4,1.3,.27,C.white);trim.rotation.y=segment.rotation.y;}
- }else{wall(w,x,north,r.w,false,r.color,r.doors?r.doors.north??[]:[x]);wall(w,x,south,r.w,false,r.color,r.doors?r.doors.south??[]:[x]);wall(w,x-rx,z,r.d,true,r.color,r.doors?r.doors.west??[]:[-10,0,10]);wall(w,x+rx,z,r.d,true,r.color,r.doors?r.doors.east??[]:[-10,0,10]);}
+ wall(w,x,north,r.w,false,r.color,r.doors?r.doors.north??[]:[x]);wall(w,x,south,r.w,false,r.color,r.doors?r.doors.south??[]:[x]);wall(w,x-rx,z,r.d,true,r.color,r.doors?r.doors.west??[]:[-10,0,10]);wall(w,x+rx,z,r.d,true,r.color,r.doors?r.doors.east??[]:[-10,0,10]);
  label(g,d.name,x,3.7,z>0?north+.22:south-.22,Math.min(4.2,r.w*.62));
  if(style==='kitchen'||style==='flowers'||style==='press'||style==='games')for(const side of [-1,1]){const wx=x+side*(rx-1.5),wz=z+(z>=0?rz:-rz)*.985;box(g,wx,2.6,wz,1.4,2.5,.13,0x8aabb4);box(g,wx,2.6,wz-(z>=0?.11:-.11),.065,2.5,.18,C.white);box(g,wx,2.6,wz-(z>=0?.11:-.11),1.4,.07,.18,C.white);for(const sx of [-.87,.87])box(g,wx+sx,2.7,wz,.34,3.05,.25,0xbca171);}
  if(style==='corridor')return;
  chandelier(g,x,z);
- if(style==='oval'){
-   rug(g,x,z,rx*.73,rz*.68,0x315d78,true);
-
-   desk(w,x,z+rz-3,4.8,1.8);chair(g,x,z+rz-1.8,0x5a3826);flag(g,x-rx+2,0,z+rz-2,.62);flag(g,x+rx-2,0,z+rz-2,.62,true);
-   sofa(g,x-3.1,z-1,Math.PI/2);sofa(g,x+3.1,z-1,-Math.PI/2);desk(w,x,z-1,1.9,.9);plant(g,x-rx+1.4,0,z-rz+2);plant(g,x+rx-1.4,0,z-rz+2);
- }else if(style==='office'){
+ if(style==='office'){
    rug(g,x,z,rx*.7,rz*.6,0x61736d);desk(w,x,z+rz-3,Math.min(r.w-3,3.8));chair(g,x,z+rz-1.6,0x4b3b2d);lamp(g,x-1.25,1.32,z+rz-2.7);chair(g,x-1,z+1,0x716958);chair(g,x+1,z+1,0x716958);plant(g,x-rx+1.2,0,z+rz-1.4);flag(g,x+rx-1.2,0,z+rz-1.2,.53);
  }else if(style==='meeting'||style==='dining'){
    const length=Math.min(r.d-5,style==='dining'?12:7);rug(g,x,z,rx*.77,rz*.78,0x778177);box(g,x,1.2,z,3.2,.2,length,C.wood);for(const sz of [-length/2+1,length/2-1])box(g,x,.6,z+sz,1.9,1.2,.4,C.wood);solid(w,x,z,3.2,length);for(let i=0;i<Math.floor(length/1.7);i++)for(const side of [-1,1]){const cz=z-length/2+.9+i*1.7;chair(g,x+side*2.25,cz,0x584837,side>0?Math.PI/2:-Math.PI/2);box(g,x+side*.85,1.34,cz,.55,.02,.5,C.white);cyl(g,x+side*1.15,1.42,cz-.3,.08,.2,0xc5d0c2,8);}flag(g,x-rx+1.3,0,z+rz-1.3,.55);
