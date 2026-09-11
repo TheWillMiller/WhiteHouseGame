@@ -1,117 +1,50 @@
 import * as T from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
-export const TRUMP_MODEL_FILE = 'models/trump-meshy-v1.glb';
-export function playerModelUrl(pathname: string) {
-  return (pathname === '/trumpgame' || pathname.startsWith('/trumpgame/') ? '/trumpgame/' : '/') + TRUMP_MODEL_FILE;
-}
+export const TRUMP_MODEL_FILE='models/trump-animated-v2.glb';
+export function playerModelUrl(pathname:string){return(pathname==='/trumpgame'||pathname.startsWith('/trumpgame/')?'/trumpgame/':'/')+TRUMP_MODEL_FILE;}
+export type Emote='dance'|'ymca'|'victory'|'backflip';
+export type Locomotion='walk'|'stroll'|'run'|'sprint';
+export type PlayerModel={object:T.Group;animate:(distance:number,dt:number,airborne:boolean,mode?:Locomotion)=>void;emote:(name:Emote|null)=>void;dispose:()=>void};
 
-export type PlayerModel = {
-  object: T.Group;
-  animate: (distance: number, dt: number, airborne: boolean) => void;
-  dispose: () => void;
-};
-
-// The supplied Meshy export is a single unrigged A-pose mesh. These joints and
-// soft weights are fitted to this specific model, not a generic auto-rigger.
-export function fitPlayerMesh(source: T.Mesh): PlayerModel {
-  const geo = source.geometry.clone();
-  source.updateWorldMatrix(true, false);
-  geo.applyMatrix4(source.matrixWorld);
-  geo.computeBoundingBox();
-  const bounds = geo.boundingBox!;
-  const height = bounds.max.y - bounds.min.y;
-  if (!Number.isFinite(height) || height <= 0) throw new Error('Invalid player model bounds');
-  const center = bounds.getCenter(new T.Vector3());
-  geo.translate(-center.x, -bounds.min.y, -center.z);
-  geo.scale(3 / height, 3 / height, 3 / height);
-  geo.rotateY(Math.PI); // Meshy faces +Z; the game faces -Z.
-  geo.computeBoundingBox();
-  geo.computeBoundingSphere();
-
-  const root = new T.Bone(); root.name = 'PlayerRoot';
-  const bones: T.Bone[] = [root];
-  const add = (name: string, position: number[], parent = root) => {
-    const bone = new T.Bone(); bone.name = name;
-    bone.position.set(position[0], position[1], position[2]);
-    parent.add(bone); bones.push(bone); return bone;
-  };
-  const hips: T.Bone[] = [], knees: T.Bone[] = [], shoulders: T.Bone[] = [], elbows: T.Bone[] = [];
-  const indices: {hip:number;knee:number;shoulder:number;elbow:number}[] = [];
-  for (const side of [-1, 1]) {
-    const hip = add(`Hip${side}`, [side * .235, 1.24, 0]); const hi = bones.length-1;
-    const knee = add(`Knee${side}`, [side * .055, -.59, 0], hip); const ki = bones.length-1;
-    const shoulder = add(`Shoulder${side}`, [side * .43, 2.40, 0]); const si = bones.length-1;
-    const elbow = add(`Elbow${side}`, [side * .18, -.53, 0], shoulder); const ei = bones.length-1;
-    hips.push(hip); knees.push(knee); shoulders.push(shoulder); elbows.push(elbow);
-    indices.push({hip:hi,knee:ki,shoulder:si,elbow:ei});
-  }
-  const position=geo.getAttribute('position');
-  const skinIndices=new Uint16Array(position.count*4), weights=new Float32Array(position.count*4);
-  const smooth = T.MathUtils.smoothstep;
-  for(let i=0;i<position.count;i++) {
-    const x=position.getX(i), y=position.getY(i), side=indices[x<0?0:1];
-    const armBoundary=.47+(2-y)*.17;
-    const arm=smooth(Math.abs(x),armBoundary-.035,armBoundary+.04)*(1-smooth(y,2.40,2.59));
-    const leg=(1-arm)*(1-smooth(y,1.11,1.29));
-    const o=i*4;
-    if(arm>.001) {
-      const lower=1-smooth(y,1.75,1.99);
-      skinIndices.set([0,side.shoulder,side.elbow,0],o);
-      weights.set([1-arm,arm*(1-lower),arm*lower,0],o);
-    } else if(leg>.001) {
-      const lower=1-smooth(y,.53,.78);
-      skinIndices.set([0,side.hip,side.knee,0],o);
-      weights.set([1-leg,leg*(1-lower),leg*lower,0],o);
-    } else { weights[o]=1; }
-  }
-  geo.setAttribute('skinIndex',new T.Uint16BufferAttribute(skinIndices,4));
-  geo.setAttribute('skinWeight',new T.Float32BufferAttribute(weights,4));
-  const original=Array.isArray(source.material)?source.material:[source.material];
-  const mats=original.map(m=>{
-    const copy=m.clone();
-    if(copy instanceof T.MeshStandardMaterial){copy.roughness=Math.max(copy.roughness,.7);copy.normalScale.setScalar(.6);}
-    return copy;
-  });
-  const skin=new T.SkinnedMesh(geo,Array.isArray(source.material)?mats:mats[0]);
-  skin.name='Meshy Donald Trump'; skin.castShadow=true;skin.receiveShadow=true;skin.frustumCulled=false;
-  skin.add(root);skin.bind(new T.Skeleton(bones));skin.normalizeSkinWeights();
-  const object=new T.Group();object.name='Meshy player';object.add(skin);
-  let phase=0,walk=0;
-  const animate=(distance:number,dt:number,airborne:boolean)=>{
+export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):PlayerModel{
+  const object=new T.Group();object.name='Animated Meshy Trump';object.add(scene);
+  const meshes:T.SkinnedMesh[]=[];
+  scene.traverse(o=>{if(o instanceof T.SkinnedMesh){meshes.push(o);o.castShadow=true;o.receiveShadow=true;o.frustumCulled=false;}});
+  if(!meshes.length)throw Error('Trump export has no skinned mesh');
+  // Keep the supplied skeleton and inverse bind matrices intact.
+  const bounds=new T.Box3();for(const mesh of meshes){mesh.geometry.computeBoundingBox();bounds.union(mesh.geometry.boundingBox!);}
+  const scale=3/(bounds.max.y-bounds.min.y);if(!Number.isFinite(scale)||scale<=0)throw Error('Invalid character bounds');
+  scene.scale.setScalar(scale);scene.position.y=-bounds.min.y*scale;object.rotation.y=Math.PI;
+  const mixer=new T.AnimationMixer(scene),actions=new Map<string,T.AnimationAction>();
+  const victory=clips.find(c=>c.name==='victory');if(!victory)throw Error('Missing standing pose');
+  // No idle clip was supplied: hold the relaxed opening pose of the victory clip.
+  const idle=new T.AnimationClip('idle',2,victory.tracks.map(track=>{
+    const t=track.clone(),n=t.getValueSize();t.times=new Float32Array([0,2]);t.values=new Float32Array([...track.values.slice(0,n),...track.values.slice(0,n)]);return t;
+  }));
+  for(const clip of [...clips,idle]){const a=mixer.clipAction(clip);if(clip.name==='victory'||clip.name==='backflip'){a.setLoop(T.LoopOnce,1);a.clampWhenFinished=true;}a.setEffectiveWeight(0).play();actions.set(clip.name,a);}
+  for(const key of ['walk','stroll','run','sprint','dance','ymca','victory','backflip'])if(!actions.has(key))throw Error('Missing animation '+key);
+  let current='idle',gesture:Emote|null=null,gestureTime=0;
+  actions.get('idle')!.setEffectiveWeight(1);mixer.update(0);
+  function select(name:string){if(current===name)return;const next=actions.get(name)!,weight=next.getEffectiveWeight();next.reset().play();next.setEffectiveWeight(weight);current=name;}
+  const emote=(name:Emote|null)=>{gesture=name;gestureTime=0;if(name){select(name);actions.get(name)!.reset().play();}};
+  const animate=(distance:number,dt:number,airborne:boolean,mode:Locomotion='walk')=>{
     const moving=distance>.0001;
-    walk=T.MathUtils.damp(walk,moving?1:0,12,dt);
-    phase+=distance*5.3;
-    const stride=airborne?0:walk*.37;
-    for(let i=0;i<2;i++){
-      const side=i===0?-1:1,swing=Math.sin(phase+i*Math.PI);
-      hips[i].rotation.x=swing*stride-(airborne?.18:0);
-      knees[i].rotation.x=Math.max(0,-swing)*stride*.9+(airborne?.25:0);
-      shoulders[i].rotation.set(-swing*stride*.7,0,-side*.22);
-      elbows[i].rotation.x=-.10-Math.max(0,swing)*stride*.3;
-    }
-    object.position.y=airborne?0:Math.abs(Math.sin(phase))*walk*.022;
+    if(moving||airborne)gesture=null;
+    if(gesture){gestureTime+=dt;const duration=actions.get(gesture)!.getClip().duration;if((gesture==='victory'||gesture==='backflip')&&gestureTime>=duration)gesture=null;}
+    // Normal jumping uses a bent-leg running pose while game physics owns height.
+    const desired=airborne?'run':gesture??(moving?mode:'idle');select(desired);
+    for(const [name,action] of actions){action.setEffectiveWeight(T.MathUtils.damp(action.getEffectiveWeight(),name===desired?1:0,14,dt));action.setEffectiveTimeScale(1);}
+    const selected=actions.get(desired)!;
+    if(airborne){selected.time=selected.getClip().duration*.20;selected.setEffectiveTimeScale(0);}
+    if(moving&&!airborne){const nominal={walk:3.2,stroll:1.6,run:6.5,sprint:9}[mode];selected.setEffectiveTimeScale(T.MathUtils.clamp(distance/Math.max(dt,.001)/nominal,.35,1.5));}
+    mixer.update(dt);
   };
-  return {object,animate,dispose(){skin.skeleton.dispose();geo.dispose();mats.forEach(m=>m.dispose());}};
+  return {object,animate,emote,dispose(){
+    mixer.stopAllAction();mixer.uncacheRoot(scene);
+    const geos=new Set<T.BufferGeometry>(),mats=new Set<T.Material>(),textures=new Set<T.Texture>(),skeletons=new Set<T.Skeleton>();
+    scene.traverse(o=>{if(o instanceof T.Mesh){geos.add(o.geometry);if(o instanceof T.SkinnedMesh)skeletons.add(o.skeleton);for(const m of Array.isArray(o.material)?o.material:[o.material]){mats.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});
+    geos.forEach(g=>g.dispose());mats.forEach(m=>m.dispose());skeletons.forEach(s=>s.dispose());textures.forEach(t=>{t.dispose();(t.image as {close?:()=>void}|undefined)?.close?.();});
+  }};
 }
-
-export async function loadPlayerModel(url: string): Promise<PlayerModel> {
-  const gltf=await new GLTFLoader().loadAsync(url);
-  let source:T.Mesh|undefined;
-  gltf.scene.updateMatrixWorld(true);
-  gltf.scene.traverse(o=>{if(o instanceof T.Mesh&&!source)source=o;});
-  if(!source)throw new Error('The character file contains no mesh');
-  const model=fitPlayerMesh(source);
-  // Geometry is copied for skinning, but textures remain shared with the import.
-  const textures=new Set<T.Texture>();
-  gltf.scene.traverse(o=>{
-    if(o instanceof T.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){
-      for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);
-      m.dispose();
-    }}
-  });
-  const dispose=model.dispose;
-  model.dispose=()=>{dispose();textures.forEach(t=>{t.dispose();const bitmap=t.image as {close?:()=>void}|undefined;bitmap?.close?.();});};
-  model.animate(0,0,false);
-  return model;
-}
+export async function loadPlayerModel(url:string){const gltf=await new GLTFLoader().loadAsync(url);return createAnimatedPlayer(gltf.scene,gltf.animations);}

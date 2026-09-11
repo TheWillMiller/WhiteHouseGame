@@ -1,43 +1,35 @@
 import assert from 'node:assert/strict';
-import { NodeIO } from '@gltf-transform/core';
+import {NodeIO} from '@gltf-transform/core';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as T from 'three';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import ts from 'typescript';
 mkdirSync('.qa',{recursive:true});
-
 writeFileSync('.qa/player-model.mjs',ts.transpileModule(readFileSync('lib/player-model.ts','utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText);
-const {fitPlayerMesh,playerModelUrl}=await import('../.qa/player-model.mjs');
-assert.equal(playerModelUrl('/trumpgame/'),'/trumpgame/models/trump-meshy-v1.glb');
-assert.equal(playerModelUrl('/'),'/models/trump-meshy-v1.glb');
-const doc=await new NodeIO().read('public/models/trump-meshy-v1.glb');
-const p=doc.getRoot().listMeshes()[0].listPrimitives()[0];
-const geometry=new T.BufferGeometry();
-geometry.setAttribute('position',new T.BufferAttribute(p.getAttribute('POSITION').getArray(),3));
-geometry.setAttribute('normal',new T.BufferAttribute(p.getAttribute('NORMAL').getArray(),3));
-geometry.setAttribute('uv',new T.BufferAttribute(p.getAttribute('TEXCOORD_0').getArray(),2));
-geometry.setIndex(new T.BufferAttribute(p.getIndices().getArray(),1));
-const source=new T.Mesh(geometry,new T.MeshStandardMaterial());
-const model=fitPlayerMesh(source),skin=model.object.children[0],pos=skin.geometry.getAttribute('position'),weights=skin.geometry.getAttribute('skinWeight');
-assert.equal(skin.geometry.index.count/3,60000);
-assert(Math.abs(skin.geometry.boundingBox.min.y)<.0001);
-assert(Math.abs(skin.geometry.boundingBox.max.y-3)<.0001);
-for(let i=0;i<weights.count;i++)assert(Math.abs(weights.getX(i)+weights.getY(i)+weights.getZ(i)+weights.getW(i)-1)<.0001);
-const original=new T.Vector3(),deformed=new T.Vector3();
-for(const [label,distance,airborne] of [['idle',0,false],['walking',.27,false],['jumping',0,true]]){
-  for(let i=0;i<20;i++)model.animate(distance/20,.016,airborne);
-  model.object.updateMatrixWorld(true);skin.skeleton.update();
-  const out=new Float32Array(pos.count*3);
-  for(let i=0;i<pos.count;i++){
-    original.fromBufferAttribute(pos,i);deformed.copy(original);skin.applyBoneTransform(i,deformed);
-    assert([deformed.x,deformed.y,deformed.z].every(Number.isFinite));
-    if(original.y>2.6)assert(original.distanceTo(deformed)<.0001,'face and hair must not deform');
-    assert(original.distanceTo(deformed)<.7,'limb displacement remains bounded');
-    deformed.toArray(out,i*3);
+const {createAnimatedPlayer,playerModelUrl}=await import('../.qa/player-model.mjs');
+assert.equal(playerModelUrl('/trumpgame/'),'/trumpgame/models/trump-animated-v2.glb');assert.equal(playerModelUrl('/'),'/models/trump-animated-v2.glb');
+const io=new NodeIO(),doc=await io.read('public/models/trump-animated-v2.glb');
+const texture=doc.getRoot().listMaterials()[0].getBaseColorTexture().getImage();writeFileSync('.qa/player-texture.jpg',texture);
+assert.equal(doc.getRoot().listSkins()[0].listJoints().length,28);assert.equal(doc.getRoot().listAnimations().length,8);
+for(const a of doc.getRoot().listAnimations())for(const c of a.listChannels())if(c.getTargetNode().getName()==='Hips'&&c.getTargetPath()==='translation'){const v=c.getSampler().getOutput().getArray();for(let i=0;i<v.length;i+=3){assert.equal(v[i],v[0]);assert.equal(v[i+2],v[2]);}}
+// Exercise the real GLTFLoader and AnimationMixer without a browser/image decoder.
+for(const t of doc.getRoot().listTextures())t.dispose();
+const bytes=await io.writeBinary(doc);const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+const model=createAnimatedPlayer(gltf.scene,gltf.animations);let skin;model.object.traverse(o=>{if(o instanceof T.SkinnedMesh)skin=o;});
+assert(skin);const weights=skin.geometry.getAttribute('skinWeight');for(let i=0;i<weights.count;i++)assert(Math.abs(weights.getX(i)+weights.getY(i)+weights.getZ(i)+weights.getW(i)-1)<.002);
+let frames=0;const vertex=new T.Vector3();
+for(const [label,mode,distance,airborne,gesture] of [['idle','walk',0,false,null],['walking','walk',3.2/60,false,null],['running','run',6.5/60,false,null],['sprint','sprint',9/60,false,null],['stroll','stroll',1.6/60,false,null],['dance','walk',0,false,'dance'],['ymca','walk',0,false,'ymca'],['victory','walk',0,false,'victory'],['backflip','walk',0,false,'backflip'],['jumping','walk',0,true,null]]){
+  model.emote(gesture);const limits=new T.Box3();
+  for(let frame=0;frame<180;frame++){
+    model.animate(distance,1/60,airborne,mode);model.object.updateMatrixWorld(true);skin.skeleton.update();
+    const positions=new Float32Array(skin.geometry.getAttribute('position').count*3);
+    for(let i=0;i<positions.length/3;i++){skin.getVertexPosition(i,vertex).applyMatrix4(skin.matrixWorld);assert([vertex.x,vertex.y,vertex.z].every(Number.isFinite));assert(vertex.length()<8,'Animation exploded');limits.expandByPoint(vertex);vertex.toArray(positions,i*3);}
+    if(frame===35)writeFileSync('.qa/player-'+label+'.bin',Buffer.from(positions.buffer));frames++;
   }
-  writeFileSync('.qa/player-'+label+'.bin',Buffer.from(out.buffer));
+  console.log(label,limits.min.toArray().map(v=>v.toFixed(2)),limits.max.toArray().map(v=>v.toFixed(2)));
 }
-writeFileSync('.qa/player-uv.bin',Buffer.from(skin.geometry.getAttribute('uv').array.buffer));
-writeFileSync('.qa/player-indices.bin',Buffer.from(Uint32Array.from(skin.geometry.index.array).buffer));
-writeFileSync('.qa/player-texture.jpg',doc.getRoot().listMaterials()[0].getBaseColorTexture().getImage());
-model.dispose();source.geometry.dispose();source.material.dispose();
-console.log('PASS: optimized GLB, root/subpath URLs, scale, normalized rig weights, finite idle/walk/jump poses, stable face and bounded deformation.');
+// Walking must cancel an emote and converge to the same pose as fresh locomotion.
+model.emote('dance');model.animate(0,.5,false);model.animate(.05,.016,false,'walk');assert.equal(model.object.position.length(),0);
+const uv=skin.geometry.getAttribute('uv'),uvs=new Float32Array(uv.count*2);for(let i=0;i<uv.count;i++){uvs[i*2]=uv.getX(i);uvs[i*2+1]=uv.getY(i);}
+writeFileSync('.qa/player-uv.bin',Buffer.from(uvs.buffer));writeFileSync('.qa/player-indices.bin',Buffer.from(Uint32Array.from(skin.geometry.index.array).buffer));
+model.dispose();console.log('PASS: all 8 clips, 28-joint skin, in-place root tracks, actual loader/mixer, '+frames+' finite posed frames and deployment URLs.');

@@ -1,0 +1,75 @@
+{
+  "sources": [
+    {
+      "name": "walk",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_Walking_withSkin.glb",
+      "sha256": "3a4b9290fa004a49d9493c9e8c9ecd7d94dc605e6caaf743d864d13bc8680bc5",
+      "bytes": 21068464,
+      "duration": 1.0333333015441895
+    },
+    {
+      "name": "run",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_Running_withSkin.glb",
+      "sha256": "84334d9b933e36c71a9f397198eb4583726b877742d0f5bfd0ce9a61a8593e20",
+      "bytes": 21059608,
+      "duration": 0.699999988079071
+    },
+    {
+      "name": "sprint",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_run_fast_10_withSkin.glb",
+      "sha256": "e76604cc6bac7515bf5028bb233d2feeedf8aaa4212639596726eea0568e512e",
+      "bytes": 21064064,
+      "duration": 0.8666666746139526
+    },
+    {
+      "name": "stroll",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_Walk_Slowly_and_Look_Around_withSkin.glb",
+      "sha256": "53aebb76199ab399174daeedc0860454d311840c3b66eb6648e8297ba3bb1714",
+      "bytes": 21674232,
+      "duration": 23.866666793823242
+    },
+    {
+      "name": "dance",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_01a09082-b846-716b-9b5f-0cd526c85349_withSkin.glb",
+      "sha256": "993ceae41f0fbde84f63031ad7e9b4004816c468d4c8426d78538914e8f990e8",
+      "bytes": 21201256,
+      "duration": 6.0333333015441895
+    },
+    {
+      "name": "ymca",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_ymca_dance_withSkin.glb",
+      "sha256": "4e5b02a30ca4149035bc581946fe6a47648a2267a0e4fddeb41c8581820d04c8",
+      "bytes": 21162300,
+      "duration": 4.566666603088379
+    },
+    {
+      "name": "victory",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_Victory_Fist_Pump_withSkin.glb",
+      "sha256": "08ce9e69b32b8806e77ec75d4e7f83eac6081b9435ef26bbae415c27206e6c4b",
+      "bytes": 21083540,
+      "duration": 1.600000023841858
+    },
+    {
+      "name": "backflip",
+      "file": "Meshy_AI_Low_Poly_Trump_biped_Animation_Backflip_Jump_withSkin.glb",
+      "sha256": "0263ea31136c3c06c17df1c9fc99e7803f3129dc149b2a8d401526430fb99a70",
+      "bytes": 21151720,
+      "duration": 4.166666507720947
+    }
+  ],
+  "output": "public/models/trump-animated-v2.glb",
+  "bytes": 2795464,
+  "joints": 28,
+  "triangles": 3128,
+  "textures": [
+    [
+      2048,
+      2048
+    ],
+    [
+      2048,
+      2048
+    ]
+  ],
+  "horizontalRootMotion": "Removed; vertical animation preserved"
+}

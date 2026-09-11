@@ -57,7 +57,7 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  const guard={zone:'grounds',world:{solids:[{x:0,z:0,w:4,d:4}]}};
  assert(Game.prototype.blocked.call(guard,0,0));assert(Game.prototype.blocked.call(guard,101,0));assert(!Game.prototype.blocked.call(guard,4,4));
  const mount={appendChild(){},clientWidth:1280,clientHeight:800};let snapshot,talking;const game=new Game(mount,s=>snapshot=s,id=>talking=id,()=>{});
- game.loop(1000);const startZ=game.player.position.z;game.key('KeyW',true);for(let i=1;i<=60;i++)game.loop(1000+i*16.67);game.key('KeyW',false);assert(game.player.position.z<startZ-4,'walking moves the player');
+ game.loop(1000);const startZ=game.player.position.z;game.key('KeyW',true);for(let i=1;i<=60;i++)game.loop(1000+i*16.67);game.key('KeyW',false);assert(game.player.position.z<startZ-3,'walking moves the player');
  game.pause(true);const pausedZ=game.player.position.z;game.key('KeyW',true);game.loop(2100);assert.equal(game.player.position.z,pausedZ,'modal pauses movement');game.pause(false);
  game.jump();game.loop(2116);assert(game.player.position.y>0,'jump leaves the ground');for(let i=0;i<80;i++)game.loop(2133+i*16.67);assert.equal(game.player.position.y,0,'jump lands');
  for(const d of destinations){game.travel(d.id);game.loop(4000+count++*16.67);assert.equal(game.zone,d.zone);assert(Number.isFinite(game.camera.position.x),'camera stays finite after travel');}

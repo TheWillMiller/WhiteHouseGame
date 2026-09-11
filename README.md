@@ -16,9 +16,13 @@ WASD / arrows move; Shift runs; Space jumps; drag looks around; Q / R turn; E in
 
 ## Meshy player asset
 
-Trump uses the user-supplied Meshy model in `public/models/trump-meshy-v1.glb`. The original 100.5 MB export was reduced from about 3.05 million to 60,000 triangles, with 2048 px textures retained, producing a 2.7 MB download. Source metadata is recorded in `assets/models/trump-source.json`; the large original is not stored in Git. Reproduce the optimization with `node scripts/prepare-trump.mjs <original.glb>`.
+Trump now uses the supplied Meshy skeleton and eight animation clips in `public/models/trump-animated-v2.glb`. The repeated 21 MB exports are combined into one 2.8 MB model with 2048 px textures, retaining the supplied 3,128-triangle mesh and 28-joint skeleton. Original files are preserved outside Git. Source hashes and clip names are in `assets/models/trump-animations.json`. Reproduce with `node scripts/prepare-trump-animations.mjs <export-directory>`.
 
-The export has no skeleton or animation clips. `lib/player-model.ts` fits a basic runtime skeleton for walking and jumping while preserving the supplied face and clothing. NPCs retain their existing models. `node tests/player-model.test.mjs` checks model size, normalized skin weights, deployment paths, and finite poses without head distortion.
+The old fitted procedural player skeleton has been removed. Walking, running, strolling and sprinting use the supplied animations with blended transitions. There was no idle clip in the package, so standing holds the opening pose of the victory clip. Space uses a bent-leg pose with the existing jump physics. B plays the complete backflip as an in-place gesture. Horizontal root motion is removed so animation cannot bypass navigation collisions. The provided unnamed custom clip is labeled Rally dance; YMCA is separate.
+
+Controls: WASD moves; Shift runs; C strolls; Shift + C sprints. G plays the rally dance, Y the YMCA dance, V the victory fist pump, B the backflip. Move or press Escape to cancel. The Moves menu also provides gesture controls on touchscreens. Victory and backflip return to standing; dances loop. NPCs and architecture are unchanged by this animation update.
+
+`node tests/player-model.test.mjs` checks the actual GLTF loader and animation mixer, all eight clip targets, skeleton weights, root motion and finite posed vertices. Offline model renders support pose inspection; browser playback has not been tested.
 
 ## Custom-domain deployment
 
