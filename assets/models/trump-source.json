@@ -1,0 +1,25 @@
+{
+  "sourceName": "Meshy_AI_Low_Poly_Trump_0911113022_texture.glb",
+  "sourceSha256": "b6b90598232bf5de1c97b5d0b0ac4c449c8fbc02ce8f6e14098820128fa31104",
+  "sourceBytes": 100515996,
+  "inputTriangles": 3052506,
+  "output": "public/models/trump-meshy-v1.glb",
+  "outputBytes": 2697708,
+  "outputTriangles": 60000,
+  "textureSizes": [
+    [
+      2048,
+      2048
+    ],
+    [
+      2048,
+      2048
+    ],
+    [
+      2048,
+      2048
+    ]
+  ],
+  "rigged": false,
+  "animations": 0
+}

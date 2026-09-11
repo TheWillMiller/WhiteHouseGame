@@ -14,6 +14,12 @@ Use Node 22.13 or newer. Run `npm install`, then `npm run dev`. `npm run build` 
 
 WASD / arrows move; Shift runs; Space jumps; drag looks around; Q / R turn; E interacts; M opens the map. Touch controls are available on phones and tablets. Use the map to travel directly to any modeled destination. Progress counters are per session.
 
+## Meshy player asset
+
+Trump uses the user-supplied Meshy model in `public/models/trump-meshy-v1.glb`. The original 100.5 MB export was reduced from about 3.05 million to 60,000 triangles, with 2048 px textures retained, producing a 2.7 MB download. Source metadata is recorded in `assets/models/trump-source.json`; the large original is not stored in Git. Reproduce the optimization with `node scripts/prepare-trump.mjs <original.glb>`.
+
+The export has no skeleton or animation clips. `lib/player-model.ts` fits a basic runtime skeleton for walking and jumping while preserving the supplied face and clothing. NPCs retain their existing models. `node tests/player-model.test.mjs` checks model size, normalized skin weights, deployment paths, and finite poses without head distortion.
+
 ## Custom-domain deployment
 
 `npm run build:domain` exports the game for `/trumpgame` and stages its static assets in an ignored `.qa` folder. It generates `wrangler.trumpgame.jsonc`. With Cloudflare authentication configured, run `npm run deploy:domain` to rebuild and deploy the `white-house-game` static-assets Worker. The four routes cover `/trumpgame` and `/trumpgame/*` on both the apex and `www` hostnames. No server runtime, database, or paid API is required. Normal `npm run build` still produces the root-path export for Sites.

@@ -11,8 +11,8 @@ const assets = mkdtempSync(resolve('.qa/domain-assets-'));
 if (!existsSync('dist/client/index.html')) throw new Error('Static game HTML was not generated.');
 cpSync('dist/client/trumpgame', resolve(assets, 'trumpgame'), { recursive: true });
 for (const entry of readdirSync('dist/client', { withFileTypes: true })) {
-  if (entry.isFile() && entry.name !== 'vinext-client-entry-manifest.json') {
-    cpSync(resolve('dist/client', entry.name), resolve(assets, 'trumpgame', entry.name));
+  if (entry.name !== 'trumpgame' && entry.name !== 'vinext-client-entry-manifest.json' && !entry.name.startsWith('.')) {
+    cpSync(resolve('dist/client', entry.name), resolve(assets, 'trumpgame', entry.name), { recursive: true });
   }
 }
 writeFileSync('wrangler.trumpgame.jsonc', JSON.stringify({
