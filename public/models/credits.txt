@@ -1,0 +1,15 @@
+WHITE HOUSE RESIDENCE
+
+This work is based on "The White House"
+https://sketchfab.com/3d-models/the-white-house-dbdb320ba4c6427ca4f2b2c2438034f9
+by Void (https://sketchfab.com/Void.com), licensed under CC BY 4.0:
+https://creativecommons.org/licenses/by/4.0/
+
+Changes: main residence extracted from the complex; presentation tilt removed;
+model scaled and oriented for the game; geometry simplified and compressed;
+textures optimized; ground-level collision and entrance markers added separately.
+The original model includes both wings. Those portions are not in the current
+game asset. The game uses its own interiors and construction scene.
+
+TRUMP CHARACTER
+User-provided Meshy model and animations, adapted for gameplay.
