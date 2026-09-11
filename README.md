@@ -4,7 +4,7 @@ Play: https://thewillmiller.com/trumpgame/
 
 Source: https://github.com/TheWillMiller/WhiteHouseGame
 
-An unofficial browser game inspired by the supplied low-poly reference images. Play as Donald Trump, freely explore the modeled grounds, visit 32 furnished interior destinations on five floor maps, and talk to 14 NPCs. The grounds include the north and south lawns, gardens, pool, putting green, colonnades, and an illustrative East Wing ballroom construction site.
+An unofficial browser game inspired by the supplied low-poly reference images. Play as Donald Trump, freely explore the modeled grounds, visit the furnished interior destinations on five floor maps, and talk to 14 NPCs. The grounds include the north and south lawns, gardens, pool, putting green, colonnades, and an illustrative East Wing ballroom construction site.
 
 The graphics pass adds beveled character models, sculpted facial features, layered hair, suit details, physically lit procedural materials, cloth flags, atmospheric sky, and closer character framing. Furnishings include carved desk panels, dimensional carpet emblems, pleated curtains, lamps, fireplace details, and raised wall molding. Facade trim, shutters, tree branches, flowers, lanterns, and construction equipment receive additional detail. Material tiles are generated locally; no image service or paid asset download is needed at runtime.
 
@@ -16,13 +16,17 @@ WASD / arrows move; Shift runs; Space jumps; drag looks around; Q / R turn; E in
 
 ## Meshy player asset
 
-Trump now uses the supplied Meshy skeleton and eight animation clips in `public/models/trump-animated-v2.glb`. The repeated 21 MB exports are combined into one 2.8 MB model with 2048 px textures, retaining the supplied 3,128-triangle mesh and 28-joint skeleton. Original files are preserved outside Git. Source hashes and clip names are in `assets/models/trump-animations.json`. Reproduce with `node scripts/prepare-trump-animations.mjs <export-directory>`.
+The player uses `public/models/trump-detailed-v3.glb`: the original 60,000-triangle textured mesh with skin weights transferred from the supplied 28-joint Meshy rig. This restores facial detail lost in the much coarser animated export. The material is nonmetallic with restrained normal mapping; scene lighting includes softer fill.
 
-The old fitted procedural player skeleton has been removed. Walking, running, strolling and sprinting use the supplied animations with blended transitions. There was no idle clip in the package, so standing holds the opening pose of the victory clip. Space uses a bent-leg pose with the existing jump physics. B plays the complete backflip as an in-place gesture. Horizontal root motion is removed so animation cannot bypass navigation collisions. The provided unnamed custom clip is labeled Rally dance; YMCA is separate.
+Idle averages opposing walking poses into a centered standing stance with slight breathing. Strolling uses the continuous walk cycle at half speed, replacing the long look-around clip whose pauses caused sliding. Normal walking, running, sprinting and gestures retain the supplied skeleton animations. G plays the custom dance, Y YMCA, V victory and B backflip. Hold C to stroll, Shift to run or Shift + C to sprint. Moving cancels gestures.
 
-Controls: WASD moves; Shift runs; C strolls; Shift + C sprints. G plays the rally dance, Y the YMCA dance, V the victory fist pump, B the backflip. Move or press Escape to cancel. The Moves menu also provides gesture controls on touchscreens. Victory and backflip return to standing; dances loop. NPCs and architecture are unchanged by this animation update.
+`scripts/restore-player-detail.mjs` transfers skin weights from the animated model to the original optimized mesh, checks alignment, and writes the detailed version. `assets/models/detail-transfer.json` records the result. Original uploads remain untouched. `tests/player-model.test.mjs` checks real loader/mixer poses, skin weights and continuous foot motion during C movement.
 
-`node tests/player-model.test.mjs` checks the actual GLTF loader and animation mixer, all eight clip targets, skeleton weights, root motion and finite posed vertices. Offline model renders support pose inspection; browser playback has not been tested.
+## Architecture revision
+
+The residence now has an open South Portico around a smaller curved wall, six fluted columns, a Truman Balcony, curved balustrades, a recessed attic and chimneys. The North Portico uses a triangular pediment. Limestone, lawn and tree treatment are revised to reduce the faceted, tiled prototype look.
+
+The State Floor separates Entrance Hall and Cross Hall, with room-specific proportions and connecting doors based on the supplied Archisyllogy drawing. The West Wing repositions the major public rooms and briefing-room annex, adds the lobby and Upper Press Hallway, and reconnects the colonnade approach using the archived White House tour plan. There are 44 destinations. These are substantial corrections to the prototype, but not a complete measured reconstruction of all offices or floors; upper-floor layouts remain simplified. Architecture and collision checks verify all destinations and NPC approaches remain reachable.
 
 ## Custom-domain deployment
 

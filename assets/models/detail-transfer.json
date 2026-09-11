@@ -1,0 +1,6 @@
+{
+  "source": "Original 60,000-triangle Meshy model with supplied 28-joint skin weights transferred from animated export",
+  "vertices": 43498,
+  "maxSurfaceDistance": 0.09169470080763277,
+  "output": "public/models/trump-detailed-v3.glb"
+}

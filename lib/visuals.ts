@@ -8,7 +8,7 @@ const textures = new Map<Surface,T.DataTexture>();
 export const materials = new Map<number,T.MeshStandardMaterial>();
 const wood = new Set([0x69412d,0x815434,0x6b452b,0x845d3c,0x94754e,0x6c6550,0x8b7653,0xb69b70,0xbea377,0x5a3826]);
 const stone = new Set([0xf5f0df,0xe0dccb,0xe8e5d7,0xcac8b0,0xe9e2cd,0xe7e0c8,0xcec8b3,0xcfbf98,0xc9c6b6,0xb3b6a3]);
-const grass = new Set([0x718e43,0x6c8745,0x748f46,0x779148,0x698644,0x5f883c]);
+const grass = new Set([0x718e43,0x6c8745,0x748f46,0x779148,0x698644,0x5f883c,0x547249]);
 const cloth = new Set([0x192840,0x315d78,0x345b73,0x41627a,0xe0cf9e,0xc9a146,0xcbb058,0x193957]);
 function tile(kind:Surface){
   if(textures.has(kind))return textures.get(kind)!;
@@ -17,20 +17,20 @@ function tile(kind:Surface){
     seed=(Math.imul(seed,1664525)+1013904223)>>>0;const noise=(seed/4294967296-.5);
     let value=240;
     if(kind==='wood')value=221+Math.sin(x*.46+Math.sin(y*.075)*1.5)*14+Math.sin(x*1.8+y*.06)*5+noise*16;
-    if(kind==='stone')value=244+noise*13-(y%32===0?22:0)-((x+(Math.floor(y/32)%2)*32)%64===0?15:0);
+    if(kind==='stone')value=246+noise*6;
     if(kind==='cloth')value=238+((x+y)%2?8:-8)+noise*7;
-    if(kind==='grass')value=220+noise*36+Math.sin(x*1.6+y*.7)*9;
+    if(kind==='grass')value=239+noise*18;
     const i=(y*n+x)*4;data[i]=data[i+1]=data[i+2]=Math.max(0,Math.min(255,value));data[i+3]=255;
   }
   const tx=new T.DataTexture(data,n,n);tx.colorSpace=T.SRGBColorSpace;tx.wrapS=tx.wrapT=T.RepeatWrapping;
   tx.magFilter=T.LinearFilter;tx.minFilter=T.LinearMipmapLinearFilter;tx.generateMipmaps=true;tx.needsUpdate=true;
-  if(kind==='grass')tx.repeat.set(18,18);if(kind==='cloth')tx.repeat.set(3,3);textures.set(kind,tx);return tx;
+  if(kind==='grass')tx.repeat.set(140,140);if(kind==='cloth')tx.repeat.set(3,3);textures.set(kind,tx);return tx;
 }
 export function material(color:number){
   if(!materials.has(color)){
     const kind:Surface=wood.has(color)?'wood':stone.has(color)?'stone':grass.has(color)?'grass':cloth.has(color)?'cloth':'plain';
     const gold=[0xd9b458,0xd6ba70,0xc79b42].includes(color),water=[0x71b2bb,0x54aeb7,0x9ccbd2,0xb5d8d5].includes(color);
-    materials.set(color,new T.MeshStandardMaterial({color,roughness:gold?.33:water?.24:kind==='wood'?.57:.86,metalness:gold?.68:water?.2:0,map:kind==='plain'?null:tile(kind),flatShading:!water}));
+    materials.set(color,new T.MeshStandardMaterial({color,roughness:gold?.33:water?.24:kind==='wood'?.57:.86,metalness:gold?.68:water?.2:0,map:kind==='plain'?null:tile(kind),flatShading:false}));
   }
   return materials.get(color)!;
 }
@@ -201,14 +201,6 @@ function fireplace(g:T.Group){
   for(const side of [-1,1]){cylinder(g,side*.95,1.93,-.1,.05,.51,0xd9b458);cylinder(g,side*.95,2.23,-.1,.06,.24,0xf6e8bf);}
 }
 export function groundsDetails(g:T.Group){
-  // Raised facade surrounds, shutters, quoins and roof dentils.
-  for(let i=-5;i<=5;i++)for(let row=0;row<3;row++)for(const face of [-1,1]){
-    const x=i*4.2,y=2.4+row*4.7,z=-23+face*15.22;
-    for(const s of [-1,1]){block(g,x+s*1.04,y,z,.14,2.91,.19,0xe0dccb);if(row>0){block(g,x+s*1.48,y,z,.60,2.76,.11,0x2e4548);for(let l=0;l<8;l++)block(g,x+s*1.48,y-1.18+l*.32,z+face*.09,.52,.035,.08,0x435954);}}
-    block(g,x,y+1.49,z,2.35,.14,.32,0xf5f0df);block(g,x,y-1.50,z,2.35,.17,.4,0xf5f0df);
-  }
-  for(const side of [-1,1])for(let y=.7;y<15;y+=.8)for(const z of [-37.7,-8.3])block(g,side*24.86,y,z,.50,.64,1.03,0xe0dccb);
-  for(let x=-25;x<=25;x++)for(const z of [-38.45,-7.55])block(g,x,15.11,z,.34,.31,.44,0xf5f0df);
   // Iron garden lanterns, path edging and planted urns.
   for(const x of [-7.1,7.1])for(const z of [7,25,77,105]){
     cylinder(g,x,.10,z,.3,.2,0x243b36);cylinder(g,x,1.62,z,.075,3,0x263a35);block(g,x,3.26,z,.39,.61,.39,0xf0db9a,.03);

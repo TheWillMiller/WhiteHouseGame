@@ -27,4 +27,4 @@ These are architectural references, not verified current measured blueprints. Re
 4. Rebuild the exterior massing and landscape against those dimensions, then add material and furnishing detail.
 5. Integrate the user's forthcoming skeleton and animation clips. Keep the current basic runtime rig only until the supplied replacement is available.
 
-Status: references reviewed and corrections recorded. No architecture changes or new game deployment were made in this reference intake.
+Status: implemented the first architecture revision: rebuilt residence facade and porticoes, softened landscape materials and tree geometry, separated Entrance Hall / Cross Hall, and replaced the six-room West Wing grid with a public-room plan including the lobby, press hallway and briefing-room annex. Remaining floors and private offices are still simplified; this is not an exact measured reconstruction.

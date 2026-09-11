@@ -7,9 +7,9 @@ const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.qa');
 fs.mkdirSync(output, { recursive: true });
-for (const file of ['world-data', 'visuals', 'player-model', 'game', 'webmcp']) {
+for (const file of ['world-data', 'visuals', 'architecture', 'player-model', 'game', 'webmcp']) {
  const source = fs.readFileSync(path.join(root, 'lib', file + '.ts'), 'utf8').replace("new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})", 'globalThis.__testRenderer()');
- const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(world-data|visuals|player-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
+ const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(world-data|visuals|architecture|player-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
  fs.writeFileSync(path.join(output, file + '.mjs'), built);
 }
 const ctx = new Proxy({}, { get: () => () => {}, set: () => true });
@@ -27,8 +27,8 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  for (const { id: zone } of floors) {
  const world = zone === 'grounds' ? grounds() : interior(zone);
  assert(world.group.children.some(o=>o.isMesh),'world has rendered geometry');
-  const minX = zone === 'grounds' ? -98 : -28.5, maxX = -minX;
-  const minZ = zone === 'grounds' ? -95 : -18.5, maxZ = zone === 'grounds' ? 126 : 18.5;
+  const minX = zone === 'grounds' ? -98 : -28.5, maxX = zone === 'west' ? 41 : -minX;
+  const minZ = zone === 'grounds' ? -95 : zone === 'west' ? -24 : -18.5, maxZ = zone === 'grounds' ? 126 : zone === 'west' ? 21 : 18.5;
   const step = .5, width = Math.round((maxX-minX)/step)+1, height = Math.round((maxZ-minZ)/step)+1;
   const blocked = new Uint8Array(width*height), reached = new Uint8Array(width*height);
   const index = (x,z) => Math.round((z-minZ)/step)*width+Math.round((x-minX)/step);
@@ -40,7 +40,7 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
   const start=index(0,zone==='grounds'?38:0), queue=[start];assert(!blocked[start],zone+' starting point is clear');reached[start]=1;
   for(let n=0;n<queue.length;n++){const cell=queue[n],x=cell%width,z=Math.floor(cell/width);for(const [dx,dz] of [[0,1],[0,-1],[1,0],[-1,0]]){const nx=x+dx,nz=z+dz,next=nz*width+nx;if(nx>=0&&nx<width&&nz>=0&&nz<height&&!blocked[next]&&!reached[next]){reached[next]=1;queue.push(next);}}}
   for(const d of destinations.filter(d=>d.zone===zone)){
-   const x=d.x,z=d.room?(d.z>2?d.z-d.room.d/2+1.6:d.z<-2?d.z+d.room.d/2-1.6:d.z):d.z;
+   const x=d.spawn?.[0]??d.x,z=d.spawn?.[1]??(d.room?(d.z>2?d.z-d.room.d/2+1.6:d.z<-2?d.z+d.room.d/2-1.6:d.z):d.z);
    assert(!blockedAt(x,z),`${zone}: travel spawn for ${d.id} intersects a solid`);
    assert(reached[index(x,z)],`${zone}: ${d.id} cannot be reached on foot from the corridor`);count++;
   }

@@ -8,3 +8,5 @@
 .floor-buttons[data-slot=tabs-list]{height:auto!important;padding:0;background:transparent;justify-content:flex-start}.floor-buttons [data-slot=tabs-trigger]{flex:none;height:auto}.floor-buttons [data-active]{background:#e5c37b;color:#173134;border-color:#e5c37b}
 
 @media(max-width:440px){.brand>svg{display:none}.brand{gap:0}.topbar{gap:8px}.topbar button{padding:0 6px}}
+
+.game-shell:has(.welcome) .bottom-left{display:none}
