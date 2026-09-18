@@ -50,3 +50,15 @@ This is a public-plan adaptation, not a current measured blueprint. Major room r
 `node tests/world.test.cjs` assembles every zone, validates finite mesh geometry, checks collision-free travel positions, flood-fills the walkable world to confirm every destination is connected, checks every NPC and entrance can be approached, and validates dialogue branches. `npx tsc --noEmit` checks TypeScript. The production build is checked before deployment.
 
 No browser interaction or screenshot QA was requested. Optional WebMCP read/travel tools are feature-detected; a supported native WebMCP verification context was unavailable, so native registration has not been verified. The regular game controls do not depend on WebMCP.
+
+## September performance and scenery pass
+
+Camera obstruction now uses nearby collision footprints instead of raycasting the detailed render meshes five times every frame. In the same offline Node test positions, the previous camera median was 234 ms; the revised median was 0.03 ms (95th percentile 1.15 ms). These are CPU timings, not browser or mobile frame-rate measurements. `node scripts/benchmark-camera.mjs` reruns the current benchmark after `node tests/world.test.cjs`.
+
+Rendering starts at at most 1x device scale on touch screens and 1.5x elsewhere, then adjusts with sustained frame times. Shadow maps use 1024 pixels and refresh at 15 Hz. Hidden tabs skip simulation/rendering. Trees have independently culled instance clusters and distant leaf detail is omitted. HUD position updates are limited to five per second and gameplay panels no longer blur the scene beneath them.
+
+The residence v2 retains the same 89,708 triangles while its color, normal, and surface maps use 2048/1024/512 pixels. Download size falls from 8,954,500 to 3,404,384 bytes; estimated uncompressed texture storage with mipmaps falls from about 128 MiB to 28 MiB. West Wing window reveals, masonry bands, roof balusters and garden entry columns, stone garden borders and urns, subtler grass, rounded upholstery and revised staff proportions carry the residence detail through the rest of the scene. The wings and staff remain authored approximations.
+
+`node tests/render-budget.test.mjs` checks camera proxy clearance and adaptive resolution. Asset decoding, navigation, player animation and Oval Office geometry checks remain available in `tests/`.
+
+Near foliage uses the original generated alpha texture in `public/textures/elm-foliage-v1.webp` (112,238 bytes); full-resolution source and generation prompt are retained under `assets/textures/`. One shared texture serves every tree.

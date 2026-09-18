@@ -24,13 +24,13 @@ for(const mesh of root.listMeshes())for(const p of mesh.listPrimitives()){
 await doc.transform(join(),weld(),simplify({simplifier:MeshoptSimplifier,ratio:.65,error:.00006}),prune());
 for(const tex of root.listTextures()){
  const base=tex.getURI().includes('baseColor'),normal=tex.getURI().includes('normal');
- const image=sharp(tex.getImage()).resize(base?4096:2048,base?4096:2048,{fit:'inside',withoutEnlargement:true});
- const bytes=base?await image.jpeg({quality:90}).toBuffer():await image.png().toBuffer();
+ const image=sharp(tex.getImage()).resize(base?2048:normal?1024:512,base?2048:normal?1024:512,{fit:'inside',withoutEnlargement:true});
+ const bytes=base?await image.jpeg({quality:88}).toBuffer():await image.png().toBuffer();
  tex.setImage(bytes).setMimeType(base?'image/jpeg':'image/png').setURI(base?'residence-color.jpg':normal?'residence-normal.png':'residence-surface.png');
 }
 let triangles=0;for(const m of root.listMeshes())for(const p of m.listPrimitives())triangles+=p.getIndices().getCount()/3;
 scene.setName('White House residence • Void • CC BY 4.0');
 scene.setExtras({source:'https://sketchfab.com/3d-models/the-white-house-dbdb320ba4c6427ca4f2b2c2438034f9',author:'Void',license:'CC-BY-4.0',adaptation:'Residence extracted, upright, scaled and oriented for the game, mesh simplified, textures optimized.'});
 await doc.transform(meshopt({encoder:MeshoptEncoder,level:'high'}),prune());
-await mkdir('public/models',{recursive:true});await io.write('public/models/white-house-residence-v1.glb',doc);
+await mkdir('public/models',{recursive:true});await io.write('public/models/white-house-residence-v2.glb',doc);
 await writeFile('.qa/residence-build.json',JSON.stringify({triangles},null,2));console.log({triangles});

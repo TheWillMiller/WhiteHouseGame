@@ -19,12 +19,12 @@ function tile(kind:Surface){
     if(kind==='wood')value=221+Math.sin(x*.46+Math.sin(y*.075)*1.5)*14+Math.sin(x*1.8+y*.06)*5+noise*16;
     if(kind==='stone')value=246+noise*6;
     if(kind==='cloth')value=238+((x+y)%2?8:-8)+noise*7;
-    if(kind==='grass')value=239+noise*18;
+    if(kind==='grass')value=239+noise*6+Math.sin(x*Math.PI/64)*2+Math.cos(y*Math.PI/64)*2;
     const i=(y*n+x)*4;data[i]=data[i+1]=data[i+2]=Math.max(0,Math.min(255,value));data[i+3]=255;
   }
   const tx=new T.DataTexture(data,n,n);tx.colorSpace=T.SRGBColorSpace;tx.wrapS=tx.wrapT=T.RepeatWrapping;
   tx.magFilter=T.LinearFilter;tx.minFilter=T.LinearMipmapLinearFilter;tx.generateMipmaps=true;tx.needsUpdate=true;
-  if(kind==='grass')tx.repeat.set(140,140);if(kind==='cloth')tx.repeat.set(3,3);textures.set(kind,tx);return tx;
+  if(kind==='grass')tx.repeat.set(36,36);if(kind==='cloth')tx.repeat.set(3,3);textures.set(kind,tx);return tx;
 }
 export function material(color:number){
   if(!materials.has(color)){

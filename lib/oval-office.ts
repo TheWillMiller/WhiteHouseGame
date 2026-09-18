@@ -112,7 +112,7 @@ function shell(g: T.Group, solids: Solid[]) {
   // Small collision tiles cover the continuous wall; windows remain solid at foot level.
   const n = 384; for (let i = 0; i < n; i++) { const a = (i + .5) / n * Math.PI * 2; if (!ovalDoor(a)) solids.push({ x: (OVAL.rx + .08) * Math.cos(a), z: (OVAL.rz + .08) * Math.sin(a), w: .28, d: .28 }); }
   // Wainscot panels follow the wall tangent, instead of cutting through the ellipse.
-  for (let i = 0; i < 48; i++) { const a = (i + .5) / 48 * Math.PI * 2; if (ovalDoor(a) || windowAt(a) || Math.abs(a - .10) < .20 || a > 6.17 || Math.abs(a - 2.96) < .20 || Math.abs(a - Math.PI * 1.5) < .25) continue; const p = anchor(g, a, .075); frame(p, 0, .66, -.01, .56, .69, false); p.children.forEach(m => { if (m instanceof T.Mesh) m.material = material(C.white); }); }
+  for (let i = 0; i < 48; i++) { const a = (i + .5) / 48 * Math.PI * 2; if (ovalDoor(a) || windowAt(a) || Math.abs(a - .10) < .20 || a > 6.17 || Math.abs(a - 2.96) < .20 || Math.abs(a - Math.PI * 1.5) < .25) continue; const p = anchor(g, a, .20); frame(p, 0, .66, -.01, .56, .69, false); p.children.forEach(m => { if (m instanceof T.Mesh) m.material = material(C.white); }); }
   for (let i = 0; i < 100; i++) { const p = anchor(g, i / 100 * Math.PI * 2, .16); box(p, 0, 5.02, 0, .11, .09, .1, C.gold); }
   // One usable northwest entry, with a lintel; no accidental opening behind the desk.
   for (const a of OVAL.door) { const p = anchor(g, a, .08); box(p, 0, 1.9, 0, .13, 3.8, .33, C.white); box(p, 0, 1.9, -.19, .035, 3.8, .035, C.gold); }

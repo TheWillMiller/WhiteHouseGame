@@ -2,7 +2,7 @@ import * as T from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
-export const RESIDENCE_MODEL_FILE='models/white-house-residence-v1.glb';
+export const RESIDENCE_MODEL_FILE='models/white-house-residence-v2.glb';
 export function residenceModelUrl(pathname:string){return(pathname==='/trumpgame'||pathname.startsWith('/trumpgame/')?'/trumpgame/':'/')+RESIDENCE_MODEL_FILE;}
 
 export function disposeResidence(object:T.Object3D){

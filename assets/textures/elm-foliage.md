@@ -1,0 +1,6 @@
+# Elm foliage asset
+
+Generated with built-in image_gen on September 18, 2026 for this game. Source: assets/textures/elm-foliage-source-v1.png. Runtime: public/textures/elm-foliage-v1.webp (512px, alpha preserved). No external license attribution required for this original generated image.
+
+Final prompt:
+Use case: photorealistic-natural. Asset type: square transparent PNG foliage texture for 3D cutout cards in a browser game. ONE isolated roughly circular spreading branch cluster with 25–40 small mature American elm leaves attached to fine natural twigs. Photorealistic leaf surfaces with serrated edges and elm veins; natural irregular silhouette and tiny transparent gaps between leaves. Subdued varied summer green. Front view, nearly flat plane suitable for a foliage card. Cluster fills 85–90 percent of square canvas but does not touch any image edge. Entire cluster visible. Soft even diffuse illumination, albedo texture without baked directional lighting, ground shadows or cast shadows. Actual alpha transparency throughout empty background and small spaces among leaves. PNG with transparent background, not drawn checkerboard. Exactly one image and one branch cluster. No text, backdrop, scenery, ground, trunk, pot, border or watermark.
