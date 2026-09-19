@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import {NodeIO} from '@gltf-transform/core';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as T from 'three';
+import {WebGLObjects} from 'three/src/renderers/webgl/WebGLObjects.js';
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import ts from 'typescript';
 mkdirSync('.qa',{recursive:true});
-writeFileSync('.qa/player-model.mjs',ts.transpileModule(readFileSync('lib/player-model.ts','utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText);
+writeFileSync('.qa/skinning.mjs',ts.transpileModule(readFileSync('lib/skinning.ts','utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText);
+writeFileSync('.qa/player-model.mjs',ts.transpileModule(readFileSync('lib/player-model.ts','utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("from './skinning'","from './skinning.mjs'"));
 const {createAnimatedPlayer,playerModelUrl}=await import('../.qa/player-model.mjs');
 assert.equal(playerModelUrl('/trumpgame/'),'/trumpgame/models/trump-detailed-v3.glb');assert.equal(playerModelUrl('/'),'/models/trump-detailed-v3.glb');
 const io=new NodeIO(),doc=await io.read('public/models/trump-detailed-v3.glb');
@@ -37,4 +39,31 @@ for(const [label,mode,distance,airborne,gesture] of [['idle','walk',0,false,null
 model.emote('dance');model.animate(0,.5,false);model.animate(.05,.016,false,'walk');assert.equal(model.object.position.length(),0);
 const uv=skin.geometry.getAttribute('uv'),uvs=new Float32Array(uv.count*2);for(let i=0;i<uv.count;i++){uvs[i*2]=uv.getX(i);uvs[i*2+1]=uv.getY(i);}
 writeFileSync('.qa/player-uv.bin',Buffer.from(uvs.buffer));writeFileSync('.qa/player-indices.bin',Buffer.from(Uint32Array.from(skin.geometry.index.array).buffer));
+// Reproduce r186's real skeleton cache, including the frame-counter increment
+// between scene collection and the intermittent shadow pass. CPU bone positions
+// alone miss this bug: the shader consumes skeleton.boneMatrices instead.
+const parent=new T.Group();parent.add(model.object);
+const gpuVertex=(index)=>{
+  const p=new T.Vector3().fromBufferAttribute(skin.geometry.attributes.position,index).applyMatrix4(skin.bindMatrix);
+  const result=new T.Vector3(),joints=skin.geometry.attributes.skinIndex,weights=skin.geometry.attributes.skinWeight;
+  for(let k=0;k<4;k++)result.addScaledVector(p.clone().applyMatrix4(new T.Matrix4().fromArray(skin.skeleton.boneMatrices,joints.getComponent(index,k)*16)),weights.getComponent(index,k));
+  return result.applyMatrix4(skin.bindMatrixInverse).applyMatrix4(skin.matrixWorld);
+};
+const headIndex=Array.from({length:skin.geometry.attributes.position.count},(_,i)=>i).reduce((best,i)=>skin.geometry.attributes.position.getY(i)>skin.geometry.attributes.position.getY(best)?i:best,0);
+let reproduced=0,maxFixedError=0;
+for(const sync of [false,true])for(const [dx,dz] of [[1,0],[-1,0],[1,-1],[0,1],[0,-1]]){
+  const info={render:{frame:0}},objects=new WebGLObjects({}, {get:(_o,g)=>g,update(){}},{},{},info);
+  const direction=new T.Vector3(dx,0,dz).normalize();parent.position.set(0,0,0);parent.rotation.y=-Math.atan2(dx,-dz);
+  for(let frame=0;frame<90;frame++){
+    const dt=[1/60,1/45,1/90][frame%3];parent.position.addScaledVector(direction,3.2*dt);model.animate(3.2*dt,dt,false,'walk');parent.updateMatrixWorld(true);
+    objects.update(skin);info.render.frame++;if(frame%4===0)objects.update(skin);
+    if(sync)skin.onBeforeRender();
+    const expected=skin.getVertexPosition(headIndex,new T.Vector3()).applyMatrix4(skin.matrixWorld),error=gpuVertex(headIndex).distanceTo(expected);
+    if(sync){maxFixedError=Math.max(maxFixedError,error);assert(error<.00003,'GPU skeleton and camera must use the same frame in every travel direction');}
+    else reproduced=Math.max(reproduced,error);
+  }
+  objects.dispose();
+}
+assert(reproduced>.05,'Regression must reproduce the stale GPU pose before the fix');
+console.log(`GPU pose regression: before ${reproduced.toFixed(4)} world-unit lag; after ${maxFixedError.toExponential(2)}. Five directions, variable frame times, real renderer cache.`);
 model.dispose();console.log('PASS: all 8 clips, 28-joint skin, in-place root tracks, actual loader/mixer, '+frames+' finite posed frames and deployment URLs.');

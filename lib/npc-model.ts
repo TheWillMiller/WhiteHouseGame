@@ -1,4 +1,5 @@
 import * as T from 'three';
+import {synchronizeSkin} from './skinning';
 import {GLTFLoader,type GLTF} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import {clone} from 'three/addons/utils/SkeletonUtils.js';
@@ -15,7 +16,7 @@ export class StaffModels {
   if(!pending){pending=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url);this.assets.set(url,pending);pending.catch(()=>{this.assets.delete(url);});}
   const asset=await pending;if(this.disposed)return null;
   const object=clone(asset.scene) as T.Group;object.name=`Staff model: ${id}`;
-  object.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;/* A conservative fixed bound covers the small idle movement. */o.frustumCulled=false;}});
+  object.traverse(o=>{if(o instanceof T.SkinnedMesh)synchronizeSkin(o);if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;/* A conservative fixed bound covers the small idle movement. */o.frustumCulled=false;}});
   const mixer=new T.AnimationMixer(object);const clip=asset.animations[0];if(clip)mixer.clipAction(clip).play();mixer.setTime(id.length*.31);
   let accumulated=0;
   return{object,animate(dt){accumulated+=dt;if(accumulated>=1/20){mixer.update(accumulated);accumulated=0;}},dispose(){mixer.stopAllAction();mixer.uncacheRoot(object);object.traverse(o=>{if(o instanceof T.SkinnedMesh)o.skeleton.dispose();});}};

@@ -72,3 +72,9 @@ Fourteen characters now use twelve textured, rigged adult assets from Microsoft'
 Staff download only when their area is entered, share downloads and GPU assets, and retain separate skeletons. Nearby idle animations update at 20 Hz; staff beyond 65 game units are hidden. The existing camera proxies, adaptive resolution and reduced shadow update frequency remain. Textured foliage stays on distant trees, reducing card counts rather than switching to polygonal canopy blobs.
 
 Run `node tests/world.test.cjs` before `node tests/staff-model.test.mjs`. The staff check decodes every shipped model, samples actual mixer poses, checks proportions and grounded feet, verifies texture limits, and checks shared loading with independent skeletons. This is offline geometry/animation validation, not a mobile FPS measurement.
+
+## Directional walking jitter
+
+Three r186 collects visible meshes before incrementing its frame counter for shadow rendering. With intermittent shadows, the shadow pass can mark a skeleton as updated for the following frame, leaving a stale GPU bone palette while the camera follows the current player position. `lib/skinning.ts` refreshes each character palette in `onBeforeRender`, after world matrices are current and before uniforms are uploaded. Shadow cadence and resolution stay unchanged.
+
+The player regression uses the installed renderer's actual `WebGLObjects` cache and shader-equivalent bone-matrix skinning. It reproduces a 0.0904 game-unit lag before the fix and less than 0.000001 afterward across five directions and variable frame intervals. This verifies pose synchronization offline; it is not a device FPS measurement.

@@ -1,4 +1,5 @@
 import * as T from 'three';
+import {synchronizeSkin} from './skinning';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 export const TRUMP_MODEL_FILE='models/trump-detailed-v3.glb';
@@ -10,7 +11,7 @@ export type PlayerModel={object:T.Group;animate:(distance:number,dt:number,airbo
 export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):PlayerModel{
   const object=new T.Group();object.name='Animated Meshy Trump';object.add(scene);
   const meshes:T.SkinnedMesh[]=[];
-  scene.traverse(o=>{if(o instanceof T.SkinnedMesh){meshes.push(o);o.castShadow=true;o.receiveShadow=true;o.frustumCulled=false;}});
+  scene.traverse(o=>{if(o instanceof T.SkinnedMesh){meshes.push(o);synchronizeSkin(o);o.castShadow=true;o.receiveShadow=true;o.frustumCulled=false;}});
   if(!meshes.length)throw Error('Trump export has no skinned mesh');
   // Keep the supplied skeleton and inverse bind matrices intact.
   const bounds=new T.Box3();for(const mesh of meshes){mesh.geometry.computeBoundingBox();bounds.union(mesh.geometry.boundingBox!);}
