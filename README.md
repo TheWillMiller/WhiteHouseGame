@@ -97,3 +97,10 @@ All rectangular room floors use continuous planes with world-scaled materials (o
 Validation: `node tests/world.test.cjs`, then `node tests/room-walkthrough.test.mjs`, `node tests/oval-office.test.mjs`, `node tests/west-layout.test.mjs`, and `node tests/render-budget.test.mjs`. The room audit covers 54 rooms and 11,856 camera positions at desktop/portrait aspects, checking obstruction, ceiling height, floor scale and removal of billboard signs. All 63 travel destinations and 14 NPC interactions remain reachable. These are offline geometry and behavior checks, not browser visual QA or mobile GPU measurements.
 
 This pass improves the existing adaptation; it does not establish measured architectural accuracy. The residence upper floors remain explicitly simplified/imagined. Current room-specific furniture, lighting and finishes still need comparison with appropriate public references before describing the project as a faithful historical walkthrough.
+
+
+## West grounds aerial reference
+
+The user's south-up aerial reference places the Rose Garden between the residence and the West Wing, immediately south of the press-room/colonnade connection. `lib/grounds-layout.ts` is now the shared source for the relocated garden, exterior geometry, map marker and garden transitions. The lawn is uninterrupted, with perimeter beds and paths; the old oversized garden south of both buildings is removed. The West Wing north approach gains a curved drive and crossing walks. Approximate game dimensions are retained, and this reference is not treated as evidence of the current planting or paving configuration.
+
+`node tests/grounds-layout.test.mjs` (after `node tests/world.test.cjs`) checks these relative positions, the garden/colonnade and north-entrance walking routes, reciprocal garden transitions, and upward-facing path geometry.

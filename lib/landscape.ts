@@ -1,3 +1,4 @@
+import {GARDENS,WEST_APPROACH,WEST_WALKS} from './grounds-layout';
 import * as T from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {material} from './visuals';
@@ -47,10 +48,10 @@ export function gardenFinishes(g:T.Group){
   const x=i*9.2,half=40*Math.sqrt(Math.max(0,1-(x/55)**2));
   slab(x,.007,58,9.15,.013,half*2,material(i%2===0?0x587346:0x546e43));
  }
- for(const side of [-1,1]){
-  const x=side===-1?-32:35,z=side===-1?10:18;
-  for(const dz of [-8.2,8.2])slab(x,.18,z+dz,25,.25,.34,stone);
-  for(const dx of [-12.5,12.5])slab(x+dx,.18,z,.34,.25,16.7,stone);
+ for(const {id,x,z,w,d} of GARDENS){
+  for(const dz of [-d/2,d/2])slab(x,.13,z+dz,w,.15,.18,stone);
+  for(const dx of [-w/2,w/2])slab(x+dx,.13,z,.18,.15,d,stone);
+  if(id==='rose')continue;
   for(const dx of [-9,9])for(const dz of [-5.5,5.5]){
    const urn=new T.Mesh(new T.LatheGeometry([new T.Vector2(.33,0),new T.Vector2(.40,.1),new T.Vector2(.20,.28),new T.Vector2(.24,.55),new T.Vector2(.53,.84),new T.Vector2(.58,1.05)],12),stone);urn.position.set(x+dx,.2,z+dz);urn.castShadow=true;g.add(urn);
    for(let j=0;j<7;j++){const sprig=new T.Mesh(new T.ConeGeometry(.18,.8,5),material(0x42614a));sprig.position.set(x+dx+Math.sin(j*2.4)*.22,1.30,z+dz+Math.cos(j*2.4)*.22);sprig.rotation.z=Math.sin(j)*.25;g.add(sprig);}
@@ -109,5 +110,22 @@ export function westWingFinishes(g:T.Group){
   const window=new T.Mesh(new T.BoxGeometry(1.1,2.7,.09),glass);frame.add(window);for(const x of [-.64,.64])local(x,0,.13,3);for(const y of [-1.47,1.47])local(0,y,1.44,.13);local(0,0,.055,2.7);for(const y of [-.45,.45])local(0,y,1.1,.05);g.add(frame);
  }
  // Finer park bench slats and curled iron ends read as furniture instead of crates.
- for(const [x,z]of [[-39,10],[-25,10],[28,18],[42,18]])for(let j=0;j<3;j++)slab(x,1+j*.14,z,.72,.045,1.95,bronze);
+ for(const [x,z]of [[GARDENS[0].x-7.1,GARDENS[0].z],[GARDENS[0].x+7.1,GARDENS[0].z],[28,18],[42,18]])for(let j=0;j<3;j++)slab(x,1+j*.14,z,.72,.045,1.95,bronze);
+}
+
+/** Flat path ribbons share one cached material and batch with the grounds. */
+export function gardenApproaches(g:T.Group){
+ const ribbon=(points:readonly (readonly [number,number])[],width:number,color:number,y:number)=>{
+  const curve=new T.CatmullRomCurve3(points.map(([x,z])=>new T.Vector3(x,y,z))),vertices:number[]=[],uvs:number[]=[],indices:number[]=[];
+  const samples=64,length=curve.getLength();
+  for(let i=0;i<=samples;i++){
+   const t=i/samples,p=curve.getPoint(t),tangent=curve.getTangent(t),normal=new T.Vector3(-tangent.z,0,tangent.x).normalize();
+   for(const side of [-1,1]){vertices.push(p.x+normal.x*width/2*side,y,p.z+normal.z*width/2*side);uvs.push(side<0?0:1,t*length/width);}
+   if(i<samples){const a=i*2;indices.push(a,a+1,a+2,a+1,a+3,a+2);}
+  }
+  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();
+  const m=new T.Mesh(geo,material(color));m.receiveShadow=true;m.name='West approach path';g.add(m);
+ };
+ ribbon(WEST_APPROACH,6.2,0x777e77,.073);
+ for(const points of WEST_WALKS)ribbon(points,2.1,0xcac8b0,.078);
 }

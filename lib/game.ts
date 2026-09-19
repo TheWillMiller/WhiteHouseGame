@@ -1,3 +1,4 @@
+import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE} from './grounds-layout';
 import {floorFinish,ceiling,wallPanels,clearRoomFinishes} from './room-finishes';
 import {insideWest,WEST_FOOTPRINT} from './west-layout';
 import * as T from 'three';
@@ -6,7 +7,7 @@ import { loadResidenceModel, disposeResidence } from './residence-model';
 import { buildOvalOffice } from './oval-office';
 import { FollowCamera } from './follow-camera';
 import {CameraObstacles,RenderBudget} from './render-budget';
-import {gardenTree,gardenFinishes,westWingFinishes} from './landscape';
+import {gardenTree,gardenFinishes,westWingFinishes,gardenApproaches} from './landscape';
 import {StaffModels,type StaffActor} from './npc-model';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -51,13 +52,28 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  solid(w,0,-27.2,50,25.7);solid(w,0,-11.3,11.5,7.7);
  for(const side of [-1,1])solid(w,side*8,-9,6.2,12);
  solid(w,0,-46.3,16,13);for(const side of [-1,1])solid(w,side*11,-47,3.9,15.3);
- for(const side of [-1,1]){box(g,side*34,3.4,-27,18,.4,5.5,C.white);for(let i=0;i<7;i++)cyl(g,side*(26+i*2.7),1.65,-24.5,.22,3.3,C.white,8);}
+ for(const side of [-1,1]){box(g,side*34,3.4,-27,18,.4,5.5,C.white);for(let i=0;i<7;i++){const x=side*(26+i*2.7);cyl(g,x,1.65,-24.5,.22,3.3,C.white,8);solid(w,x,-24.5,.44,.44,3.3);}}
  box(g,-58,3.4,-20,32,6.8,36,C.white);solid(w,-58,-20,32,36);box(g,-58,7,-20,33,.5,37,C.trim);for(let x=-71;x<-43;x+=4)for(const z of [-38.1,-1.9])box(g,x,2.55,z,1.8,2.45,.15,C.window);box(g,-41.9,1.8,-24,.15,3.5,2.5,C.window);
  const ov=cyl(g,-47,2.6,-1.5,6.8,5.2,C.white,24);ov.scale.z=.8;solid(w,-47,-1.5,11,9);for(let i=0;i<6;i++){const a=i/6*Math.PI;box(g,-47+Math.cos(a)*6.2,2.8,-1.5+Math.sin(a)*5.3,.8,2.8,.25,C.window);}
  box(g,-34,2.1,-31,18,4.2,7.5,C.white);solid(w,-34,-31,18,7.5);box(g,-34,4.35,-31,18.5,.3,8,C.trim);for(let x=-40;x<-26;x+=3){box(g,x,2.35,-27.18,1.5,2.25,.12,C.window);box(g,x,3.58,-27.1,1.8,.14,.24,C.white);}
  flag(g,0,18.53,-23,1.2);
  // Gardens and trees.
- for(const side of [-1,1]){const x=side===-1?-32:35,z=side===-1?10:18;box(g,x,.03,z,25,.08,18,0xb7b99b);box(g,x,.09,z,18,.1,12,0x698644);flowers(g,x,z-7,23,1.4);flowers(g,x,z+7,23,1.4);flowers(g,x-11,z,1.5,11);flowers(g,x+11,z,1.5,11);box(g,x,.15,z,3,.08,14,C.path);bench(g,x-7,z,Math.PI/2);bench(g,x+7,z,-Math.PI/2);}
+ for(const garden of GARDENS){const {x,z,w:width,d:depth,lawnW,lawnD}=garden;
+   box(g,x,.03,z,width,.08,depth,0xb7b99b);box(g,x,.09,z,lawnW,.1,lawnD,0x698644);
+   if(garden.id==='rose'){
+     // An uninterrupted rectangular lawn, with planting and walking routes around it.
+     for(const side of [-1,1]){
+       flowers(g,x+side*(lawnW/2+.55),z,.9,lawnD);
+       flowers(g,x,z+side*(lawnD/2+.55),lawnW+.2,.9);
+       bench(g,x+side*7.1,z,side<0?-Math.PI/2:Math.PI/2);
+       solid(w,x+side*7.1,z,.75,2.1,1.5);
+     }
+   }else{
+     flowers(g,x,z-7,23,1.4);flowers(g,x,z+7,23,1.4);flowers(g,x-11,z,1.5,11);flowers(g,x+11,z,1.5,11);
+     box(g,x,.15,z,3,.08,14,C.path);bench(g,x-7,z,-Math.PI/2);bench(g,x+7,z,Math.PI/2);
+   }
+ }
+ gardenApproaches(g);
  for(let i=0;i<28;i++){const z=-80+i*7.2;tree(w,-96+(i%3)*3,z,i);tree(w,95-(i%3)*3,z,i+30);}for(let i=0;i<16;i++){const x=-77+i*10;tree(w,x,-92,i+70);if(Math.abs(x)>22)tree(w,x,122,i+100);}for(const [x,z,s]of [[-62,78,34],[65,80,37],[-38,97,23],[38,95,18],[-54,43,16],[57,48,17],[-43,-63,2],[46,-67,5]])tree(w,x,z,s);
  fountain(w,0,48,5.5);fountain(w,0,-63,5);
  // Pool, putting green, benches and garden path details.
@@ -73,8 +89,8 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  for(let i=0;i<5;i++){box(g,73,.35+i*.36,3,8,.3,1.7,0x8b7653);}for(let i=0;i<6;i++){cyl(g,43+i*6,.6,9,.35,1.1,0xe28e38,6,.08);box(g,43+i*6,.1,9,.75,.14,.75,0x4c4f43);}
  const digger=new T.Group();digger.position.set(69,0,-47);box(digger,0,.5,0,3,1,4,0x414a45);box(digger,0,1.4,0,2.6,1,3,0xe3ac3e);box(digger,0,2.7,-.5,2,1.7,1.7,0xe2b044);box(digger,0,2.9,-1.39,1.7,1.1,.06,0x3e5c60);const arm=box(digger,0,3.5,2,.5,.5,4,0xe1a437);arm.rotation.x=.5;box(digger,0,1.4,4.5,2,.5,1.5,0x7d7250);g.add(digger);solid(w,69,-47,3,5);
  label(g,'BALLROOM · UNDER CONSTRUCTION',59,3.2,10,7);
- ring(w,{id:'south-door',label:'Enter the residence',kind:'door',x:0,z:-4.7,target:'diplomatic'});ring(w,{id:'north-door',label:'Enter the Entrance Hall',kind:'door',x:0,z:-55,target:'entrance'});ring(w,{id:'west-door',label:'Enter the West Wing',kind:'door',x:-39,z:-23,zone:'west',spawn:[40,-21]});ring(w,{id:'west-front',label:'West Wing north entrance',kind:'door',x:-60,z:-40,zone:'west',spawn:[-5.5,-18]});
- groundsDetails(g);gardenFinishes(g);westWingFinishes(g);for(const x of [-62.8,-57.2])solid(w,x,-41.55,.7,.7,4.6);for(const [x,z]of [[-32,10],[35,18]])for(const dx of [-9,9])for(const dz of [-5.5,5.5])solid(w,x+dx,z+dz,1.1,1.1,1.7);const sky=new Sky();sky.scale.setScalar(10000);sky.userData.dynamic=true;sky.frustumCulled=false;sky.material.uniforms.turbidity.value=3.2;sky.material.uniforms.rayleigh.value=1.5;sky.material.uniforms.mieCoefficient.value=.004;sky.material.uniforms.mieDirectionalG.value=.8;sky.material.uniforms.sunPosition.value.set(-35,60,28);g.add(sky);mergeStatic(g);return w;
+ ring(w,{id:'south-door',label:'Enter the residence',kind:'door',x:0,z:-4.7,target:'diplomatic'});ring(w,{id:'north-door',label:'Enter the Entrance Hall',kind:'door',x:0,z:-55,target:'entrance'});ring(w,{id:'west-door',label:'Enter the West Wing',kind:'door',x:GARDEN_ENTRANCE[0],z:GARDEN_ENTRANCE[1],zone:'west',spawn:[40,-21]});ring(w,{id:'west-front',label:'West Wing north entrance',kind:'door',x:-60,z:-40,zone:'west',spawn:[-5.5,-18]});
+ groundsDetails(g);gardenFinishes(g);westWingFinishes(g);for(const x of [-62.8,-57.2])solid(w,x,-41.55,.7,.7,4.6);for(const [x,z]of [[35,18]])for(const dx of [-9,9])for(const dz of [-5.5,5.5])solid(w,x+dx,z+dz,1.1,1.1,1.7);const sky=new Sky();sky.scale.setScalar(10000);sky.userData.dynamic=true;sky.frustumCulled=false;sky.material.uniforms.turbidity.value=3.2;sky.material.uniforms.rayleigh.value=1.5;sky.material.uniforms.mieCoefficient.value=.004;sky.material.uniforms.mieDirectionalG.value=.8;sky.material.uniforms.sunPosition.value.set(-35,60,28);g.add(sky);mergeStatic(g);return w;
 }
 
 export class Game{
@@ -206,7 +222,7 @@ function furnish(w:World,d:Destination){const g=w.group,{x,z}=d,r=d.room!,{style
  }
 }
 export function interior(zone:Place):World {const w:World={group:new T.Group(),solids:[],spots:[],actors:[],rings:[]};const g=w.group;if(zone==='west'){for(const r of WEST_FOOTPRINT)box(g,r.x,-.15,r.z,r.w,.3,r.d,0xcfbf98);}else box(g,0,-.15,0,60,.3,40,0xcfbf98);for(let i=-28;i<29;i+=2)for(let j=-18;j<20;j+=2)if(zone!=='west')box(g,i,.018,j,1.99,.025,1.99,((i+j)/2)%2?0xcec8b3:0xe7e0c8);for(const d of destinations.filter(d=>d.zone===zone&&d.room))furnish(w,d);
- if(zone==='west'){ring(w,{id:'exit-west',label:'Exit to the Rose Garden',kind:'door',x:44,z:-18.5,zone:'grounds',spawn:[-38,-23]});ring(w,{id:'residence-west',label:'Palm Room: enter the residence',kind:'door',x:93,z:-23,zone:'ground',spawn:[-26,0]});ring(w,{id:'exit-west-north',label:'North lobby entrance',kind:'door',x:-5.5,z:-20,zone:'grounds',spawn:[-60,-40]});}
+ if(zone==='west'){ring(w,{id:'exit-west',label:'Exit to the Rose Garden',kind:'door',x:44,z:-18.5,zone:'grounds',spawn:[...GARDEN_EXIT]});ring(w,{id:'residence-west',label:'Palm Room: enter the residence',kind:'door',x:93,z:-23,zone:'ground',spawn:[-26,0]});ring(w,{id:'exit-west-north',label:'North lobby entrance',kind:'door',x:-5.5,z:-20,zone:'grounds',spawn:[-60,-40]});}
  else {ring(w,{id:'residence-exit',label:'Exit to the South Lawn',kind:'door',x:0,z:0,target:'south'});const order:Place[]=['ground','state','second','third'];const index=order.indexOf(zone);if(index<3)ring(w,{id:'stairs-up',label:`Up to the ${floors.find(f=>f.id===order[index+1])?.label}`,kind:'door',x:9,z:zone==='state'?-8:0,zone:order[index+1],spawn:[5,0]});if(index>0)ring(w,{id:'stairs-down',label:`Down to the ${floors.find(f=>f.id===order[index-1])?.label}`,kind:'door',x:-9,z:zone==='state'?-8:0,zone:order[index-1],spawn:[-5,0]});if(zone==='ground')ring(w,{id:'to-west',label:'Palm Room and West Wing',kind:'door',x:-27,z:0,zone:'west',spawn:[91,-23]});for(const x of [-9,9]){for(let step=0;step<5;step++)box(g,x-1+step*.45,.06+step*.08,zone==='state'?-9.6:-1.6,.4,.1+step*.16,1.8,0xdbcbaa);}}
  if(zone==='west')for(const r of WEST_FOOTPRINT)ceiling(g,r.x,r.z,r.w,r.d,r.d===47?{x:22,z:15.6,rx:8,rz:8.6}:undefined);else ceiling(g,0,0,60,40);
  mergeStatic(g);return w;}
