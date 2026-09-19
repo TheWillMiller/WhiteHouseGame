@@ -93,11 +93,11 @@ export function westWingFinishes(g:T.Group){
   slab(-58,7.75,z,32,.14,.34,white);
   for(let x=-73.5;x<-42;x+=1.25)slab(x,7.49,z,.16,.48,.22,white);
  }
- // Garden entrance portico, with an open approach around the existing hotspot.
- slab(-60,4.4,-.2,7,.26,4.3,white);slab(-60,4.64,-.2,7.4,.19,4.65,stone);
+ // North lobby entrance, matching the supplied first-floor plan.
+ slab(-60,4.4,-39.8,7,.26,4.3,white);slab(-60,4.64,-39.8,7.4,.19,4.65,stone);
  for(const x of [-62.8,-57.2]){
-  const column=new T.Mesh(new T.CylinderGeometry(.22,.28,4.12,12),white);column.position.set(x,2.06,1.55);column.castShadow=true;g.add(column);
-  slab(x,.16,1.55,.7,.3,.7,stone);slab(x,4.08,1.55,.64,.21,.64,white);
+  const column=new T.Mesh(new T.CylinderGeometry(.22,.28,4.12,12),white);column.position.set(x,2.06,-41.55);column.castShadow=true;g.add(column);
+  slab(x,.16,-41.55,.7,.3,.7,stone);slab(x,4.08,-41.55,.64,.21,.64,white);
  }
  // Curved Oval Office pavilion: radial window frames and a continuous cornice.
  for(const y of [.25,4.83,5.18]){

@@ -78,3 +78,11 @@ Run `node tests/world.test.cjs` before `node tests/staff-model.test.mjs`. The st
 Three r186 collects visible meshes before incrementing its frame counter for shadow rendering. With intermittent shadows, the shadow pass can mark a skeleton as updated for the following frame, leaving a stale GPU bone palette while the camera follows the current player position. `lib/skinning.ts` refreshes each character palette in `onBeforeRender`, after world matrices are current and before uniforms are uploaded. Shadow cadence and resolution stay unchanged.
 
 The player regression uses the installed renderer's actual `WebGLObjects` cache and shader-equivalent bone-matrix skinning. It reproduces a 0.0904 game-unit lag before the fix and less than 0.000001 afterward across five directions and variable frame intervals. This verifies pose synchronization offline; it is not a device FPS measurement.
+
+## West Wing floor-plan correction
+
+The supplied first-floor plan is preserved in `assets/references/west-wing-first-floor-user-reference.jpg`. `lib/west-layout.ts` follows its room relationships: northwest adviser offices and north lobby entrance; Vice President and Chief of Staff on the west; south reception, adviser offices, dining and study; Roosevelt Room beside the Oval approach; Cabinet Room north of the Oval; and the eastern briefing-room/press-office connection alongside the West Colonnade, ending in the Palm Room.
+
+The Palm Room is now the residence transition in both directions. Players can walk through the briefing/press-office area or along the parallel colonnade. The study has a working door into the Oval Office. The map, cast positions, exterior press strip, floor footprint and collision bounds use the revised arrangement. Numbered offices correspond to the supplied diagram. The room relationships follow that reference; furniture, straightened room outlines and navigation widths remain game adaptations rather than measured current dimensions.
+
+Navigation verification covers all 63 destinations, the complete press connection and the new study doorway. The unchanged Oval seating and behind-desk routes retain their clearance checks.

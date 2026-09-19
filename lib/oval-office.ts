@@ -5,7 +5,7 @@ import { material, detailedFlag, deskDetails, lamp } from './visuals';
 // Coordinates are local to the office. South is +Z; every seat faces local -Z.
 // Keep the floor, shell, openings and collision samples on the same ellipse.
 export const OVAL = { rx: 8, rz: 8.6, height: 5.4, thickness: .24,
-  door: [3.70, 4.16] as const, windows: [1.21, Math.PI / 2, Math.PI - 1.21], windowHalf: .112 };
+  door: [3.70, 4.16] as const, studyDoor: [2.96,3.32] as const, windows: [1.21, Math.PI / 2, Math.PI - 1.21], windowHalf: .112 };
 export const OVAL_SEATS = [
   { name: 'West inward-facing sofa', x: -3.45, z: -1.45, rotation: -Math.PI / 2, kind: 'sofa' },
   { name: 'East inward-facing sofa', x: 3.45, z: -1.45, rotation: Math.PI / 2, kind: 'sofa' },
@@ -18,7 +18,7 @@ export const OVAL_SEATS = [
 type Solid = { x: number; z: number; w: number; d: number };
 const C = { wall: 0xf0ece1, white: 0xf5f0df, gold: 0xd9b458, darkGold: 0xa78340,
   cream: 0xe8dfc6, cushion: 0xf0e7d0, walnut: 0x69412d, mahogany: 0x815434 };
-export function ovalDoor(a: number) { return a > OVAL.door[0] && a < OVAL.door[1]; }
+export function ovalDoor(a: number) { return [OVAL.door,OVAL.studyDoor].some(([start,end])=>a>start&&a<end); }
 function windowAt(a: number) { return OVAL.windows.some(w => Math.abs(a - w) < OVAL.windowHalf); }
 function surfaceMaterials() {
   const n = 128, cloth = new Uint8Array(n * n * 4), paper = new Uint8Array(n * n * 4);
@@ -100,7 +100,7 @@ function floor(g: T.Group) {
   const medallion = cyl(g, 0, .105, 0, 1.32, .01, 0xc39561); medallion.scale.z = 1.05; cyl(g, 0, .112, 0, 1.25, .01, 0xebd8b4);
 }
 function shell(g: T.Group, solids: Solid[]) {
-  const cuts = [0, ...OVAL.door, ...OVAL.windows.flatMap(a => [a - OVAL.windowHalf, a + OVAL.windowHalf]), Math.PI * 2].sort((a, b) => a - b);
+  const cuts = [0, ...OVAL.door, ...OVAL.studyDoor, ...OVAL.windows.flatMap(a => [a - OVAL.windowHalf, a + OVAL.windowHalf]), Math.PI * 2].sort((a, b) => a - b);
   for (let i = 0; i < cuts.length - 1; i++) {
     const a = cuts[i], b = cuts[i + 1], mid = (a + b) / 2;
     if (ovalDoor(mid)) arcBand(g, a, b, 3.8, OVAL.height - 3.8, 0, OVAL.thickness, C.wall);
@@ -114,9 +114,9 @@ function shell(g: T.Group, solids: Solid[]) {
   // Wainscot panels follow the wall tangent, instead of cutting through the ellipse.
   for (let i = 0; i < 48; i++) { const a = (i + .5) / 48 * Math.PI * 2; if (ovalDoor(a) || windowAt(a) || Math.abs(a - .10) < .20 || a > 6.17 || Math.abs(a - 2.96) < .20 || Math.abs(a - Math.PI * 1.5) < .25) continue; const p = anchor(g, a, .20); frame(p, 0, .66, -.01, .56, .69, false); p.children.forEach(m => { if (m instanceof T.Mesh) m.material = material(C.white); }); }
   for (let i = 0; i < 100; i++) { const p = anchor(g, i / 100 * Math.PI * 2, .16); box(p, 0, 5.02, 0, .11, .09, .1, C.gold); }
-  // One usable northwest entry, with a lintel; no accidental opening behind the desk.
-  for (const a of OVAL.door) { const p = anchor(g, a, .08); box(p, 0, 1.9, 0, .13, 3.8, .33, C.white); box(p, 0, 1.9, -.19, .035, 3.8, .035, C.gold); }
-  arcBand(g, OVAL.door[0], OVAL.door[1], 3.79, .1, .1, .16, C.white);
+  // Northwest lobby entry and the west study connection.
+  for (const a of [...OVAL.door,...OVAL.studyDoor]) { const p = anchor(g, a, .08); box(p, 0, 1.9, 0, .13, 3.8, .33, C.white); box(p, 0, 1.9, -.19, .035, 3.8, .035, C.gold); }
+  for(const [start,end] of [OVAL.door,OVAL.studyDoor])arcBand(g,start,end,3.79,.1,.1,.16,C.white);
 }
 function windows(g: T.Group) {
   for (const a of OVAL.windows) {
