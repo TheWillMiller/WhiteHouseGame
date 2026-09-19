@@ -1,3 +1,4 @@
+globalThis.DOMRect ??= class DOMRect {};
 // Run after world.test.cjs has transpiled the game modules into .qa.
 import assert from 'node:assert/strict';
 import * as T from 'three';

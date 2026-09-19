@@ -1,3 +1,4 @@
+globalThis.DOMRect ??= class DOMRect { constructor(x=0,y=0,width=0,height=0){Object.assign(this,{x,y,width,height});} };
 // Geometry and navigation checks run without launching a browser or WebGL.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -7,9 +8,9 @@ const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.qa');
 fs.mkdirSync(output, { recursive: true });
-for (const file of ['west-layout', 'skinning', 'render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
+for (const file of ['room-finishes', 'west-layout', 'skinning', 'render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
  const source = fs.readFileSync(path.join(root, 'lib', file + '.ts'), 'utf8').replace("new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})", 'globalThis.__testRenderer()');
- const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(west-layout|skinning|render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
+ const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(room-finishes|west-layout|skinning|render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
  fs.writeFileSync(path.join(output, file + '.mjs'), built);
 }
 const ctx = new Proxy({}, { get: () => () => {}, set: () => true });
@@ -65,6 +66,7 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  game.jump();game.loop(2116);assert(game.player.position.y>0,'jump leaves the ground');for(let i=0;i<80;i++)game.loop(2133+i*16.67);assert.equal(game.player.position.y,0,'jump lands');
  for(const d of destinations){game.travel(d.id);game.loop(4000+count++*16.67);assert.equal(game.zone,d.zone);assert(Number.isFinite(game.camera.position.x),'camera stays finite after travel');}
  for(const npc of npcs){game.change(npc.zone,npc.x,npc.z+1.2);game.loop(6000+count++*16.67);assert.equal(game.nearby?.id,npc.id,`interaction target for ${npc.id}`);game.interact();assert.equal(talking,npc.id);assert(game.met.has(npc.id));}
+ game.toggleCamera();game.loop(9000);assert(!game.player.visible,'eye-level camera hides the avatar');assert(Math.abs(game.camera.position.x-game.player.position.x)<1e-8,'eye-level camera stays with the player');game.toggleCamera();game.loop(9017);assert(!snapshot.firstPerson,'camera toggle returns to third person');
  const before=game.zone;assert.throws(()=>game.travel('not-a-destination'));assert.equal(game.zone,before,'invalid travel preserves state');assert(snapshot);game.dispose();
  console.log(`PASS: ${destinations.length} travel destinations, ${npcs.length} NPC conversations, finite geometry, walking connectivity, movement, jump/landing, pause, travel, camera calculations and interaction state. Renderer stubbed; no visual QA.`);
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

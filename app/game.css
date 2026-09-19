@@ -39,3 +39,6 @@
  .interact{bottom:calc(16px + env(safe-area-inset-bottom));max-width:calc(100% - 320px)}
  .welcome{bottom:20px;max-width:300px}.welcome p{display:none}
 }
+
+.topbar button[aria-pressed="true"]{background:#d8bd7c;color:#142f32}
+@media (max-width:390px){.brand{flex-basis:65px}.topbar nav{gap:3px}.topbar nav button[aria-label="Enable ambient sound"],.topbar nav button[aria-label="Mute ambient sound"]{display:none}}

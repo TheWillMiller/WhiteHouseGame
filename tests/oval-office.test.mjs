@@ -1,3 +1,4 @@
+globalThis.DOMRect ??= class DOMRect { constructor(x=0,y=0,width=0,height=0){Object.assign(this,{x,y,width,height});} };
 // Run after world.test.cjs, which transpiles the production modules into .qa.
 import assert from 'node:assert/strict';
 import * as T from 'three';

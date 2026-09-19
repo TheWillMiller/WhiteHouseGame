@@ -1,3 +1,4 @@
+globalThis.DOMRect ??= class DOMRect { constructor(x=0,y=0,width=0,height=0){Object.assign(this,{x,y,width,height});} };
 // Deterministic geometry budget and CPU camera benchmark; not a browser FPS test.
 import * as T from 'three';import {writeFileSync} from 'node:fs';
 const ctx=new Proxy({},{get:()=>()=>{},set:()=>true});globalThis.document={createElement:()=>({getContext:()=>ctx,width:0,height:0})};

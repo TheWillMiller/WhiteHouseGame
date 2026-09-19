@@ -16,7 +16,7 @@ function tile(kind:Surface){
   for(let y=0;y<n;y++)for(let x=0;x<n;x++){
     seed=(Math.imul(seed,1664525)+1013904223)>>>0;const noise=(seed/4294967296-.5);
     let value=240;
-    if(kind==='wood')value=221+Math.sin(x*.46+Math.sin(y*.075)*1.5)*14+Math.sin(x*1.8+y*.06)*5+noise*16;
+    if(kind==='wood')value=240+Math.sin(x*.46+Math.sin(y*.075)*1.5)*3+noise*4;
     if(kind==='stone')value=246+noise*6;
     if(kind==='cloth')value=238+((x+y)%2?8:-8)+noise*7;
     if(kind==='grass')value=239+noise*6+Math.sin(x*Math.PI/64)*2+Math.cos(y*Math.PI/64)*2;
@@ -156,6 +156,7 @@ export function deskDetails(g:T.Group,x:number,z:number,width:number,depth:numbe
   if(hero){for(const side of [-1,1]){block(g,x+side*1.75,1.53,z+.38,.45,.43,.045,0xd9b458,.015);block(g,x+side*1.75,1.54,z+.35,.35,.32,.016,0x405c6c);} }
 }
 export function carpetDetail(g:T.Group,x:number,z:number,rx:number,rz:number,oval=false){
+  if(!oval){for(const factor of [.91,.86]){for(const side of [-1,1]){block(g,x,.12,z+side*rz*factor,rx*2*factor,.008,.024,0xc6ba94);block(g,x+side*rx*factor,.12,z,.024,.008,rz*2*factor,0xc6ba94);}}return;}
   // Geometry follows the carpet, so the border stays crisp at an oblique angle.
   for(const factor of [.91,.86]){const curve=new T.EllipseCurve(0,0,rx*factor,rz*factor,0,Math.PI*2,false,0);const points=curve.getPoints(96).map(p=>new T.Vector3(x+p.x,.126,z+p.y));g.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points),96,.022,4,false),material(0xd9b458)));}
   if(oval){const emblem=eagle(g,x,.21,z,Math.min(rx,rz)*.25);emblem.rotation.x=Math.PI/2;for(let i=0;i<24;i++){const a=i*Math.PI/12;const s=star(g,x+Math.cos(a)*rx*.72,.145,z+Math.sin(a)*rz*.72,.09,0xf3dfa1);s.rotation.x=Math.PI/2;}}
@@ -173,26 +174,21 @@ function windowDressing(g:T.Group,x:number,z:number,width:number,gold:boolean){
   for(let i=0;i<8;i++){const sw=orb(m,-width/2+i*width/7,4.02,-.17,width/6,.21,.09,gold?0xc9a146:0xcbb058);sw.rotation.z=(i<4?1:-1)*.10;}
 }
 export function roomDetails(g:T.Group,d:Destination){
-  const {x,z}=d,r=d.room!,rx=r.w/2,rz=r.d/2,oval=r.style==='oval';
-  if(oval){
-    // Three tall windows form the recognizable gold-draped backdrop behind the desk.
-    for(const offset of [-3.1,0,3.1])windowDressing(g,x+offset,z+rz-.72,1.65,true);
-    for(const side of [-1,1]){
-      const t=new T.Group();t.position.set(x+side*3.65,0,z+rz-2.0);block(t,0,.86,0,1.0,.12,.8,0x69412d,.025);for(const sx of [-.36,.36])for(const sz of [-.25,.25])block(t,sx,.42,sz,.07,.84,.07,0x69412d);lamp(t,0,.93,0);g.add(t);
-    }
-    // Fireplace at the opposite end, offset from the open center doorway.
-    const f=new T.Group();f.position.set(x-3.8,0,z-rz+.72);f.rotation.y=Math.PI;fireplace(f);g.add(f);
-  }else if(!['kitchen','flowers','press','games'].includes(r.style)){
-    for(const side of [-1,1]){const wx=x+side*(rx-1.5),wz=z+(z>=0?rz:-rz)*.98;const drape=new T.Group();drape.position.set(wx,0,wz);if(z<0)drape.rotation.y=Math.PI;windowDressing(drape,0,0,1.4,false);g.add(drape);}
+ const r=d.room!,rx=r.w/2,rz=r.d/2;
+ // Windows only on known outer elevations. Internal offices never receive fake windows through adjoining rooms.
+ const north=d.z-rz,south=d.z+rz;
+ const outerNorth=d.zone==='west'?(Math.abs(north+22)<.2||Math.abs(north+39)<.2):north<=-16;
+ const outerSouth=d.zone==='west'?Math.abs(south-22)<.2:south>=16;
+ for(const [edge,outward,doors]of [[north,-1,r.doors?.north??(r.doors?[]:[d.x])],[south,1,r.doors?.south??(r.doors?[]:[d.x])]] as [number,number,number[]][]){
+  if(!(outward<0?outerNorth:outerSouth))continue;
+  const count=Math.floor((r.w-.6)/3.4);
+  for(let i=0;i<count;i++){
+   const wx=d.x-rx+(i+.5)*r.w/count;
+   if(doors.some(door=>Math.abs(wx-door)<3.1))continue;
+   const drape=new T.Group();drape.position.set(wx,0,edge-outward*.21);if(outward<0)drape.rotation.y=Math.PI;
+   windowDressing(drape,0,0,1.4,false);g.add(drape);
   }
-  if(!oval){
-    // Raised wall panels, picture rails and a continuous cornice give rooms depth.
-    for(const side of [-1,1])for(let q=0;q<Math.floor((r.w-4)/2);q++){
-      const px=x-rx+1.05+q*2;if(Math.abs(px-x)<2.2)continue;const pz=z+side*(rz-.17);
-      for(const yy of [.23,1.08])block(g,px,yy,pz,1.35,.035,.055,0xd9b458);
-      for(const dx of [-.675,.675])block(g,px+dx,.65,pz,.035,.86,.055,0xd9b458);
-    }
-  }
+ }
 }
 function fireplace(g:T.Group){
   block(g,0,.77,0,2.5,1.55,.5,0xf5f0df);block(g,0,.67,-.26,1.57,1.2,.035,0x25312f);
