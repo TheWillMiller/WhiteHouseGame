@@ -10,3 +10,32 @@
 @media(max-width:440px){.brand>svg{display:none}.brand{gap:0}.topbar{gap:8px}.topbar button{padding:0 6px}}
 
 .game-shell:has(.welcome) .bottom-left{display:none}
+
+/* Compact play surface: reserve the center for the game, not duplicate HUD cards. */
+@media (max-width:700px), (pointer:coarse) and (max-width:1100px) {
+ .topbar{height:66px;padding:0 12px;gap:6px;align-items:center}
+ .brand{flex:0 1 86px;min-width:0}.brand>svg,.brand p{display:none}
+ .brand h1{font-size:12px;line-height:1.35;letter-spacing:1px;margin:0}
+ .topbar nav{gap:4px;flex-shrink:0}.topbar button{height:44px;min-width:44px;padding:0 7px;font-size:14px;border-radius:7px}
+ .topbar nav button>span,.topbar nav kbd,.topbar nav button[aria-label="Full screen"]{display:none}
+ .location{top:76px;left:14px;right:14px}.location h2{font-size:21px;line-height:1.25;margin:0;max-width:calc(100% - 104px)}
+ .location .eyebrow,.location p,.bottom-left,.control-strip{display:none}
+ .minimap{top:108px;right:12px;bottom:auto;width:86px;padding:5px;border-radius:7px;background:#142f31bf;box-shadow:none}
+ .minimap .map-svg{height:80px}.minimap-top,.minimap-bottom{display:none}
+ .touch-pad{left:12px;bottom:calc(16px + env(safe-area-inset-bottom));display:grid;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px;gap:5px}
+ .touch-pad button{padding:0;border-radius:12px;background:#123238b3}
+ .touch-actions{right:16px;bottom:calc(28px + env(safe-area-inset-bottom));gap:0}
+ .touch-actions button{width:62px;height:62px;padding:0;border-radius:50%;font-size:14px}
+ .touch-actions button:last-child{display:none}
+ .interact{left:50%;bottom:calc(132px + env(safe-area-inset-bottom));width:max-content;max-width:calc(100% - 28px);min-height:46px;padding:10px 15px;gap:10px;white-space:normal;box-shadow:0 3px 12px #09232433}
+ .interact kbd,.interact small{display:none}.interact div{min-width:0}.interact strong{display:block;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.interact>svg{flex-shrink:0}
+ .welcome{top:auto;bottom:calc(138px + env(safe-area-inset-bottom));left:14px;right:14px;width:auto;max-width:330px;padding:16px;margin:auto}
+ .welcome .eyebrow,.welcome small{display:none}.welcome h3{font-size:22px;margin:0 0 8px}.welcome p{font-size:14px;line-height:1.45;margin-bottom:12px}
+ .map-progress{display:block;font-size:14px;color:#c3d0c5;margin:10px 0}
+}
+@media (pointer:coarse) and (max-height:500px) and (orientation:landscape) {
+ .topbar{height:56px}.brand{flex-basis:160px}.brand h1{white-space:nowrap}.location{top:61px}.location h2{font-size:18px}
+ .minimap{top:68px;right:12px;width:72px}.minimap .map-svg{height:64px}
+ .interact{bottom:calc(16px + env(safe-area-inset-bottom));max-width:calc(100% - 320px)}
+ .welcome{bottom:20px;max-width:300px}.welcome p{display:none}
+}

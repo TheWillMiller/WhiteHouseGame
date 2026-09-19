@@ -7,9 +7,9 @@ const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.qa');
 fs.mkdirSync(output, { recursive: true });
-for (const file of ['render-budget', 'landscape', 'staff-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
+for (const file of ['render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
  const source = fs.readFileSync(path.join(root, 'lib', file + '.ts'), 'utf8').replace("new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})", 'globalThis.__testRenderer()');
- const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(render-budget|landscape|staff-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
+ const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
  fs.writeFileSync(path.join(output, file + '.mjs'), built);
 }
 const ctx = new Proxy({}, { get: () => () => {}, set: () => true });
