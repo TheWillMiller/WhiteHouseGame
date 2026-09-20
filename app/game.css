@@ -42,3 +42,7 @@
 
 .topbar button[aria-pressed="true"]{background:#d8bd7c;color:#142f32}
 @media (max-width:390px){.brand{flex-basis:65px}.topbar nav{gap:3px}.topbar nav button[aria-label="Enable ambient sound"],.topbar nav button[aria-label="Mute ambient sound"]{display:none}}
+
+.player-mode{max-width:240px;white-space:normal;line-height:1.4}.map-point text{paint-order:stroke;stroke:#153332;stroke-width:.8px;stroke-linejoin:round}.map-point circle{stroke:#1b3437;stroke-width:.6px}
+
+.activity-notice{position:absolute;bottom:220px;left:38px;max-width:290px;padding:12px 16px;background:#153638e8;border:1px solid #d8bd7c88;border-radius:8px;font-size:14px;line-height:1.5;pointer-events:none}@media(pointer:coarse){.activity-notice{left:14px;bottom:200px;max-width:260px}}

@@ -6,7 +6,7 @@ const {insideWest,westDestinations}=await import('../.qa/west-layout.mjs');
 const west=interior('west'),ground=interior('ground');
 const blocked=(x,z)=>!insideWest(x,z)||west.solids.some(s=>Math.abs(x-s.x)<s.w/2+.36&&Math.abs(z-s.z)<s.d/2+.36);
 function route(points){for(let i=1;i<points.length;i++){const [ax,az]=points[i-1],[bx,bz]=points[i];for(let t=0;t<=1;t+=.01)assert(!blocked(ax+(bx-ax)*t,az+(bz-az)*t),`Blocked connection at ${ax+(bx-ax)*t},${az+(bz-az)*t}`);}}
-route([[-6,-6],[17,-6],[17,-21],[25,-21],[36,-21],[36,-32],[49,-32],[49,-28],[56,-28],[56,-32],[81,-32],[81,-28],[89,-28],[93,-23]]);
+route([[-6,-6],[17,-6],[17,-21],[25,-21],[36,-21],[36,-33.6],[52,-33.6],[52,-28],[56,-28],[56,-32],[81,-32],[81,-28],[89,-28],[93,-23]]);
 route([[25,-21],[91,-21],[91,-23]]); // Parallel West Colonnade / Palm Room route.
 route([[12,15.6],[16,15.6]]); // Study to Oval Office, through the west wall.
 const toResidence=west.spots.find(s=>s.id==='residence-west'),toWest=ground.spots.find(s=>s.id==='to-west');

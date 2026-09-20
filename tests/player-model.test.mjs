@@ -24,6 +24,19 @@ const foot=model.object.getObjectByName('LeftFoot'),footPath=[];assert(foot);
 for(let i=0;i<90;i++){model.animate(1.6/60,1/60,false,'stroll');model.object.updateMatrixWorld(true);footPath.push(foot.getWorldPosition(new T.Vector3()));}
 assert(Math.max(...footPath.map(p=>p.distanceTo(footPath[0])))>.3,'C movement must animate a stride rather than slide in a held pose');
 model.emote(null);for(let i=0;i<60;i++)model.animate(0,1/60,false);
+model.pose('sit');for(let i=0;i<60;i++)model.animate(0,1/60,false);model.object.updateMatrixWorld(true);
+for(const side of ['Left','Right']){
+ const hip=model.object.getObjectByName(side+'UpLeg').getWorldPosition(new T.Vector3()),knee=model.object.getObjectByName(side+'Leg').getWorldPosition(new T.Vector3()),ankle=model.object.getObjectByName(side+'Foot').getWorldPosition(new T.Vector3());
+ assert(Math.abs(hip.y-.96)<.06,'Seated hips match chair cushion height');
+ assert(Math.abs(knee.y-hip.y)<.06,'Seated thighs are horizontal');
+ assert(ankle.y<knee.y-.45&&ankle.y>.05,'Seated shins point down and feet stay above floor');
+ assert(knee.z<hip.z-.5,'Seated knees face the front of the chair');
+ console.log('Seated '+side,hip.toArray(),knee.toArray(),ankle.toArray());
+}
+model.pose(null);assert.equal(model.object.position.y,0,'Standing removes sitting height offset');
+model.pose('briefing');for(let i=0;i<120;i++)model.animate(0,1/60,false);model.object.updateMatrixWorld(true);
+assert(model.object.getObjectByName('RightHand').getWorldPosition(new T.Vector3()).y>1,'Briefing hand remains above lectern level');
+model.pose(null);for(let i=0;i<60;i++)model.animate(0,1/60,false);
 let frames=0;const vertex=new T.Vector3();
 for(const [label,mode,distance,airborne,gesture] of [['idle','walk',0,false,null],['walking','walk',3.2/60,false,null],['running','run',6.5/60,false,null],['sprint','sprint',9/60,false,null],['stroll','stroll',1.6/60,false,null],['dance','walk',0,false,'dance'],['ymca','walk',0,false,'ymca'],['victory','walk',0,false,'victory'],['backflip','walk',0,false,'backflip'],['jumping','walk',0,true,null]]){
   model.emote(gesture);const limits=new T.Box3();

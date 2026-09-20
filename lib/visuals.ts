@@ -151,8 +151,8 @@ export function deskDetails(g:T.Group,x:number,z:number,width:number,depth:numbe
   }
   block(g,x,1.317,z-.1,width*.40,.018,depth*.64,0x273c39,.006);
   for(const side of [-1,1]){const paper=block(g,x+side*.29,1.34,z-.18,.49,.012,.5,0xf7f2dd);paper.rotation.y=side*.06;for(let i=0;i<4;i++)block(g,x+side*.29,1.349,z-.31+i*.06,.3,.003,.006,0x9a9d92);}
-  block(g,x+.92,1.40,z-.14,.38,.14,.26,0x1e2931,.05);const handset=block(g,x+.92,1.49,z-.13,.45,.08,.11,0x15212a,.035);handset.rotation.y=.15;
-  cylinder(g,x-.8,1.46,z,.08,.27,0x69412d);for(let i=0;i<3;i++)cylinder(g,x-.84+i*.035,1.65,z,.012,.25,0xd9b458);
+  block(g,x+Math.min(.92,width*.29),1.40,z-.14,.38,.14,.26,0x1e2931,.05);const handset=block(g,x+Math.min(.92,width*.29),1.49,z-.13,.45,.08,.11,0x15212a,.035);handset.rotation.y=.15;
+  cylinder(g,x-Math.min(.8,width*.29),1.46,z,.08,.27,0x69412d);for(let i=0;i<3;i++)cylinder(g,x-Math.min(.84,width*.3)+i*.035,1.65,z,.012,.25,0xd9b458);
   if(hero){for(const side of [-1,1]){block(g,x+side*1.75,1.53,z+.38,.45,.43,.045,0xd9b458,.015);block(g,x+side*1.75,1.54,z+.35,.35,.32,.016,0x405c6c);} }
 }
 export function carpetDetail(g:T.Group,x:number,z:number,rx:number,rz:number,oval=false){
@@ -186,7 +186,7 @@ export function roomDetails(g:T.Group,d:Destination){
    const wx=d.x-rx+(i+.5)*r.w/count;
    if(doors.some(door=>Math.abs(wx-door)<3.1))continue;
    const drape=new T.Group();drape.position.set(wx,0,edge-outward*.21);if(outward<0)drape.rotation.y=Math.PI;
-   windowDressing(drape,0,0,1.4,false);g.add(drape);
+   if(r.style==='press'||r.style==='press-offices'){block(drape,0,2.55,0,1.7,2.7,.08,0x70949c);for(const sx of [-.89,.89])block(drape,sx,2.55,-.08,.1,2.9,.16,0xf5f0df);block(drape,0,2.55,-.1,.07,2.7,.1,0xf5f0df);for(const y of [1.17,2.1,3,3.93])block(drape,0,y,-.1,1.88,.08,.13,0xf5f0df);}else windowDressing(drape,0,0,1.4,false);g.add(drape);
   }
  }
 }

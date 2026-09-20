@@ -6,7 +6,7 @@ export const TRUMP_MODEL_FILE='models/trump-detailed-v3.glb';
 export function playerModelUrl(pathname:string){return(pathname==='/trumpgame'||pathname.startsWith('/trumpgame/')?'/trumpgame/':'/')+TRUMP_MODEL_FILE;}
 export type Emote='dance'|'ymca'|'victory'|'backflip';
 export type Locomotion='walk'|'stroll'|'run'|'sprint';
-export type PlayerModel={object:T.Group;animate:(distance:number,dt:number,airborne:boolean,mode?:Locomotion)=>void;emote:(name:Emote|null)=>void;dispose:()=>void};
+export type PlayerModel={object:T.Group;animate:(distance:number,dt:number,airborne:boolean,mode?:Locomotion)=>void;emote:(name:Emote|null)=>void;pose:(name:'sit'|'briefing'|null)=>void;dispose:()=>void};
 
 export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):PlayerModel{
   const object=new T.Group();object.name='Animated Meshy Trump';object.add(scene);
@@ -37,13 +37,20 @@ export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):Play
   }));
   for(const clip of [...clips,idle]){const a=mixer.clipAction(clip);if(clip.name==='victory'||clip.name==='backflip'){a.setLoop(T.LoopOnce,1);a.clampWhenFinished=true;}a.setEffectiveWeight(0).play();actions.set(clip.name,a);}
   for(const key of ['walk','stroll','run','sprint','dance','ymca','victory','backflip'])if(!actions.has(key))throw Error('Missing animation '+key);
-  let current='idle',gesture:Emote|null=null,gestureTime=0;
+  let current='idle',gesture:Emote|null=null,gestureTime=0,posed:'sit'|'briefing'|null=null,poseTime=0;
+  const bones=new Map<string,T.Object3D>();scene.traverse(o=>{if(o instanceof T.Bone)bones.set(o.name,o);});
+  let unposed:{bone:T.Object3D;rotation:T.Quaternion}[]=[];
+  const restorePose=()=>{for(const {bone,rotation}of unposed)bone.quaternion.copy(rotation);unposed=[];};
+  // Aim the exported skeleton's local +Y bone axes in model space, preserving its bind matrices.
+  const aim=(name:string,direction:T.Vector3)=>{const bone=bones.get(name);if(!bone?.parent)return;object.updateMatrixWorld(true);const worldDirection=direction.clone().applyQuaternion(scene.getWorldQuaternion(new T.Quaternion()));const rotation=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),worldDirection.normalize());bone.quaternion.copy(bone.parent.getWorldQuaternion(new T.Quaternion()).invert().multiply(rotation));};
+  const pose=(name:'sit'|'briefing'|null)=>{restorePose();posed=name;poseTime=0;gesture=null;object.position.y=0;};
   actions.get('idle')!.setEffectiveWeight(1);mixer.update(0);
   function select(name:string){if(current===name)return;const next=actions.get(name)!,weight=next.getEffectiveWeight();next.reset().play();next.setEffectiveWeight(weight);current=name;}
   const emote=(name:Emote|null)=>{gesture=name;gestureTime=0;if(name){select(name);actions.get(name)!.reset().play();}};
   const animate=(distance:number,dt:number,airborne:boolean,mode:Locomotion='walk')=>{
+    restorePose();
     const moving=distance>.0001;
-    if(moving||airborne)gesture=null;
+    if(moving||airborne){gesture=null;posed=null;object.position.y=0;}
     if(gesture){gestureTime+=dt;const duration=actions.get(gesture)!.getClip().duration;if((gesture==='victory'||gesture==='backflip')&&gestureTime>=duration)gesture=null;}
     // Normal jumping uses a bent-leg running pose while game physics owns height.
     const desired=airborne?'run':gesture??(moving?(mode==='stroll'?'walk':mode):'idle');select(desired);
@@ -52,8 +59,21 @@ export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):Play
     if(airborne){selected.time=selected.getClip().duration*.20;selected.setEffectiveTimeScale(0);}
     if(moving&&!airborne){const nominal={walk:3.2,stroll:3.2,run:6.5,sprint:9}[mode];selected.setEffectiveTimeScale(T.MathUtils.clamp(distance/Math.max(dt,.001)/nominal,.2,1.5));}
     mixer.update(dt);
+    if(posed){unposed=[...bones.values()].map(bone=>({bone,rotation:bone.quaternion.clone()}));poseTime+=dt;object.position.y=posed==='briefing'?.25:0;object.updateMatrixWorld(true);
+      const feet=['LeftFoot','RightFoot'].map(name=>bones.get(name)!.getWorldQuaternion(new T.Quaternion()));
+      if(posed==='sit'){
+        const hip=object.worldToLocal(bones.get('LeftUpLeg')!.getWorldPosition(new T.Vector3()));object.position.y=.96-hip.y;
+        for(const [i,side] of ['Left','Right'].entries()){
+          aim(side+'UpLeg',new T.Vector3(i===0?.09:-.09,0,1));aim(side+'Leg',new T.Vector3(0,-1,.07));
+          const foot=bones.get(side+'Foot')!;object.updateMatrixWorld(true);foot.quaternion.copy(foot.parent!.getWorldQuaternion(new T.Quaternion()).invert().multiply(feet[i]));
+          aim(side+'Arm',new T.Vector3(i===0?.12:-.12,-1,.14));aim(side+'ForeArm',new T.Vector3(0,-.15,1));
+        }
+      }else{
+        aim('RightArm',new T.Vector3(-.2,-1,.18));aim('RightForeArm',new T.Vector3(-.12,.2+Math.sin(poseTime*1.9)*.15,1));
+      }
+    }
   };
-  return {object,animate,emote,dispose(){
+  return {object,animate,emote,pose,dispose(){
     mixer.stopAllAction();mixer.uncacheRoot(scene);
     const geos=new Set<T.BufferGeometry>(),mats=new Set<T.Material>(),textures=new Set<T.Texture>(),skeletons=new Set<T.Skeleton>();
     scene.traverse(o=>{if(o instanceof T.Mesh){geos.add(o.geometry);if(o instanceof T.SkinnedMesh)skeletons.add(o.skeleton);for(const m of Array.isArray(o.material)?o.material:[o.material]){mats.add(m);for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);}}});

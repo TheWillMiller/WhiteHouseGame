@@ -1,0 +1,8 @@
+Presidential Walk of Fame gallery portraits
+Source: https://www.whitehouse.gov/walk-of-fame/
+Images: https://www.whitehouse.gov/wp-content/uploads/2026/06/p01.png through p47.png
+Accessed September 20, 2026. Official U.S. government gallery photographs, including historic portrait reproductions. Resized into one texture atlas. No endorsement implied.
+The game nameplates give names and terms; they do not reproduce the exhibition's biographical commentary.
+
+Hall artwork: Emanuel Leutze, Washington Crossing the Delaware, 1851. Metropolitan Museum of Art Open Access / public domain. https://www.metmuseum.org/art/collection/search/11417
+The game uses this public-domain reproduction to evoke the historically documented West Wing lobby artwork; placement and additional hallway reproductions are interpretive.

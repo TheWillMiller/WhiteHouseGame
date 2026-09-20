@@ -8,9 +8,9 @@ const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.qa');
 fs.mkdirSync(output, { recursive: true });
-for (const file of ['grounds-layout', 'room-finishes', 'west-layout', 'skinning', 'render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
+for (const file of ['colonnade-people', 'interior-details', 'worksite', 'estate-map', 'grounds-layout', 'room-finishes', 'west-layout', 'skinning', 'render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
  const source = fs.readFileSync(path.join(root, 'lib', file + '.ts'), 'utf8').replace("new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})", 'globalThis.__testRenderer()');
- const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(grounds-layout|room-finishes|west-layout|skinning|render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
+ const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(colonnade-people|interior-details|worksite|estate-map|grounds-layout|room-finishes|west-layout|skinning|render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
  fs.writeFileSync(path.join(output, file + '.mjs'), built);
 }
 const ctx = new Proxy({}, { get: () => () => {}, set: () => true });
@@ -67,6 +67,16 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  for(const d of destinations){game.travel(d.id);game.loop(4000+count++*16.67);assert.equal(game.zone,d.zone);assert(Number.isFinite(game.camera.position.x),'camera stays finite after travel');}
  for(const npc of npcs){game.change(npc.zone,npc.x,npc.z+1.2);game.loop(6000+count++*16.67);assert.equal(game.nearby?.id,npc.id,`interaction target for ${npc.id}`);game.interact();assert.equal(talking,npc.id);assert(game.met.has(npc.id));}
  game.toggleCamera();game.loop(9000);assert(!game.player.visible,'eye-level camera hides the avatar');assert(Math.abs(game.camera.position.x-game.player.position.x)<1e-8,'eye-level camera stays with the player');game.toggleCamera();game.loop(9017);assert(!snapshot.firstPerson,'camera toggle returns to third person');
+ // Interactive seating and lectern must return to a clear approach spot, including on mobile movement.
+ for(const [destination,id]of [['oval','sit-resolute'],['press','briefing-lectern']]){
+  game.travel(destination);const spot=game.world.spots.find(s=>s.id===id);assert(spot);assert(!game.blocked(spot.x,spot.z),id+': clear approach');
+  game.change(game.zone,spot.x,spot.z);game.loop(9200);assert.equal(game.nearby.id,id);const before=game.player.position.clone();game.interact();assert.equal(game.activePose.id,id);assert.equal(game.player.position.x,spot.pose[0]);
+  game.pause(true);game.interact();assert(game.activePose,'Paused interaction does not stand');game.pause(false);game.interact();assert(!game.activePose);assert(game.player.position.equals(before),'E returns to the approach position');
+  game.nearby=spot;game.interact();game.key('KeyW',true);game.loop(9220);game.key('KeyW',false);assert(!game.activePose,'Movement stands up');assert(!game.blocked(game.player.position.x,game.player.position.z),'Standing does not trap the player');
+ }
+ game.travel('ballroom');const control=game.world.spots.find(s=>s.kind==='equipment');game.change('grounds',control.x,control.z);game.loop(9250);game.interact();assert(game.activity.includes('Lift signaled'),'Worksite control starts a lift');
+ const crane=game.world.group.getObjectByName('Working tower crane');assert(crane&&crane.children.length);const dynamic=[];crane.traverse(o=>{if(o.isMesh&&o.userData.dynamic)dynamic.push(o);});assert(dynamic.length>4,'Crane rig survives static batching');
+ const positions=dynamic.map(o=>{o.updateWorldMatrix(true,false);return o.getWorldPosition(new (o.position.constructor)());});game.world.worksite.update(6);assert(dynamic.some((o,i)=>{o.updateWorldMatrix(true,false);return o.getWorldPosition(o.position.clone()).distanceTo(positions[i])>1;}),'Crane actually moves the load');
  const before=game.zone;assert.throws(()=>game.travel('not-a-destination'));assert.equal(game.zone,before,'invalid travel preserves state');assert(snapshot);game.dispose();
  console.log(`PASS: ${destinations.length} travel destinations, ${npcs.length} NPC conversations, finite geometry, walking connectivity, movement, jump/landing, pause, travel, camera calculations and interaction state. Renderer stubbed; no visual QA.`);
 })().catch(error=>{console.error(error.message);process.exitCode=1;});
