@@ -4,7 +4,7 @@ import { material } from './visuals';
 
 const surfaces = new Map<string, T.MeshStandardMaterial>();
 /** A repeating 4.8 x 4.8 world-unit sample, never stretched to a room's size. */
-function finish(kind: 'oak' | 'stone' | 'carpet') {
+function finish(kind: 'oak' | 'stone' | 'carpet' | 'hall-carpet') {
   if (surfaces.has(kind)) return surfaces.get(kind)!;
   const n = 512, data = new Uint8Array(n * n * 4);
   for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
@@ -13,8 +13,9 @@ function finish(kind: 'oak' | 'stone' | 'carpet') {
     const variation = Math.sin(row * 13.1 + Math.floor((x + row % 2 * 128) / 256) * 4.2);
     const joint = kind === 'oak' ? (y % 32 === 0 || end === 0) : kind === 'stone' ? (x % 128 === 0 || y % 128 === 0) : false;
     const grain = Math.sin(y * 1.9 + Math.sin(x * .021) * 1.7) * 1.5;
-    const base = kind === 'oak' ? [158, 119, 79] : kind === 'stone' ? [205, 203, 190] : [86, 101, 102];
-    for (let c = 0; c < 3; c++) data[(y * n + x) * 4 + c] = base[c] + (joint ? -13 : variation * 5 + grain + hash * 3);
+    const base = kind === 'oak' ? [158, 119, 79] : kind === 'stone' ? [205, 203, 190] : kind==='hall-carpet' ? [151,140,117] : [86, 101, 102];
+    const diamond=kind==='hall-carpet'&&((x+y)%32<2||(x-y+512)%32<2)?-11:0;
+    for (let c = 0; c < 3; c++) data[(y * n + x) * 4 + c] = base[c] + diamond + (joint ? -13 : variation * 5 + grain + hash * 3);
     data[(y * n + x) * 4 + 3] = 255;
   }
   const texture = new T.DataTexture(data, n, n); texture.colorSpace = T.SRGBColorSpace;
@@ -24,8 +25,9 @@ function finish(kind: 'oak' | 'stone' | 'carpet') {
   surfaces.set(kind, mat); return mat;
 }
 export function clearRoomFinishes() { surfaces.forEach(m => { m.map?.dispose(); m.dispose(); }); surfaces.clear(); }
+export function circulationFloor(g:T.Group,x:number,z:number,w:number,d:number){const geo=new T.PlaneGeometry(w,d);geo.rotateX(-Math.PI/2);const uv=geo.getAttribute('uv'),pos=geo.getAttribute('position');for(let i=0;i<uv.count;i++)uv.setXY(i,(pos.getX(i)+x)/4.8,(pos.getZ(i)+z)/4.8);const floor=new T.Mesh(geo,finish('hall-carpet'));floor.position.set(x,.029,z);floor.receiveShadow=true;floor.name='Continuous corridor carpet';g.add(floor);}
 export function floorFinish(g: T.Group, d: Destination) {
-  const r = d.room!, kind = ['press','press-offices'].includes(r.style) ? 'carpet' : ['corridor','palm','hall','kitchen','flowers'].includes(r.style) ? 'stone' : 'oak';
+  const r = d.room!, kind = ['west-lobby','press-hall','reception','president-secretary'].includes(d.id)?'hall-carpet':['press','press-offices'].includes(r.style) ? 'carpet' : ['corridor','palm','hall','kitchen','flowers'].includes(r.style) ? 'stone' : 'oak';
   const geo = new T.PlaneGeometry(r.w, r.d); geo.rotateX(-Math.PI / 2);
   const uv = geo.getAttribute('uv'), pos = geo.getAttribute('position');
   for (let i = 0; i < uv.count; i++) uv.setXY(i, (pos.getX(i) + d.x) / 4.8, (pos.getZ(i) + d.z) / 4.8);

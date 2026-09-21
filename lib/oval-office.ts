@@ -112,7 +112,7 @@ function shell(g: T.Group, solids: Solid[]) {
   // Small collision tiles cover the continuous wall; windows remain solid at foot level.
   const n = 384; for (let i = 0; i < n; i++) { const a = (i + .5) / n * Math.PI * 2; if (!ovalDoor(a)) solids.push({ x: (OVAL.rx + .08) * Math.cos(a), z: (OVAL.rz + .08) * Math.sin(a), w: .28, d: .28 }); }
   // Wainscot panels follow the wall tangent, instead of cutting through the ellipse.
-  for (let i = 0; i < 48; i++) { const a = (i + .5) / 48 * Math.PI * 2; if (ovalDoor(a) || windowAt(a) || Math.abs(a - .10) < .20 || a > 6.17 || Math.abs(a - 2.96) < .20 || Math.abs(a - Math.PI * 1.5) < .25) continue; const p = anchor(g, a, .20); frame(p, 0, .66, -.01, .56, .69, false); p.children.forEach(m => { if (m instanceof T.Mesh) m.material = material(C.white); }); }
+  for (let i = 0; i < 48; i++) { const a = (i + .5) / 48 * Math.PI * 2; if ([a-.065,a,a+.065].some(t=>ovalDoor(t)||windowAt(t)) || Math.abs(a - .10) < .20 || a > 6.17 || Math.abs(a - 2.96) < .20 || Math.abs(a - Math.PI * 1.5) < .25) continue; const p = anchor(g, a, .20); frame(p, 0, .66, -.01, .56, .69, false); p.children.forEach(m => { if (m instanceof T.Mesh) m.material = material(C.white); }); }
   for (let i = 0; i < 100; i++) { const p = anchor(g, i / 100 * Math.PI * 2, .16); box(p, 0, 5.02, 0, .11, .09, .1, C.gold); }
   // Northwest lobby entry and the west study connection.
   for (const a of [...OVAL.door,...OVAL.studyDoor]) { const p = anchor(g, a, .08); box(p, 0, 1.9, 0, .13, 3.8, .33, C.white); box(p, 0, 1.9, -.19, .035, 3.8, .035, C.gold); }
@@ -187,11 +187,11 @@ function fireplace(g: T.Group, solids: Solid[]) {
 function wallDecor(g: T.Group) {
   portrait(anchor(g, 4.39, .17), 'franklin', .93, 1.14, 3.14);
   portrait(anchor(g, 5.05, .17), 'jefferson', .89, 1.18, 3.12);
-  portrait(anchor(g, 3.32, .17), 'adams', 1.09, 1.34, 3.22);
+  portrait(anchor(g, 3.51, .17), 'adams', 1.09, 1.34, 3.22);
   portrait(anchor(g, 2.52, .17), 'lincoln', 1.0, 1.34, 3.08);
   portrait(anchor(g, .62, .17), 'jackson', 1.0, 1.34, 3.08);
   // Recessed panel doors stay within the tangent wall, with visible hardware.
-  for (const a of [.10, 2.96]) { const p = anchor(g, a, .08); box(p, 0, 1.67, -.005, 1.42, 3.31, .09, C.white); frame(p, 0, 1.69, -.055, 1.50, 3.40, false); for (const y of [.68, 1.73, 2.76]) frame(p, 0, y, -.07, 1.06, .70, false); p.traverse(o => { if (o instanceof T.Mesh) o.material = material(C.white); }); orb(p, .56, 1.47, -.20, .06, .06, .065, C.gold); }
+  for (const a of [.10]) { const p = anchor(g, a, .08); box(p, 0, 1.67, -.005, 1.42, 3.31, .09, C.white); frame(p, 0, 1.69, -.055, 1.50, 3.40, false); for (const y of [.68, 1.73, 2.76]) frame(p, 0, y, -.07, 1.06, .70, false); p.traverse(o => { if (o instanceof T.Mesh) o.material = material(C.white); }); orb(p, .56, 1.47, -.20, .06, .06, .065, C.gold); }
   const clock = anchor(g, 5.78, .52); clock.name = 'Grandfather clock'; box(clock, 0, 1.53, 0, .80, 3.06, .42, C.walnut, .025); box(clock, 0, 1.38, -.23, .55, 1.76, .035, 0x302d24); box(clock, 0, .15, -.01, .94, .30, .55, C.mahogany); box(clock, 0, 3.03, -.01, 1.01, .16, .59, C.mahogany);
   const face = cyl(clock, 0, 2.54, -.26, .32, .04, 0xf0dfb2); face.rotation.x = Math.PI / 2; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; box(clock, Math.sin(a) * .26, 2.54 + Math.cos(a) * .26, -.29, .025, .04, .015, 0x40382b); } box(clock, 0, 2.63, -.30, .026, .19, .01, 0x302d24); const hand = box(clock, .06, 2.54, -.305, .14, .025, .01, 0x302d24); hand.rotation.z = -.45; cyl(clock, 0, 1.36, -.26, .018, 1.16, C.gold); const pendulum = cyl(clock, 0, .82, -.27, .14, .035, C.gold); pendulum.rotation.x = Math.PI / 2;
 }

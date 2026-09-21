@@ -1,0 +1,25 @@
+// Run after world.test.cjs. Regression rays use the actual batched scene meshes.
+import assert from 'node:assert/strict';
+import * as T from 'three';
+globalThis.DOMRect ??= class DOMRect {};
+const ctx=new Proxy({},{get:()=>()=>{},set:()=>true});
+globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>ctx})};
+const {grounds}=await import('../.qa/game.mjs');
+const {openDoor,colonnadeGallery,exteriorGallery,corridorFace}=await import('../.qa/interior-details.mjs');
+const {buildOvalOffice,OVAL}=await import('../.qa/oval-office.mjs');
+const exterior=grounds().group;exterior.updateMatrixWorld(true);const facadeMeshes=[];exterior.traverse(o=>{if(o.isMesh)facadeMeshes.push(o);});
+for(const [x,z,dir]of [[-60,-38,-1],[-39,-27.25,1]])for(const dx of [-.85,0,.85])for(const y of [.6,1.6,2.8]){
+ const ray=new T.Raycaster(new T.Vector3(x+dx,y,z+dir*.65),new T.Vector3(0,0,-dir),0,1.15);
+ assert.equal(ray.intersectObjects(facadeMeshes,false).length,0,'no masonry or window behind entrance '+[x,z,dx,y]);
+}
+const gallery=new T.Group();colonnadeGallery(gallery);assert.equal(gallery.children.filter(o=>o.name.startsWith('Gallery portrait:')).length,47);
+const preview=new T.Group();exteriorGallery(preview);assert.equal(preview.children.filter(o=>o.name.startsWith('Gallery portrait:')).length,8);
+const doors=new T.Group();openDoor(doors,36,-25);openDoor(doors,36,-25);assert.equal(doors.children.length,1,'shared press/colonnade doorway created once');
+const hall=new T.Group();corridorFace(hall,-18,4,5,true,-1);assert(hall.children.length>8,'circulation-facing walls receive finish and art');
+const room=new T.Group();buildOvalOffice(room,0,0);room.updateMatrixWorld(true);
+for(const [start,end]of [OVAL.door,OVAL.studyDoor])for(let a=start+.055;a<end-.055;a+=.025)for(const y of [.7,1.5,2.8]){
+ const p=new T.Vector3(OVAL.rx*Math.cos(a),y,OVAL.rz*Math.sin(a)),dir=new T.Vector3(Math.cos(a),0,Math.sin(a));
+ const ray=new T.Raycaster(p.clone().addScaledVector(dir,-.55),dir,0,1.1);
+ assert.equal(ray.intersectObject(room,true).length,0,'Oval doorway free from decorative doors, frames and portraits '+[a,y]);
+}
+console.log('PASS: both exterior doorway openings, 47 gallery portraits, 8 exterior preview portraits, shared door deduplication, corridor surfaces, and clear Oval doorway mesh rays.');

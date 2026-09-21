@@ -104,3 +104,14 @@ This pass improves the existing adaptation; it does not establish measured archi
 The user's south-up aerial reference places the Rose Garden between the residence and the West Wing, immediately south of the press-room/colonnade connection. `lib/grounds-layout.ts` is now the shared source for the relocated garden, exterior geometry, map marker and garden transitions. The lawn is uninterrupted, with perimeter beds and paths; the old oversized garden south of both buildings is removed. The West Wing north approach gains a curved drive and crossing walks. Approximate game dimensions are retained, and this reference is not treated as evidence of the current planting or paving configuration.
 
 `node tests/grounds-layout.test.mjs` (after `node tests/world.test.cjs`) checks these relative positions, the garden/colonnade and north-entrance walking routes, reciprocal garden transitions, and upward-facing path geometry.
+
+
+## Gallery access, corridor elevations and doorway repairs
+
+The travel map now has a persistent **Visit the portrait gallery** shortcut. The full 47-picture Presidential Walk of Fame remains in the West Colonnade; eight recent entries also appear on the smaller exterior colonnade representation, with a physical entrance sign. Both use the same existing portrait atlas. Exterior and interior scales remain different game adaptations, not a seamless measured replica.
+
+The official archived West Wing tour informed cream corridor elevations, chair rails/cornices, patterned tan circulation carpet, blue lobby seating, wood side tables, lamps and historical photographic displays. Corridor-facing sides of office walls are now finished wherever they actually border circulation space. Shallow room signs sit outside door openings. Four dated official White House photos share a 1024-by-640 atlas; sources and interpretation are documented in `public/art/west-wing-history-credits.txt`. These are historical photographs, not a reconstruction of today's changing photo displays. No new per-picture textures or point lights were added.
+
+The north West Wing and garden/press entrances now have hollow facade shells with actual openings. Lower windows and masonry bands stop at the north door; duplicate unrotated exterior Oval windows were removed. The west walkway roof/columns were raised to clear the fanlights. Shared press/colonnade doors are created once. In the Oval, a decorative door was removed from the working study opening, the Adams portrait was moved clear, and panel trim checks its entire width against openings.
+
+Validation: `node tests/world.test.cjs`, `node tests/entrances-gallery.test.mjs`, `node tests/room-walkthrough.test.mjs`, the Oval/West-layout/grounds/render-budget suites, and TypeScript. New mesh-ray tests check both exterior door openings and the two Oval doors, plus gallery counts and duplicate-door prevention. This is geometry/behavior validation, not visual browser review or a measured mobile frame rate.

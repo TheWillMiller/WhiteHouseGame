@@ -63,6 +63,7 @@ export const npcs:NPC[]=[
 export const sources=[
  {title:'White House: official Presidential Walk of Fame gallery',url:'https://www.whitehouse.gov/walk-of-fame/'},
  {title:'Archived official West Wing tour and floor plan',url:'https://obamawhitehouse.archives.gov/node/354641'},
+ {title:'Historical hallway photographs: sources and dates',url:'art/west-wing-history-credits.txt'},
  {title:'Colonnade gallery image credits',url:'art/colonnade-credits.txt'},
  {title:'Staff characters · Microsoft Rocketbox · MIT license and credits',url:'models/staff/credits.txt'},
  {title:'White House residence · Void · CC BY 4.0 · Model credits',url:'models/credits.txt'},

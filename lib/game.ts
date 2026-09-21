@@ -1,8 +1,8 @@
-import {fanlight,openDoor,hallDetails,textPanel,clearInteriorDetails} from './interior-details';
+import {fanlight,openDoor,hallDetails,textPanel,corridorFace,corridorRoomSigns,exteriorGallery,clearInteriorDetails} from './interior-details';
 import {buildWorksite,type Worksite} from './worksite';
 import {renderEstateMap} from './estate-map';
 import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE} from './grounds-layout';
-import {floorFinish,ceiling,wallPanels,clearRoomFinishes} from './room-finishes';
+import {floorFinish,circulationFloor,ceiling,wallPanels,clearRoomFinishes} from './room-finishes';
 import {insideWest,WEST_FOOTPRINT} from './west-layout';
 import * as T from 'three';
 import { residenceExterior } from './architecture';
@@ -55,10 +55,20 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  solid(w,0,-27.2,50,25.7);solid(w,0,-11.3,11.5,7.7);
  for(const side of [-1,1])solid(w,side*8,-9,6.2,12);
  solid(w,0,-46.3,16,13);for(const side of [-1,1])solid(w,side*11,-47,3.9,15.3);
- for(const side of [-1,1]){box(g,side*34,3.4,-27,18,.4,5.5,C.white);for(let i=0;i<7;i++){const x=side*(26+i*2.7);cyl(g,x,1.65,-24.5,.22,3.3,C.white,8);solid(w,x,-24.5,.44,.44,3.3);}}
- box(g,-58,3.4,-20,32,6.8,36,C.white);solid(w,-58,-20,32,36);box(g,-58,7,-20,33,.5,37,C.trim);for(let x=-71;x<-43;x+=4)for(const z of [-38.1,-1.9])box(g,x,2.55,z,1.8,2.45,.15,C.window);box(g,-41.9,1.8,-24,.15,3.5,2.5,C.window);
- const ov=cyl(g,-47,2.6,-1.5,6.8,5.2,C.white,24);ov.scale.z=.8;solid(w,-47,-1.5,11,9);for(let i=0;i<6;i++){const a=i/6*Math.PI;box(g,-47+Math.cos(a)*6.2,2.8,-1.5+Math.sin(a)*5.3,.8,2.8,.25,C.window);}
- box(g,-34,2.1,-31,18,4.2,7.5,C.white);solid(w,-34,-31,18,7.5);box(g,-34,4.35,-31,18.5,.3,8,C.trim);for(let x=-40;x<-26;x+=3){fanlight(g,x,2.8,-27.18,.75);box(g,x,2.3,-34.82,1.65,2.3,.12,C.window);for(const side of [-1,1])box(g,x+side*.86,2.3,-34.91,.12,2.5,.12,C.white);box(g,x,2.3,-34.95,.05,2.3,.05,C.white);box(g,x,2.3,-34.95,1.65,.05,.05,C.white);}openDoor(g,-39,-27.2);openDoor(g,-60,-38.2,Math.PI);
+ for(const side of [-1,1]){const height=side<0?4.2:3.3;box(g,side*34,height+.1,side<0?-25.1:-27,18,.3,side<0?4:5.5,C.white);for(let i=0;i<7;i++){const x=side*(26+i*2.7);cyl(g,x,height/2,-24.5,.22,height,C.white,12);solid(w,x,-24.5,.44,.44,height);}}
+ // Hollow facade shells leave genuine openings behind the two entrance doors.
+ for(const [cx,width]of [[-67.8,12.4],[-50.2,16.4]])box(g,cx,3.4,-38,width,6.8,.25,C.white);
+ box(g,-60,5.3,-38,3.2,3,.25,C.white);box(g,-58,3.4,-2,32,6.8,.25,C.white);
+ for(const x of [-74,-42])box(g,x,3.4,-20,.25,6.8,36,C.white);
+ box(g,-58,.025,-20,32,.05,36,0xc1baa8);solid(w,-58,-20,32,36);box(g,-58,7,-20,33,.5,37,C.trim);
+ const ov=cyl(g,-47,2.6,-1.5,6.8,5.2,C.white,48);ov.scale.z=.8;solid(w,-47,-1.5,11,9);
+ for(const [cx,width]of [[-41.8,2.4],[-31.2,12.4]])box(g,cx,2.1,-27.25,width,4.2,.18,C.white);
+ box(g,-39,3.95,-27.25,3.2,.5,.18,C.white);box(g,-34,2.1,-34.75,18,4.2,.18,C.white);
+ for(const x of [-43,-25])box(g,x,2.1,-31,.18,4.2,7.5,C.white);
+ box(g,-34,.025,-31,18,.05,7.5,0xc1baa8);solid(w,-34,-31,18,7.5);box(g,-34,4.35,-31,18.5,.3,8,C.trim);
+ for(let x=-40;x<-26;x+=3){if(Math.abs(x+39)>2.5)fanlight(g,x,3.25,-27.10,.65);box(g,x,2.3,-34.82,1.65,2.3,.12,C.window);for(const side of [-1,1])box(g,x+side*.86,2.3,-34.91,.12,2.5,.12,C.white);box(g,x,2.3,-34.95,.05,2.3,.05,C.white);box(g,x,2.3,-34.95,1.65,.05,.05,C.white);}
+ openDoor(g,-39,-27.2);openDoor(g,-60,-38.2,Math.PI);exteriorGallery(g);
+
  flag(g,0,18.53,-23,1.2);
  // Gardens and trees.
  for(const garden of GARDENS){const {x,z,w:width,d:depth,lawnW,lawnD}=garden;
@@ -162,6 +172,7 @@ function wall(w:World,x:number,z:number,length:number,vertical:boolean,color:num
  for(const {a,b}of parts){const px=vertical?x:(a+b)/2,pz=vertical?(a+b)/2:z;
    box(w.group,px,2.3,pz,vertical?.22:b-a,4.6,vertical?b-a:.22,0xe9e2cd);
    wallPanels(w.group,px,pz,b-a,vertical,inward,color);
+   if(w.group.userData.west)corridorFace(w.group,px,pz,b-a,vertical,inward);
    solid(w,px,pz,vertical?.22:b-a,vertical?b-a:.22,4.6);
  }
  for(const d of openings){
@@ -197,7 +208,15 @@ function furnish(w:World,d:Destination){const g=w.group,{x,z}=d,r=d.room!,{style
  const north=z-rz,south=z+rz;roomDetails(g,d);
  wall(w,x,north,r.w,false,r.color,r.doors?r.doors.north??[]:[x],1);if(d.id!=='colonnade')wall(w,x,south,r.w,false,r.color,r.doors?r.doors.south??[]:[x],-1);
  wall(w,x-rx,z,r.d,true,r.color,r.doors?r.doors.west??[]:[-10,0,10],1);wall(w,x+rx,z,r.d,true,r.color,r.doors?r.doors.east??[]:[-10,0,10],-1);
- if(style==='corridor'){hallDetails(g,d);if(d.id==='colonnade'){for(let cx=19;cx<84;cx+=4.5)solid(w,cx,-17.25,.6,.6,4.4);}return;}
+ if(d.zone==='west')corridorRoomSigns(g,d);
+ if(style==='corridor'){hallDetails(g,d);
+   if(d.id==='west-lobby'){
+     // Blue upholstery and dark wood from the archived lobby tour; keep all four routes open.
+     for(const [sx,sz,rot]of [[-10,-1.15,0],[-1.2,-8,Math.PI/2]]){sofa(g,sx,sz,rot,0x637b94);solid(w,sx,sz,rot?1.1:2.7,rot?2.7:1.1,1.6);}
+     for(const [tx,tz]of [[-11,-3.1],[-1.2,-10]]){box(g,tx,.86,tz,1,.13,1,0x69412d);for(const dx of [-.35,.35])for(const dz of [-.35,.35])box(g,tx+dx,.42,tz+dz,.075,.84,.075,0x69412d);lamp(g,tx,.93,tz);solid(w,tx,tz,1,1,1.8);}
+   }
+   if(d.id==='reception'){sofa(g,-14,20.8,0,0x637b94);solid(w,-14,20.8,2.7,1.1,1.6);}
+if(d.id==='colonnade'){for(let cx=19;cx<84;cx+=4.5)solid(w,cx,-17.25,.6,.6,4.4);}return;}
  if(style==='small-office'){desk(w,x,z+rz-1.8,Math.min(2.2,r.w-1.6),1);chair(g,x,z+rz-.7,0x4b3b2d);lamp(g,x-.65,1.32,z+rz-1.8);officeStorage(w,d);if(r.w>5.5&&r.d>8)chair(g,x,z+rz-3.3,0x6d766e,Math.PI);return;}
  if(style==='palm'){for(const px of [x-rx+1.4,x+rx-1.4])for(const pz of [z-rz+1.5,z+rz-1.5])plant(g,px,0,pz);bench(g,x,z-rz+1,0);return;}
  if(style==='press-offices'){for(let px=x-rx+4;px<x+rx-2;px+=5)for(const pz of [z-rz+3,z+rz-4]){desk(w,px,pz,2.6,1.2);chair(g,px,pz+1.2,0x394d57);}return;}
@@ -236,7 +255,7 @@ function furnish(w:World,d:Destination){const g=w.group,{x,z}=d,r=d.room!,{style
    rug(g,x,z,rx*.71,rz*.62,style==='salon-oval'?0x41627a:0x867660,style==='salon-oval');cyl(g,x,.85,z,1.0,.15,C.wood);cyl(g,x,.42,z,.25,.85,C.wood);sofa(g,x-rx+1.6,z,-Math.PI/2);sofa(g,x+rx-1.6,z,Math.PI/2);w.spots.push({id:'sit-'+d.id,label:'Sit on the sofa',kind:'seat',x:x-rx+2.8,z:z-1.5,pose:[x-rx+1.6,z,-Math.PI/2]});plant(g,x-rx+1.1,0,z+rz-1.3);plant(g,x+rx-1.1,0,z+rz-1.3);
  }
 }
-export function interior(zone:Place):World {const w:World={group:new T.Group(),solids:[],spots:[],actors:[],rings:[]};const g=w.group;if(zone==='west'){for(const r of WEST_FOOTPRINT)box(g,r.x,-.15,r.z,r.w,.3,r.d,0xcfbf98);}else box(g,0,-.15,0,60,.3,40,0xcfbf98);for(let i=-28;i<29;i+=2)for(let j=-18;j<20;j+=2)if(zone!=='west')box(g,i,.018,j,1.99,.025,1.99,((i+j)/2)%2?0xcec8b3:0xe7e0c8);for(const d of destinations.filter(d=>d.zone===zone&&d.room))furnish(w,d);
+export function interior(zone:Place):World {const w:World={group:new T.Group(),solids:[],spots:[],actors:[],rings:[]};const g=w.group;g.userData.west=zone==='west';if(zone==='west'){for(const r of WEST_FOOTPRINT){box(g,r.x,-.15,r.z,r.w,.3,r.d,0xcfbf98);circulationFloor(g,r.x,r.z,r.w,r.d);}}else box(g,0,-.15,0,60,.3,40,0xcfbf98);for(let i=-28;i<29;i+=2)for(let j=-18;j<20;j+=2)if(zone!=='west')box(g,i,.018,j,1.99,.025,1.99,((i+j)/2)%2?0xcec8b3:0xe7e0c8);for(const d of destinations.filter(d=>d.zone===zone&&d.room))furnish(w,d);
  if(zone==='west'){openDoor(g,-5.5,-22,Math.PI);openDoor(g,96,-23,Math.PI/2);ring(w,{id:'exit-west',label:'Exit to the Rose Garden',kind:'door',x:44,z:-18.5,zone:'grounds',spawn:[...GARDEN_EXIT]});ring(w,{id:'residence-west',label:'Palm Room: enter the residence',kind:'door',x:93,z:-23,zone:'ground',spawn:[-26,0]});ring(w,{id:'exit-west-north',label:'North lobby entrance',kind:'door',x:-5.5,z:-20,zone:'grounds',spawn:[-60,-40]});}
  else {if(zone==='ground'){ring(w,{id:'residence-exit',label:'Exit to the South Lawn',kind:'door',x:0,z:16.2,target:'south'});openDoor(g,0,18);}if(zone==='state'){ring(w,{id:'residence-exit',label:'Exit to the North Lawn',kind:'door',x:0,z:-11.5,target:'north'});openDoor(g,0,-13,Math.PI);}const order:Place[]=['ground','state','second','third'];const index=order.indexOf(zone);if(index<3)ring(w,{id:'stairs-up',label:`Up to the ${floors.find(f=>f.id===order[index+1])?.label}`,kind:'door',x:9,z:zone==='state'?-8:0,zone:order[index+1],spawn:[5,0]});if(index>0)ring(w,{id:'stairs-down',label:`Down to the ${floors.find(f=>f.id===order[index-1])?.label}`,kind:'door',x:-9,z:zone==='state'?-8:0,zone:order[index-1],spawn:[-5,0]});if(zone==='ground')ring(w,{id:'to-west',label:'Palm Room and West Wing',kind:'door',x:-27,z:0,zone:'west',spawn:[91,-23]});for(const x of [-9,9]){for(let step=0;step<5;step++)box(g,x-1+step*.45,.06+step*.08,zone==='state'?-9.6:-1.6,.4,.1+step*.16,1.8,0xdbcbaa);}}
  if(zone==='west')for(const r of WEST_FOOTPRINT)ceiling(g,r.x,r.z,r.w,r.d,r.d===47?{x:22,z:15.6,rx:8,rz:8.6}:undefined);else ceiling(g,0,0,60,40);

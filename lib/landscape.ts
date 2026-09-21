@@ -67,13 +67,14 @@ export function westWingFinishes(g:T.Group){
  const slab=(x:number,y:number,z:number,w:number,h:number,d:number,m:T.Material)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;};
  slab(-58,7.27,-20,31.5,.13,35.5,roof);
  for(const [y,h,overhang]of [[.28,.5,.18],[4.0,.13,.12],[6.55,.18,.24],[6.86,.16,.48],[7.22,.18,.18]]){
-  for(const z of [-38, -2])slab(-58,y,z,32+overhang*2,h,.25+overhang,white);
+  for(const z of [-38, -2]){if(z===-38&&y<3.8){for(const [cx,width]of [[-67.8,12.4],[-50.2,16.4]])slab(cx,y,z,width,h,.25+overhang,white);}else slab(-58,y,z,32+overhang*2,h,.25+overhang,white);}
   for(const x of [-74,-42])slab(x,y,-20,.25+overhang,h,36,white);
  }
  for(const x of [-73.4,-42.6])for(let y=.6;y<6.4;y+=.43)for(const z of [-38.03,-1.97])slab(x,y,z,1.1,.39,.23,stone);
  for(let x=-71;x<-43;x+=4)for(const z of [-38.14,-1.86]){
   const direction=z<-20?-1:1;
   for(const [y,h]of [[2.55,2.45],[5.33,1.62]]){
+   if(z<-20&&y<3.8&&Math.abs(x+60)<2.8)continue;
    slab(x,y,z,1.86,h,.15,glass);
    for(const side of [-1,1])slab(x+side*1.04,y,z+direction*.09,.15,h+.29,.23,white);
    slab(x,y+h/2+.12,z+direction*.12,2.3,.18,.31,white);
