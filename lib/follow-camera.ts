@@ -1,6 +1,15 @@
 import * as T from 'three';
 import CameraControls from 'camera-controls';
 CameraControls.install({ THREE: T });
+/** A held movement gesture keeps its world direction while the camera recenters. */
+export class ThirdPersonOrbit {
+ private input='';private movementYaw=0;private lookDelay=0;
+ looking=false;
+ reset(yaw=0){this.input='';this.movementYaw=yaw;this.lookDelay=0;this.looking=false;}
+ manualLook(){this.lookDelay=1.2;}
+ movementBasis(input:string,yaw:number){if(input!==this.input||this.looking||this.lookDelay>1.19){this.input=input;this.movementYaw=yaw;}return this.movementYaw;}
+ follow(yaw:number,heading:number,moving:boolean,dt:number){this.lookDelay=Math.max(0,this.lookDelay-dt);if(!moving||this.looking||this.lookDelay>0)return yaw;const delta=Math.atan2(Math.sin(heading-yaw),Math.cos(heading-yaw));return yaw+delta*(1-Math.exp(-dt*2.2));}
+}
 /** Library orbit damping and near-plane collision, with an undelayed player anchor. */
 export class FollowCamera {
   private camera = new T.PerspectiveCamera(66, 1, .18, 420);
@@ -11,7 +20,7 @@ export class FollowCamera {
   constructor() { this.controls.smoothTime = .16; this.controls.minDistance = .05; this.controls.restThreshold = .001; }
   reset() { this.fresh = true; this.distance = 0; }
   dispose() { this.controls.dispose(); }
-  solve(target: T.Vector3, desired: T.Vector3, surfaces: T.Object3D[], dt: number, view?: T.PerspectiveCamera) {
+  solve(target: T.Vector3, desired: T.Vector3, surfaces: T.Object3D[], dt: number, view?: T.PerspectiveCamera, avatarClearance=2) {
     if (view) { this.camera.fov = view.fov; this.camera.aspect = view.aspect; this.camera.updateProjectionMatrix(); }
     const delta = desired.clone().sub(target), sphere = new T.Spherical().setFromVector3(delta);
     this.controls.colliderMeshes = surfaces as T.Mesh[];
@@ -38,6 +47,6 @@ export class FollowCamera {
       void this.controls.dollyTo(this.distance, false);
       this.controls.update(0);
     }
-    return { position, showPlayer: this.distance >= 2.0 };
+    return { position, showPlayer: this.distance >= avatarClearance };
   }
 }

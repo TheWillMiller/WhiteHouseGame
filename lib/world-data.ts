@@ -61,6 +61,7 @@ export const npcs:NPC[]=[
  {id:'docent',name:'Taylor, the curator',role:'Residence staff · fictional character',zone:'state',x:20,z:5,hair:0x574433,suit:0x696050,greeting:'Welcome to the East Room. It’s one of the great ceremonial spaces of the house.',topics:[{question:'How does this layout work?',answer:'The East Room occupies the eastern end. The Green, Blue, and Red Rooms run along the south side, with the State Dining Room at the west. The Cross Hall connects them.'},{question:'Is the game historically exact?',answer:'The main relationships come from public plans, but this is an adaptation. Furniture, passage widths, and upper-floor arrangements are simplified. The field guide has our references.'}]},
 ];
 export const sources=[
+ {title:'White House Historical Association: published residence dimensions',url:'https://www.whitehousehistory.org/press-room/press-backgrounders/white-house-dimensions'},
  {title:'White House: official Presidential Walk of Fame gallery',url:'https://www.whitehouse.gov/walk-of-fame/'},
  {title:'Archived official West Wing tour and floor plan',url:'https://obamawhitehouse.archives.gov/node/354641'},
  {title:'Historical hallway photographs: sources and dates',url:'art/west-wing-history-credits.txt'},
