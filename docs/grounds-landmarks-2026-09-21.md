@@ -2,8 +2,10 @@
 
 Adds a 30.48 m diameter South Lawn helipad, with a local monochrome presidential
 seal vector texture, granite grain, fine slab joints and narrow stone approach.
-Its center is at (0,25) in the game's approximate estate coordinate system.
-The existing fountain and race route remain clear. The travel map now includes
+Its center is at (0,50) in the game's approximate estate coordinate system.
+The placeholder South Lawn fountain is removed; the North Lawn fountain remains.
+The approach crosses the South Drive and continues across open lawn to the pad.
+The flagpole sits east of the approach at (18,19). The race route remains clear. The travel map now includes
 the helipad, South Lawn flagpole and TV press tents.
 
 The South Lawn flagpole is 26.8224 m (88 ft), with a tapered metal shaft, base
@@ -11,7 +13,9 @@ collar, halyard, cleat, finial, planting and white border flowers. A subdivided
 flag deforms at 20 Hz when nearby; the hoist remains attached. This is the only
 new continuously animated landmark. Static components join the existing batches.
 
-Four open-front press canopies stand on the North Lawn near the West Wing, in
+Four green-roofed, dark-curtained press canopies form a north-south row at
+x=-47, z=-43 to -61, perpendicular to the residence facade, with east-facing
+open fronts and rotated equipment collisions. They stand near the West Wing, in
 the public-reference broadcast area rather than the helipad's flight surface.
 They include tensioned hip roofs, curtain folds, crossed bracing, weighted legs,
 tripod cameras, lenses, softboxes, equipment cases and cables. Equipment and

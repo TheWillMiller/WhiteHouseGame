@@ -13,6 +13,9 @@ export const WEST_WALKS = [
 export const GARDEN_EXIT = [-56.5,-20.3] as const;
 export const GARDEN_ENTRANCE = [-56.5,-20.3] as const;
 // Photo-based placements within the game's existing approximate estate scale.
-export const HELIPAD={x:0,z:25,radius:15.24}; // Reported 100 ft diameter.
-export const SOUTH_FLAG={x:18,z:6,height:26.8224}; // Reported 88 ft pole.
-export const PRESS_TENTS=[[-65,-49],[-59,-49],[-53,-49],[-47,-49]] as const;
+// Beyond the South Drive, with lawn between the residence and landing circle.
+export const HELIPAD={x:0,z:50,radius:15.24}; // Reported 100 ft diameter.
+export const SOUTH_FLAG={x:18,z:19,height:26.8224}; // East of the approach, beside the drive.
+// Pebble Beach follows the west side of the North Drive, perpendicular to the facade.
+export const PRESS_TENTS=[[-47,-43],[-47,-49],[-47,-55],[-47,-61]] as const;
+export const PRESS_TENT_YAW=Math.PI/2; // Open fronts face east toward the residence.

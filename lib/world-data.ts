@@ -10,7 +10,7 @@ export const destinations:Destination[]=[
   {id:'south',name:'South Lawn',zone:'grounds',x:0,z:38,description:'An open lawn and the South Portico'},
   {id:'helipad',name:'South Lawn helipad',short:'Helipad',zone:'grounds',x:HELIPAD.x,z:HELIPAD.z,description:'Granite presidential-seal landing pad and stone approach'},
   {id:'south-flag',name:'South Lawn flagpole',short:'Flagpole',zone:'grounds',x:SOUTH_FLAG.x,z:SOUTH_FLAG.z,spawn:[SOUTH_FLAG.x+3.5,SOUTH_FLAG.z],description:'An 88-foot tapered flagpole with a planted base'},
-  {id:'press-tents',name:'TV press tents',short:'Press tents',zone:'grounds',x:-56,z:-45,description:'North Lawn broadcast canopies, tripod cameras and lighting equipment'},
+  {id:'press-tents',name:'TV press tents',short:'Press tents',zone:'grounds',x:-43.5,z:-52,description:'North Lawn broadcast canopies, tripod cameras and lighting equipment'},
   {id:'north',name:'North Lawn',zone:'grounds',x:0,z:-72,description:'The fountain and Pennsylvania Avenue'},
   {id:'rose',name:'Rose Garden',zone:'grounds',x:GARDENS[0].x,z:GARDENS[0].z,description:'Between the residence and West Wing, south of the press-room connection'},
   {id:'kennedy',name:'Jacqueline Kennedy Garden',short:'East Garden',zone:'grounds',x:GARDENS[1].x,z:GARDENS[1].z,description:'The garden east of the residence'},

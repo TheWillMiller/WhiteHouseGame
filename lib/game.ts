@@ -91,7 +91,8 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  }
  gardenApproaches(g);
  for(let i=0;i<28;i++){const z=-80+i*7.2;tree(w,-122+(i%3)*2,z,i);tree(w,119-(i%3)*2,z,i+30);}for(let i=0;i<16;i++){const x=-77+i*10;tree(w,x,-92,i+70);if(Math.abs(x)>22)tree(w,x,122,i+100);}for(const [x,z,s]of [[-62,78,34],[65,80,37],[-38,97,23],[38,95,18],[-54,43,16],[103,87,17],[-43,-63,2],[46,-67,5]])tree(w,x,z,s);
- fountain(w,0,48,5.5);fountain(w,0,-63,5);
+ // The former placeholder South Lawn fountain occupied the landing area.
+ fountain(w,0,-63,5);
  // Pool, putting green, benches and garden path details.
  box(g,-72,.02,50,19,.1,30,C.path);box(g,-72,.09,50,12,.1,24,0x54aeb7);for(let i=0;i<6;i++)box(g,-72,.15,42+i*3.5,10,.01,.08,0xb3e1d7);for(let i=0;i<4;i++)bench(g,-81,40+i*6,Math.PI/2);cyl(g,-53,.07,66,8,.1,0x5f883c,28);cyl(g,-53,.12,66,.25,.08,0x263924);flag(g,-53,.1,66,.45);
  for(let i=0;i<8;i++){const a=i/8*Math.PI*2,x=Math.cos(a)*65,z=56+Math.sin(a)*49;bench(g,x,z,-a+Math.PI/2);}

@@ -5,7 +5,7 @@ const ctx=new Proxy({},{get:()=>()=>{},set:()=>true});
 globalThis.document={createElement:()=>({getContext:()=>ctx})};
 globalThis.window={location:{pathname:'/trumpgame/'}};
 const {buildGroundsLandmarks}=await import('../.qa/grounds-landmarks.mjs');
-const {HELIPAD,SOUTH_FLAG,PRESS_TENTS}=await import('../.qa/grounds-layout.mjs');
+const {HELIPAD,SOUTH_FLAG,PRESS_TENTS,PRESS_TENT_YAW}=await import('../.qa/grounds-layout.mjs');
 const g=new T.Group(),solids=[],landmarks=buildGroundsLandmarks(g,solids);
 const pad=g.getObjectByName('South Lawn granite helipad'),pole=g.getObjectByName('South Lawn 88-foot flagpole');
 assert(pad&&pole);assert.equal(HELIPAD.radius*2,30.48);assert.equal(SOUTH_FLAG.height,26.8224);
@@ -16,7 +16,15 @@ for(let i=0;i<positions.count;i++)if(Math.abs(before[i*3]+3.81)<.001)assert(Math
 g.traverse(o=>{if(o.isMesh){assert(o.geometry.attributes.uv,'static batching has consistent attributes');for(const v of o.geometry.attributes.position.array)assert(Number.isFinite(v));}});
 const blocked=(x,z)=>solids.some(o=>Math.abs(x-o.x)<o.w/2+.3&&Math.abs(z-o.z)<o.d/2+.3);
 assert(blocked(SOUTH_FLAG.x,SOUTH_FLAG.z),'pole blocks walking');
-for(const [x,z]of PRESS_TENTS){assert(!blocked(x,z+2.2),'tent front is open');assert(!blocked(x,z+.9),'tent interior has a walking aisle');assert(blocked(x-.9,z+.3),'camera tripod has collision');}
+for(const [i,[x,z]]of PRESS_TENTS.entries()){
+ const tent=g.getObjectByName('Press live-shot canopy '+(i+1));assert.equal(tent.rotation.y,PRESS_TENT_YAW);
+ assert(!blocked(x+2.2,z),'east-facing tent front is open');assert(!blocked(x+.9,z),'rotated tent interior has a walking aisle');
+ assert(blocked(x+.3,z+.9),'rotated camera tripod has collision');assert(blocked(x-2.1,z),'rear curtain collision follows rotation');
+ assert.equal(x,PRESS_TENTS[0][0],'tents form a north-south row');
+}
+assert(HELIPAD.z-HELIPAD.radius>30,'landing circle sits well beyond the South Drive');
+assert(SOUTH_FLAG.z<HELIPAD.z-HELIPAD.radius,'flag stands beside the approach, before the pad');
+assert(Math.hypot(SOUTH_FLAG.x-HELIPAD.x,SOUTH_FLAG.z-HELIPAD.z)>HELIPAD.radius+10,'pole has clearance from landing circle');
 assert(!blocked(HELIPAD.x,HELIPAD.z),'pad is walkable');
 const svg=readFileSync('public/textures/helipad-seal-v1.svg','utf8');assert(svg.includes('width="1024" height="1024"'));assert(!svg.includes('<script'));assert(!svg.includes('<text'),'legend uses portable vector outlines');
 console.log('PASS: helipad and pole dimensions, waving flag with anchored hoist, finite batchable geometry, accessible tents and equipment collisions, bounded local seal texture.');
