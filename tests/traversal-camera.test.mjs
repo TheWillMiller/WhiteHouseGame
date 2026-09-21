@@ -40,4 +40,6 @@ rig.manualLook();assert.equal(rig.follow(1,-1,true,.1),1,'manual look gets prior
 rig.looking=true;assert.equal(rig.follow(1,-1,true,2),1,'camera does not fight dragging');rig.looking=false;
 assert.equal(rig.follow(1,-1,false,2),1,'standing free look remains where placed');
 rig.reset();const wrap=rig.follow(Math.PI-.02,-Math.PI+.02,true,.1);assert(wrap>Math.PI-.02&&wrap<Math.PI+.02,'shortest-path recenter across angle wrap');
+// Source-mesh West Wing portico: a continuous ground-to-door approach.
+game.change('grounds',-89,-29);for(let z=-29;z<=-22.2;z+=.05){assert(!game.blocked(-89,z),'West Wing approach clear');game.player.position.z=z;game.loop(now+=16);assert(game.player.position.y>=residenceHeight(-89,z)-.001);}assert(game.player.position.y<1,'portico ceiling is not mistaken for its walking floor');
 game.dispose();console.log('PASS: four stair routes, physical outdoor scale, elevated landing/jumping, free look and stable third-person recenter.');

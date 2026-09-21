@@ -1,4 +1,4 @@
-WHITE HOUSE RESIDENCE
+WHITE HOUSE RESIDENCE AND WEST WING
 
 This work is based on "The White House"
 https://sketchfab.com/3d-models/the-white-house-dbdb320ba4c6427ca4f2b2c2438034f9
@@ -8,8 +8,19 @@ https://creativecommons.org/licenses/by/4.0/
 Changes: main residence extracted from the complex; presentation tilt removed;
 model scaled and oriented for the game; geometry simplified and compressed;
 textures optimized; ground-level collision and entrance markers added separately.
-The original model includes both wings. Those portions are not in the current
-game asset. The game uses its own interiors and construction scene.
+The West Wing and press connector are extracted as a second optimized asset,
+using the same metre scale and origin. Two playable doorway openings are cut
+through the facade; collisions and garden placements are adapted separately. The game uses its own interiors and construction scene.
 
 TRUMP CHARACTER
 User-provided Meshy model and animations, adapted for gameplay.
+
+
+GOLD GOLF CART
+Based on "Golf cart" by Michael Ruddy
+https://poly.pizza/m/0ZN5hIrQCUh
+Licensed under Creative Commons Attribution 3.0:
+https://creativecommons.org/licenses/by/3.0/
+Changes: gold body finish, saddle leather, polished trim, metre-scale adaptation,
+wheel pivots, compressed geometry and batched static parts. Driving and seated
+character behavior are game additions. Original download: 2026-09-21.

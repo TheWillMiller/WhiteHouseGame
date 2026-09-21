@@ -17,3 +17,5 @@ export async function loadResidenceModel(pathname:string){
  gltf.scene.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;for(const material of Array.isArray(o.material)?o.material:[o.material])if(material instanceof T.MeshStandardMaterial){material.side=T.FrontSide;material.normalScale.set(.55,.55);for(const texture of [material.map,material.normalMap,material.roughnessMap,material.metalnessMap])if(texture)texture.anisotropy=4;}}});
  return gltf.scene;
 }
+
+export async function loadWestWingModel(pathname:string){const url=residenceModelUrl(pathname).replace('white-house-residence-v2.glb','white-house-west-v1.glb');const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url);gltf.scene.name='Sketchfab White House West Wing';gltf.scene.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=true;o.receiveShadow=true;for(const m of Array.isArray(o.material)?o.material:[o.material])if(m instanceof T.MeshStandardMaterial){m.side=T.FrontSide;m.normalScale.set(.55,.55);if(m.map)m.map.anisotropy=4;}}});return gltf.scene;}

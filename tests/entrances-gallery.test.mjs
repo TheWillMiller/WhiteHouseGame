@@ -7,8 +7,8 @@ globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>ctx})};
 const {grounds}=await import('../.qa/game.mjs');
 const {openDoor,colonnadeGallery,exteriorGallery,corridorFace}=await import('../.qa/interior-details.mjs');
 const {buildOvalOffice,OVAL}=await import('../.qa/oval-office.mjs');
-const exterior=grounds().group;exterior.updateMatrixWorld(true);const facadeMeshes=[];exterior.traverse(o=>{if(o.isMesh)facadeMeshes.push(o);});
-for(const [x,z,dir]of [[-60,-38,-1],[-39,-27.25,1]])for(const dx of [-.85,0,.85])for(const y of [.6,1.6,2.8]){
+const {NodeIO}=await import('@gltf-transform/core');const {ALL_EXTENSIONS}=await import('@gltf-transform/extensions');const {MeshoptDecoder}=await import('meshoptimizer');const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');await MeshoptDecoder.ready;const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});const doc=await io.read('public/models/white-house-west-v1.glb');for(const t of doc.getRoot().listTextures())t.dispose();for(const e of doc.getRoot().listExtensionsUsed())if(e.extensionName==='EXT_meshopt_compression')e.dispose();const bytes=await io.writeBinary(doc),model=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');const exterior=grounds().group;exterior.add(model.scene);exterior.updateMatrixWorld(true);const facadeMeshes=[];exterior.traverse(o=>{if(o.isMesh)facadeMeshes.push(o);});
+for(const [x,z,dir]of [[-89,-20.2,-1],[-57,-22.15,1]])for(const dx of [-.85,0,.85])for(const y of [.6,1.6,2.8]){
  const ray=new T.Raycaster(new T.Vector3(x+dx,y,z+dir*.65),new T.Vector3(0,0,-dir),0,1.15);
  assert.equal(ray.intersectObjects(facadeMeshes,false).length,0,'no masonry or window behind entrance '+[x,z,dx,y]);
 }

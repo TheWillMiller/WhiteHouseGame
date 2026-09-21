@@ -1,5 +1,6 @@
+import {WEST_TERRAIN} from './west-terrain-data';
 import {RESIDENCE_TERRAIN} from './residence-terrain-data';
-const fields=RESIDENCE_TERRAIN.map(({rle,...field})=>{const heights=new Int16Array(field.w*field.d);let at=0;for(let i=0;i<rle.length;i+=2){heights.fill(rle[i+1],at,at+rle[i]);at+=rle[i];}return {...field,heights};});
+const fields=[...RESIDENCE_TERRAIN,...WEST_TERRAIN].map(({rle,...field})=>{const heights=new Int16Array(field.w*field.d);let at=0;for(let i=0;i<rle.length;i+=2){heights.fill(rle[i+1],at,at+rle[i]);at+=rle[i];}return {...field,heights};});
 export const OUTDOOR_HUMAN_SCALE=1.9/3;
 export const STEP_HEIGHT=.30;
 export function residenceHeight(x:number,z:number){for(const f of fields){const col=Math.round((x-f.x)/f.step),row=Math.round((z-f.z)/f.step);if(col>=0&&col<f.w&&row>=0&&row<f.d)return f.heights[row*f.w+col]/100;}return 0;}

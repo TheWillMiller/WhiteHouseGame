@@ -8,9 +8,9 @@ const { pathToFileURL } = require('node:url');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, '.qa');
 fs.mkdirSync(output, { recursive: true });
-for (const file of ['residence-terrain-data', 'residence-terrain', 'colonnade-people', 'interior-details', 'worksite', 'estate-map', 'grounds-layout', 'room-finishes', 'west-layout', 'skinning', 'render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
+for (const file of ['west-terrain-data', 'locomotion', 'golf-cart', 'residence-terrain-data', 'residence-terrain', 'colonnade-people', 'interior-details', 'worksite', 'estate-map', 'grounds-layout', 'room-finishes', 'west-layout', 'skinning', 'render-budget', 'landscape', 'npc-model', 'world-data', 'visuals', 'architecture', 'oval-office', 'follow-camera', 'player-model', 'residence-model', 'game', 'webmcp']) {
  const source = fs.readFileSync(path.join(root, 'lib', file + '.ts'), 'utf8').replace("new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})", 'globalThis.__testRenderer()');
- const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(residence-terrain-data|residence-terrain|colonnade-people|interior-details|worksite|estate-map|grounds-layout|room-finishes|west-layout|skinning|render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
+ const built = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText.replace(/from ['"]\.\/(west-terrain-data|locomotion|golf-cart|residence-terrain-data|residence-terrain|colonnade-people|interior-details|worksite|estate-map|grounds-layout|room-finishes|west-layout|skinning|render-budget|landscape|npc-model|world-data|visuals|architecture|oval-office|follow-camera|player-model|residence-model)['"]/g, (_, name) => "from './" + name + ".mjs'");
  fs.writeFileSync(path.join(output, file + '.mjs'), built);
 }
 const ctx = new Proxy({}, { get: () => () => {}, set: () => true });
@@ -29,7 +29,7 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  const world = zone === 'grounds' ? grounds() : interior(zone);
  assert(world.group.children.some(o=>o.isMesh),'world has rendered geometry');
  if(zone==='west')assert(world.group.children.filter(o=>o.isMesh&&o.userData.cameraBlocker).length>2,'architectural camera surfaces survive static batching');
-  const minX = zone === 'grounds' ? -98 : -28.5, maxX = zone === 'west' ? 95.5 : -minX;
+  const minX = zone === 'grounds' ? -123 : -28.5, maxX = zone === 'west' ? 95.5 : -minX;
   const minZ = zone === 'grounds' ? -95 : zone === 'west' ? -39.5 : -18.5, maxZ = zone === 'grounds' ? 126 : zone === 'west' ? 24.5 : 18.5;
   const step = .5, width = Math.round((maxX-minX)/step)+1, height = Math.round((maxZ-minZ)/step)+1;
   const blocked = new Uint8Array(width*height), reached = new Uint8Array(width*height);
@@ -59,7 +59,7 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  // Validate conversation branches and ordinary movement guards.
  npcs.forEach(n=>{assert(n.greeting&&n.topics.length>=2);n.topics.forEach(t=>assert(t.question&&t.answer));});
  const guard={zone:'grounds',world:{solids:[{x:0,z:0,w:4,d:4}]}};
- assert(Game.prototype.blocked.call(guard,0,0));assert(Game.prototype.blocked.call(guard,101,0));assert(!Game.prototype.blocked.call(guard,4,4));
+ assert(Game.prototype.blocked.call(guard,0,0));assert(Game.prototype.blocked.call(guard,126,0));assert(!Game.prototype.blocked.call(guard,4,4));
  const mount={appendChild(){},clientWidth:1280,clientHeight:800};let snapshot,talking;const game=new Game(mount,s=>snapshot=s,id=>talking=id,()=>{});
  game.loop(1000);const startZ=game.player.position.z;game.key('KeyW',true);for(let i=1;i<=60;i++)game.loop(1000+i*16.67);game.key('KeyW',false);assert(game.player.position.z<startZ-1.8,'walking moves the player');
  game.pause(true);const pausedZ=game.player.position.z;game.key('KeyW',true);game.loop(2100);assert.equal(game.player.position.z,pausedZ,'modal pauses movement');game.pause(false);

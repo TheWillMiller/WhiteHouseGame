@@ -204,9 +204,5 @@ export function groundsDetails(g:T.Group){
     cylinder(g,x,3.68,z,.34,.21,0x243b36,.07);orb(g,x,3.86,z,.07,.13,.07,0xd9b458);
   }
   for(const side of [-1,1])for(let z=5;z<31;z+=1.0)block(g,side*5.65,.095,z,.32,.16,.94,0xe0dccb);
-  // Tracks, slab joints and small equipment detail at the ballroom work site.
-  for(let i=0;i<8;i++)block(g,62,.26,-36+i*4.2,33,.013,.028,0x929589);
-  for(const x of [53.5,62,70.5])block(g,x,.26,-21,.025,.013,33,0x929589);
-  for(let i=0;i<10;i++)for(const x of [67.45,70.55])block(g,x,.46,-48.8+i*.4,.13,.67,.20,0x727a6c);
-  for(let i=0;i<7;i++){const x=47+i*4.8;block(g,x,.7,9.8,3.2,.19,.16,0xf2c55a);for(let j=0;j<4;j++){const stripe=block(g,x-1.2+j*.75,.7,9.70,.20,.21,.025,0x303d3a);stripe.rotation.z=-.3;}}
+
 }
