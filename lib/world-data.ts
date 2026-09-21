@@ -1,4 +1,4 @@
-import {GARDENS} from './grounds-layout';
+import {GARDENS,HELIPAD,SOUTH_FLAG} from './grounds-layout';
 import {westDestinations} from './west-layout';
 export type Place = 'grounds'|'west'|'state'|'ground'|'second'|'third';
 export const floors: {id:Place;label:string}[]=[{id:'grounds',label:'Grounds'},{id:'west',label:'West Wing'},{id:'ground',label:'Ground floor'},{id:'state',label:'State floor'},{id:'second',label:'Second floor'},{id:'third',label:'Third floor'}];
@@ -8,6 +8,9 @@ export const destinations:Destination[]=[
   {id:'cross-hall',name:'Cross Hall',zone:'state',x:0,z:0,spawn:[0,0],description:'The east-west passage linking the ceremonial rooms',room:{w:23,d:6,color:0xe7e0c8,style:'corridor',doors:{north:[0],south:[-8,0,8],west:[0],east:[0]}}},
 
   {id:'south',name:'South Lawn',zone:'grounds',x:0,z:38,description:'An open lawn and the South Portico'},
+  {id:'helipad',name:'South Lawn helipad',short:'Helipad',zone:'grounds',x:HELIPAD.x,z:HELIPAD.z,description:'Granite presidential-seal landing pad and stone approach'},
+  {id:'south-flag',name:'South Lawn flagpole',short:'Flagpole',zone:'grounds',x:SOUTH_FLAG.x,z:SOUTH_FLAG.z,spawn:[SOUTH_FLAG.x+3.5,SOUTH_FLAG.z],description:'An 88-foot tapered flagpole with a planted base'},
+  {id:'press-tents',name:'TV press tents',short:'Press tents',zone:'grounds',x:-56,z:-45,description:'North Lawn broadcast canopies, tripod cameras and lighting equipment'},
   {id:'north',name:'North Lawn',zone:'grounds',x:0,z:-72,description:'The fountain and Pennsylvania Avenue'},
   {id:'rose',name:'Rose Garden',zone:'grounds',x:GARDENS[0].x,z:GARDENS[0].z,description:'Between the residence and West Wing, south of the press-room connection'},
   {id:'kennedy',name:'Jacqueline Kennedy Garden',short:'East Garden',zone:'grounds',x:GARDENS[1].x,z:GARDENS[1].z,description:'The garden east of the residence'},
@@ -61,6 +64,10 @@ export const npcs:NPC[]=[
  {id:'docent',name:'Taylor, the curator',role:'Residence staff · fictional character',zone:'state',x:20,z:5,hair:0x574433,suit:0x696050,greeting:'Welcome to the East Room. It’s one of the great ceremonial spaces of the house.',topics:[{question:'How does this layout work?',answer:'The East Room occupies the eastern end. The Green, Blue, and Red Rooms run along the south side, with the State Dining Room at the west. The Cross Hall connects them.'},{question:'Is the game historically exact?',answer:'The main relationships come from public plans, but this is an adaptation. Furniture, passage widths, and upper-floor arrangements are simplified. The field guide has our references.'}]},
 ];
 export const sources=[
+ {title:'Helipad seal and grounds-detail credits',url:'textures/helipad-credits.txt'},
+ {title:'White House Historical Association: outdoor press positions',url:'https://www.whitehousehistory.org/galleries/beyond-the-press-room'},
+ {title:'White House: South Lawn flagpole photo reference',url:'https://www.whitehouse.gov/gallery/president-trump-raises-new-american-flag-on-south-lawn-of-the-white-house/'},
+ {title:'Helipad scale and white-stone approach: published reporting',url:'https://www.washingtonpost.com/politics/2026/07/06/trump-speeds-up-white-house-helipad-driveway-changes-xi-visit-looms/'},
  {title:'White House Historical Association: published residence dimensions',url:'https://www.whitehousehistory.org/press-room/press-backgrounders/white-house-dimensions'},
  {title:'White House: official Presidential Walk of Fame gallery',url:'https://www.whitehouse.gov/walk-of-fame/'},
  {title:'Archived official West Wing tour and floor plan',url:'https://obamawhitehouse.archives.gov/node/354641'},

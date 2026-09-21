@@ -1,0 +1,22 @@
+SOUTH LAWN HELIPAD SEAL
+Vector adaptation of the public-domain Seal of the President of the United States.
+Source: https://commons.wikimedia.org/wiki/File:Seal_of_the_President_of_the_United_States.svg
+Original: https://upload.wikimedia.org/wikipedia/commons/3/36/Seal_of_the_President_of_the_United_States.svg
+Source lists a U.S. federal government work (Executive Office of the President).
+Adapted September 21, 2026: monochrome granite palette, circular legend rebuilt
+as vector outlines, 1024-pixel intrinsic resolution for bounded GPU memory.
+Used as an architectural detail in an unofficial fictional White House game.
+
+REFERENCE MATERIAL
+Helipad reported size and stone approach:
+https://www.washingtonpost.com/politics/2026/07/06/trump-speeds-up-white-house-helipad-driveway-changes-xi-visit-looms/
+Completed-pad photograph used for visual reference, not distributed with game:
+https://www.reddit.com/r/Helicopters/comments/1wggs0w/white_house_helipad_is_complete/
+South Lawn flagpole photo reference:
+https://www.whitehouse.gov/gallery/president-trump-raises-new-american-flag-on-south-lawn-of-the-white-house/
+Outdoor press position reference:
+https://www.whitehousehistory.org/galleries/beyond-the-press-room
+
+The pad diameter and flagpole height follow reported dimensions. Positions,
+planting, tent count, individual equipment and fabric details are photo-led
+game adaptations, not surveyed measurements or a depiction of live operations.
