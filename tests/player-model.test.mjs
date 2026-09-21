@@ -37,6 +37,9 @@ model.pose(null);assert.equal(model.object.position.y,0,'Standing removes sittin
 model.pose('briefing');for(let i=0;i<120;i++)model.animate(0,1/60,false);model.object.updateMatrixWorld(true);
 assert(model.object.getObjectByName('RightHand').getWorldPosition(new T.Vector3()).y>1,'Briefing hand remains above lectern level');
 model.pose(null);for(let i=0;i<60;i++)model.animate(0,1/60,false);
+model.pose('flight');for(let i=0;i<120;i++)model.animate(0,1/60,false);model.object.updateMatrixWorld(true);
+for(const side of ['Left','Right']){const hip=model.object.getObjectByName(side+'UpLeg').getWorldPosition(new T.Vector3()),knee=model.object.getObjectByName(side+'Leg').getWorldPosition(new T.Vector3()),ankle=model.object.getObjectByName(side+'Foot').getWorldPosition(new T.Vector3());assert(knee.y<hip.y-.5&&ankle.y<knee.y-.5,'jetpack pose has relaxed hanging legs, not a running stride');assert([hip,knee,ankle].every(p=>p.toArray().every(Number.isFinite)));}
+model.pose(null);for(let i=0;i<60;i++)model.animate(0,1/60,false);assert.equal(model.object.position.y,0,'exiting flight restores standing height');
 let frames=0;const vertex=new T.Vector3();
 for(const [label,mode,distance,airborne,gesture] of [['idle','walk',0,false,null],['walking','walk',3.2/60,false,null],['running','run',6.5/60,false,null],['sprint','sprint',9/60,false,null],['stroll','stroll',1.6/60,false,null],['dance','walk',0,false,'dance'],['ymca','walk',0,false,'ymca'],['victory','walk',0,false,'victory'],['backflip','walk',0,false,'backflip'],['jumping','walk',0,true,null]]){
   model.emote(gesture);const limits=new T.Box3();
