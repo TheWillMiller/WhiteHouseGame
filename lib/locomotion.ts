@@ -4,7 +4,10 @@ export class LocomotionMotor {
   reset(){this.x=0;this.z=0;this.jumpBuffer=0;this.groundedGrace=0;}
   requestJump(){this.jumpBuffer=.16;}
   horizontal(x:number,z:number,dt:number,airborne=false){
-    const response=airborne?7:Math.hypot(x,z)>0?18:25;
+    // Keep momentum when the stick is released in mid-air; allow deliberate
+    // steering while jumping without the old heavy ground-like braking.
+    if(airborne&&Math.hypot(x,z)<.01)return {x:this.x*dt,z:this.z*dt};
+    const response=airborne?14:Math.hypot(x,z)>0?22:28;
     const a=1-Math.exp(-response*dt);this.x+=(x-this.x)*a;this.z+=(z-this.z)*a;
     if(Math.hypot(this.x,this.z)<.015){this.x=0;this.z=0;}
     return {x:this.x*dt,z:this.z*dt};

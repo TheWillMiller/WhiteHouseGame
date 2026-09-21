@@ -33,9 +33,9 @@ assert(game.world.actors.every(a=>a.group.scale.y===OUTDOOR_HUMAN_SCALE),'outdoo
 // Advance the real simulation along every tread, then descend and jump from a landing.
 let now=1000;game.loop(now);
 for(const path of paths){game.change('grounds',path[0][0],path[0][1]);for(const [x,z,h]of [...path,...path.slice().reverse()]){game.player.position.x=x;game.player.position.z=z;game.loop(now+=40);assert(game.player.position.y>=h-1e-6,'feet never fall through the visible stair');}const [x,z,h]=path.at(-1);game.change('grounds',x,z);game.jump();game.loop(now+=16);assert(game.player.position.y>h,'jump works on an elevated landing');for(let i=0;i<90;i++)game.loop(now+=16);assert.equal(game.player.position.y,h,'jump lands on the same stair, not ground zero');}
-const rig=new ThirdPersonOrbit();let yaw=0;const initial=rig.movementBasis('0,1',yaw);
-for(let i=0;i<240;i++){assert.equal(rig.movementBasis('0,1',yaw),initial,'camera recenter cannot steer a held side-step into a circle');yaw=rig.follow(yaw,Math.PI/2,true,1/60);}
-assert(Math.abs(yaw-Math.PI/2)<.002,'camera settles behind travel direction');
+const rig=new ThirdPersonOrbit();let yaw=0;
+for(let i=0;i<240;i++){assert.equal(rig.movementBasis('0,1',yaw),yaw,'movement uses the currently chosen view, without a frozen input basis');yaw=rig.follow(yaw,Math.PI/2,true,1/60);}
+assert(Math.abs(yaw-Math.PI/2)<.002,'vehicle chase camera settles behind travel direction');
 rig.manualLook();assert.equal(rig.follow(1,-1,true,.1),1,'manual look gets priority');
 rig.looking=true;assert.equal(rig.follow(1,-1,true,2),1,'camera does not fight dragging');rig.looking=false;
 assert.equal(rig.follow(1,-1,false,2),1,'standing free look remains where placed');

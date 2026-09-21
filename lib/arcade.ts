@@ -1,7 +1,7 @@
 import * as T from 'three';
 
-export type ArcadeMode='off'|'flight'|'blaster';
-export type ArcadeState={mode:ArcadeMode;score:number;shots:number;seconds:number;finished:boolean;started:boolean;rings:number;totalRings:number;altitude:number;nextDistance:number;hit:boolean};
+export type ArcadeMode='off'|'flight'|'blaster'|'race';
+export type ArcadeState={mode:ArcadeMode;score:number;shots:number;seconds:number;finished:boolean;started:boolean;rings:number;totalRings:number;altitude:number;nextDistance:number;hit:boolean;guided:boolean;next?:{x:number;y:number;behind:boolean}};
 export const SKY_ROUTE=[new T.Vector3(0,14,65),new T.Vector3(22,19,40),new T.Vector3(30,28,5),new T.Vector3(5,33,-34),new T.Vector3(-34,28,-35),new T.Vector3(-60,23,0),new T.Vector3(-42,16,40),new T.Vector3(0,12,82)];
 const gold=new T.Color(0xe5b84c),cyan=new T.Color(0x65e9ee);
 
@@ -12,7 +12,7 @@ export class Arcade {
  readonly rings:T.Mesh[]=[];readonly velocity=new T.Vector3();
  private beams:{mesh:T.Mesh;life:number}[]=[];private flames:T.Mesh[]=[];
  private muzzle:T.Mesh;private hitFlash=0;private cooldown=0;private recoil=0;private clock=0;
- mode:ArcadeMode='off';score=0;shots=0;seconds=60;finished=false;started=false;ringIndex=0;
+ mode:ArcadeMode='off';score=0;shots=0;seconds=60;finished=false;started=false;ringIndex=0;guided=true;
  constructor(){
   this.world.name='Sandbox challenges';this.world.userData.mapExclude=true;
   this.jetpack.name='Gold jetpack';this.blaster.name='Gold pulse blaster';
@@ -28,19 +28,22 @@ export class Arcade {
   this.blaster.position.set(.31,-.26,-.62);this.blaster.rotation.y=.08;
   const targetGeometry=new T.SphereGeometry(.85,16,10),haloGeometry=new T.TorusGeometry(1.05,.045,5,32);
   for(let i=0;i<5;i++){const home=new T.Vector3((i-2)*5,3+(2-Math.abs(i-2))*1.7,64-Math.abs(i-2)*-2),mesh=new T.Mesh(targetGeometry,new T.MeshStandardMaterial({color:0x173c4b,metalness:.55,roughness:.3,emissive:cyan,emissiveIntensity:.12}));mesh.position.copy(home);const halo=new T.Mesh(haloGeometry,light);mesh.add(halo);const bull=new T.Mesh(new T.SphereGeometry(.3,10,8),metal);bull.position.z=.78;mesh.add(bull);this.world.add(mesh);this.targets.push({mesh,home,cooldown:0});}
-  const ringGeometry=new T.TorusGeometry(3,.10,6,48);
+  const ringGeometry=new T.TorusGeometry(5.7,.32,8,48);
   for(const [i,p]of SKY_ROUTE.entries()){const mesh=new T.Mesh(ringGeometry,new T.MeshBasicMaterial({color:gold,transparent:true,opacity:1}));mesh.position.copy(p);mesh.lookAt(i?SKY_ROUTE[i-1]:new T.Vector3(0,12,82));this.rings.push(mesh);this.world.add(mesh);}
   const beamGeometry=new T.CylinderGeometry(.024,.024,1,5);for(let i=0;i<4;i++){const mesh=new T.Mesh(beamGeometry,light);mesh.visible=false;this.beams.push({mesh,life:0});this.world.add(mesh);}
   this.setMode('off');
  }
  setMode(mode:ArcadeMode){this.mode=mode;this.score=0;this.shots=0;this.seconds=mode==='flight'?0:60;this.finished=false;this.started=false;this.ringIndex=0;this.clock=0;this.cooldown=0;this.hitFlash=0;this.velocity.set(0,0,0);this.world.visible=mode!=='off';this.jetpack.visible=mode==='flight';this.blaster.visible=mode==='blaster';this.muzzle.visible=false;for(const b of this.beams){b.life=0;b.mesh.visible=false;}for(const t of this.targets){t.cooldown=0;t.mesh.position.copy(t.home);t.mesh.visible=mode==='blaster';}this.updateRings();}
- private updateRings(){this.rings.forEach((r,i)=>{r.visible=this.mode==='flight'&&i>=this.ringIndex;(r.material as T.MeshBasicMaterial).color.copy(i===this.ringIndex?cyan:gold);(r.material as T.MeshBasicMaterial).opacity=i===this.ringIndex?1:.25;});}
- snapshot(p:T.Vector3):ArcadeState{return {mode:this.mode,score:this.score,shots:this.shots,seconds:this.seconds,finished:this.finished,started:this.started,rings:this.ringIndex,totalRings:SKY_ROUTE.length,altitude:Math.round(p.y),nextDistance:this.ringIndex<SKY_ROUTE.length?Math.round(p.distanceTo(SKY_ROUTE[this.ringIndex])):0,hit:this.hitFlash>0};}
+ private updateRings(){this.rings.forEach((r,i)=>{r.visible=this.mode==='flight'&&i>=this.ringIndex&&i<=this.ringIndex+2;(r.material as T.MeshBasicMaterial).color.setHex(i===this.ringIndex?0x00ffff:0xffcf58);(r.material as T.MeshBasicMaterial).opacity=i===this.ringIndex?1:.8;});}
+ snapshot(p:T.Vector3,camera?:T.Camera):ArcadeState{let next:ArcadeState['next'];if(camera&&this.mode==='flight'&&!this.finished){const point=SKY_ROUTE[this.ringIndex].clone(),behind=point.clone().applyMatrix4(camera.matrixWorldInverse).z>0,ndc=point.project(camera);next={x:T.MathUtils.clamp((ndc.x*(behind?-1:1)+1)*50,12,88),y:T.MathUtils.clamp((1-ndc.y*(behind?-1:1))*50,28,65),behind};}return {mode:this.mode,score:this.score,shots:this.shots,seconds:this.seconds,finished:this.finished,started:this.started,rings:this.ringIndex,totalRings:SKY_ROUTE.length,altitude:Math.round(p.y),nextDistance:this.ringIndex<SKY_ROUTE.length?Math.round(p.distanceTo(SKY_ROUTE[this.ringIndex])):0,hit:this.hitFlash>0,guided:this.guided,next};}
  flight(dt:number,p:T.Vector3,yaw:number,right:number,forward:number,vertical:number,boost:boolean,blocked:(p:T.Vector3)=>boolean){
-  const length=Math.max(1,Math.hypot(right,forward)),speed=boost?24:12,desired=new T.Vector3((Math.sin(yaw)*forward+Math.cos(yaw)*right)/length*speed,vertical*(boost?13:8),(-Math.cos(yaw)*forward+Math.sin(yaw)*right)/length*speed);
-  this.velocity.lerp(desired,1-Math.exp(-dt*6));const delta=this.velocity.clone().multiplyScalar(dt),before=p.clone(),steps=Math.max(1,Math.ceil(delta.length()/.2));
+  const next=SKY_ROUTE[this.ringIndex],assist=this.guided&&!this.finished&&forward>0;
+  const heading=assist?Math.atan2(next.x-p.x,-(next.z-p.z)):yaw;
+  const length=Math.max(1,Math.hypot(right,forward)),speed=boost?14:8,climb=vertical?vertical*7:assist?T.MathUtils.clamp((next.y-p.y)*2,-6,6)*Math.min(1,forward):0;
+  const desired=new T.Vector3((Math.sin(heading)*forward+Math.cos(heading)*right)/length*speed,climb,(-Math.cos(heading)*forward+Math.sin(heading)*right)/length*speed);
+  this.velocity.lerp(desired,1-Math.exp(-dt*(desired.lengthSq()>.01?14:24)));const delta=this.velocity.clone().multiplyScalar(dt),before=p.clone(),steps=Math.max(1,Math.ceil(delta.length()/.2));
   for(let i=0;i<steps;i++)for(const axis of ['y','x','z'] as const){const candidate=p.clone();candidate[axis]+=delta[axis]/steps;candidate.y=T.MathUtils.clamp(candidate.y,0,60);candidate.x=T.MathUtils.clamp(candidate.x,-120,120);candidate.z=T.MathUtils.clamp(candidate.z,-93,124);if(!blocked(candidate))p.copy(candidate);else this.velocity[axis]=0;}
-  if(!this.finished){this.seconds+=dt;const next=SKY_ROUTE[this.ringIndex];const closest=new T.Line3(before,p).closestPointToPoint(next,true,new T.Vector3());if(closest.distanceTo(next)<2.65){this.ringIndex++;this.score+=100;this.hitFlash=.3;this.finished=this.ringIndex===SKY_ROUTE.length;this.updateRings();}}
+  if(!this.finished){if(desired.lengthSq()>.01)this.started=true;if(this.started)this.seconds+=dt;const next=SKY_ROUTE[this.ringIndex];const closest=new T.Line3(before,p).closestPointToPoint(next,true,new T.Vector3());if(closest.distanceTo(next)<5.2){this.ringIndex++;this.score+=100;this.hitFlash=.55;this.finished=this.ringIndex===SKY_ROUTE.length;this.updateRings();}}
  }
  get canFire(){return this.mode==='blaster'&&!this.finished&&this.cooldown<=0;}
  fire(origin:T.Vector3,direction:T.Vector3,occlusion:number=120){
@@ -50,7 +53,7 @@ export class Arcade {
   if(winner){winner.cooldown=.8;winner.mesh.visible=false;this.score+=100;this.hitFlash=.15;}
   const beam=this.beams.find(b=>b.life<=0)??this.beams[0],end=origin.clone().addScaledVector(ray.direction,nearest),start=this.muzzle.getWorldPosition(new T.Vector3()),vector=end.clone().sub(start);beam.mesh.position.copy(start).addScaledVector(vector,.5);beam.mesh.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),vector.clone().normalize());beam.mesh.scale.set(1,vector.length(),1);beam.mesh.visible=true;beam.life=.09;return !!winner;
  }
- update(dt:number){if(this.mode==='off')return;this.clock+=dt;this.hitFlash=Math.max(0,this.hitFlash-dt);this.cooldown=Math.max(0,this.cooldown-dt);this.recoil=Math.max(0,this.recoil-dt*10);this.blaster.position.z=-.62+this.recoil*.07;this.muzzle.visible=this.recoil>.55;
+ update(dt:number,camera?:T.Camera){if(this.mode==='off')return;this.clock+=dt;this.hitFlash=Math.max(0,this.hitFlash-dt);this.cooldown=Math.max(0,this.cooldown-dt);this.recoil=Math.max(0,this.recoil-dt*10);this.blaster.position.z=-.62+this.recoil*.07;this.muzzle.visible=this.recoil>.55;if(camera&&this.mode==='flight')for(const r of this.rings)r.quaternion.copy(camera.quaternion);
   for(const b of this.beams){b.life-=dt;b.mesh.visible=b.life>0;}
   if(this.mode==='blaster'){if(this.started&&!this.finished){this.seconds=Math.max(0,this.seconds-dt);this.finished=this.seconds===0;}for(const [i,t]of this.targets.entries()){t.cooldown=Math.max(0,t.cooldown-dt);t.mesh.visible=t.cooldown===0;t.mesh.position.x=t.home.x+Math.sin(this.clock*.85+i*1.4)*1.8;t.mesh.position.y=t.home.y+Math.sin(this.clock*1.3+i)*.55;}}
   for(const [i,f]of this.flames.entries())f.scale.y=.55+Math.min(1,this.velocity.length()/20)*.6+Math.sin(this.clock*22+i)*.07;

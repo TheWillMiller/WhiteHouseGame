@@ -1,13 +1,13 @@
 import * as T from 'three';
 import CameraControls from 'camera-controls';
 CameraControls.install({ THREE: T });
-/** A held movement gesture keeps its world direction while the camera recenters. */
+/** Manual on-foot view; gentle chase recentering is reserved for vehicles. */
 export class ThirdPersonOrbit {
- private input='';private movementYaw=0;private lookDelay=0;
+ private lookDelay=0;
  looking=false;
- reset(yaw=0){this.input='';this.movementYaw=yaw;this.lookDelay=0;this.looking=false;}
+ reset(_yaw=0){this.lookDelay=0;this.looking=false;}
  manualLook(){this.lookDelay=1.2;}
- movementBasis(input:string,yaw:number){if(input!==this.input||this.looking||this.lookDelay>1.19){this.input=input;this.movementYaw=yaw;}return this.movementYaw;}
+ movementBasis(_input:string,yaw:number){return yaw;}
  follow(yaw:number,heading:number,moving:boolean,dt:number){this.lookDelay=Math.max(0,this.lookDelay-dt);if(!moving||this.looking||this.lookDelay>0)return yaw;const delta=Math.atan2(Math.sin(heading-yaw),Math.cos(heading-yaw));return yaw+delta*(1-Math.exp(-dt*2.2));}
 }
 /** Library orbit damping and near-plane collision, with an undelayed player anchor. */
@@ -16,6 +16,7 @@ export class FollowCamera {
   private controls = new CameraControls(this.camera);
   private centerRay = new T.Raycaster();
   private fresh = true;
+  private azimuth = 0;
   distance = 0;
   constructor() { this.controls.smoothTime = .16; this.controls.minDistance = .05; this.controls.restThreshold = .001; }
   reset() { this.fresh = true; this.distance = 0; }
@@ -25,7 +26,11 @@ export class FollowCamera {
     const delta = desired.clone().sub(target), sphere = new T.Spherical().setFromVector3(delta);
     this.controls.colliderMeshes = surfaces as T.Mesh[];
     void this.controls.moveTo(target.x, target.y, target.z, false);
-    void this.controls.rotateTo(sphere.theta, sphere.phi, !this.fresh);
+    // Spherical theta wraps at +/-PI. Feed a continuous equivalent angle so
+    // crossing south never asks camera-controls to orbit a full revolution.
+    this.azimuth=this.fresh?sphere.theta:this.azimuth+Math.atan2(Math.sin(sphere.theta-this.azimuth),Math.cos(sphere.theta-this.azimuth));
+    // Look input is already smooth. A second angular spring makes steering lag.
+    void this.controls.rotateTo(this.azimuth, sphere.phi, false);
     void this.controls.dollyTo(sphere.radius, !this.fresh);
     this.controls.update(Math.max(dt, 1 / 240)); this.fresh = false;
     const position = this.camera.position.clone(), previous = this.distance;
