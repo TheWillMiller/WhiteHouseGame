@@ -11,6 +11,7 @@ globalThis.requestAnimationFrame=()=>1;globalThis.cancelAnimationFrame=()=>{};
 T.TextureLoader.prototype.load=()=>new T.Texture();
 globalThis.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttribute(){},focus(){},remove(){},setPointerCapture(){},getBoundingClientRect(){return {left:0,top:0,width:1280,height:800};}}),shadowMap:{},setPixelRatio(){},setSize(){},dispose(){},render(scene,camera){scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);}});
 const {Game}=await import('../.qa/game.mjs'),{FollowCamera}=await import('../.qa/follow-camera.mjs'),{racePoint,raceHeading,RACERS}=await import('../.qa/cart-race.mjs'),{GolfCart}=await import('../.qa/golf-cart.mjs'),{teleportRayTarget}=await import('../.qa/teleport.mjs');
+const {projectCourse,COURSE_LENGTH,CHECKPOINTS,RAMPS,ITEM_BOXES,BOOST_PADS}=await import('../.qa/race-course.mjs');
 let state;const game=new Game({appendChild(){},clientWidth:1280,clientHeight:800},s=>state=s,()=>{},()=>{});let now=1000;const frame=(n=1)=>{for(let i=0;i<n;i++)game.loop(now+=25);};frame();
 game.change('grounds',0,78);game.key('KeyS',true);frame(120);assert.equal(game.yaw,0,'walking 180 degrees away never rotates the view');assert(game.player.position.z>82);game.keys.clear();
 // Actual camera-controls solver stays continuous on both crossings of +/-PI.
@@ -33,11 +34,24 @@ const grid=game.cart.object.position.clone();game.key('KeyW',true);frame(80);ass
 // No skipped checkpoint can award a lap.
 game.cart.placeOnCourse(racePoint(Math.PI),raceHeading(Math.PI),0);frame();assert.equal(game.race.passed,0);game.recoverRace();assert(game.race.seconds>=3);assert.equal(game.cart.motor.speed,0);
 // Drive the actual cart motor around the route with a bounded steering controller.
-game.race.reset();game.cart.placeOnCourse(racePoint(0),raceHeading(0),0);frame(122);game.key('KeyW',true);let lane=1.1,stalled=0;
-for(let i=0;i<6000&&!game.race.finished;i++){
- const p=game.cart.object.position,a=Math.atan2(p.x/49.5,(p.z-56)/43.5);for(const r of game.race.rivals){const delta=r.cart.object.position.clone().sub(p);if(delta.length()<10&&delta.dot(new T.Vector3(Math.sin(game.cart.motor.heading),0,-Math.cos(game.cart.motor.heading)))>0)lane=r.lane>0?-1.1:1.1;}
- const target=racePoint(a+.10,lane),heading=Math.atan2(target.x-p.x,-(target.z-p.z)),error=Math.atan2(Math.sin(heading-game.cart.motor.heading),Math.cos(heading-game.cart.motor.heading));game.moveStick(T.MathUtils.clamp(error*2.4,-1,1),0);frame();stalled=game.cart.motor.speed<.01?stalled+1:0;if(stalled>50){console.log('STALLED',game.race.rivals.map(r=>[r.name,r.angle,r.cart.object.position.toArray()]),game.world.solids.filter(o=>Math.abs(o.x-p.x)<o.w/2+5&&Math.abs(o.z-p.z)<o.d/2+5));break;}
+game.race.reset();game.cart.placeOnCourse(racePoint(0),raceHeading(0),0);frame(122);game.key('KeyW',true);let lane=1.1,stalled=0,jumps=0,wasAirborne=false,maxSpeed=0,itemsUsed=0;
+assert(COURSE_LENGTH>600,'estate circuit is longer than the old oval');
+for(let i=0;i<1000;i++)for(const lane of [-2,0,2]){const p=racePoint(i/1000*Math.PI*2,lane);assert(!game.world.solids.some(o=>Math.abs(p.x-o.x)<o.w/2+.95&&Math.abs(p.z-o.z)<o.d/2+.95),'full course clears architecture and columns');}
+for(let i=0;i<12000&&!game.race.finished;i++){
+ const p=game.cart.object.position,a=projectCourse(p).angle;for(const r of game.race.rivals){const delta=r.cart.object.position.clone().sub(p);if(delta.length()<10&&delta.dot(new T.Vector3(Math.sin(game.cart.motor.heading),0,-Math.cos(game.cart.motor.heading)))>0)lane=r.lane>0?-1.1:1.1;}
+ const target=racePoint(a+(.07+Math.abs(game.cart.motor.speed)*.002),lane),heading=Math.atan2(target.x-p.x,-(target.z-p.z)),error=Math.atan2(Math.sin(heading-game.cart.motor.heading),Math.cos(heading-game.cart.motor.heading));game.moveStick(T.MathUtils.clamp(error*2.4,-1,1),0);game.key('ShiftLeft',Math.abs(error)<.2);if(game.race.item){game.key('KeyX',true);itemsUsed++;}else game.key('KeyX',false);frame();maxSpeed=Math.max(maxSpeed,game.cart.motor.speed);if(game.race.airborne&&!wasAirborne)jumps++;wasAirborne=game.race.airborne;stalled=game.cart.motor.speed<.01?stalled+1:0;if(stalled>50){console.log('STALLED',game.race.rivals.map(r=>[r.name,r.angle,r.cart.object.position.toArray()]),game.world.solids.filter(o=>Math.abs(o.x-p.x)<o.w/2+5&&Math.abs(o.z-p.z)<o.d/2+5));break;}
 }
-assert(game.race.finished,`two playable laps: gates ${game.race.passed}, position ${game.cart.object.position.toArray()}, speed ${game.cart.motor.speed}`);assert.equal(game.race.passed,16);assert(state.race.rank>=1&&state.race.rank<=4);console.log('Race complete:',game.race.seconds.toFixed(1),'seconds, place',game.race.rank);
+assert(game.race.finished,`two playable laps: gates ${game.race.passed}, position ${game.cart.object.position.toArray()}, speed ${game.cart.motor.speed}`);assert.equal(game.race.passed,CHECKPOINTS*2);assert(maxSpeed>19,"boost accelerates the real cart");assert(jumps>=4,"multiple ramps launch on both laps");assert(itemsUsed>=3,"mystery boxes can be collected and used");assert(state.race.rank>=1&&state.race.rank<=4);console.log('Race complete:',game.race.seconds.toFixed(1),'seconds, place',game.race.rank,'jumps',jumps,'items',itemsUsed,'max speed',maxSpeed);
+// Each item has an observable effect, consumes its slot and resets safely.
+game.race.reset();game.race.countdown=0;
+for(const item of ['gold','shield','deal']){
+ game.race.item=item;game.cart.placeOnCourse(racePoint(0),raceHeading(0),0);game.race.rivals[0].cart.object.position.copy(game.cart.object.position).add(new T.Vector3(0,0,3));
+ assert(game.race.useItem(game.cart));assert.equal(game.race.item,null);
+ if(item==='gold'){game.cart.motor.speed=10;game.race.beforeDrive(.1,game.cart,false,false);assert.equal(game.cart.motor.maxForwardSpeed,22);}
+ if(item==='shield'){const p=game.cart.object.position.clone();game.race.rivals[0].cart.object.position.copy(p);game.race.resolveContacts(game.cart,()=>true);assert(game.cart.object.position.equals(p));}
+ if(item==='deal')assert(game.race.rivals[0].slow>0);
+}
+game.race.reset();game.race.countdown=0;game.cart.motor.speed=10;const charge=game.race.boost;game.race.beforeDrive(1,game.cart,true,false);assert(game.race.boost<charge);game.race.beforeDrive(1,game.cart,false,false);assert(game.race.boost>charge-34);
+game.race.airborne=true;game.race.recover(game.cart);assert(!game.race.airborne);assert.equal(game.cart.object.rotation.x,0);
 game.startArcade('off');assert(!game.race.group.visible&&!game.cart.driving);assert.equal(game.player.position.y,0);game.dispose();GLTFLoader.prototype.loadAsync=original;
 console.log('PASS: reverse-view stability, both camera angle wraps, auto-run and air control, valid/invalid teleport and occlusion, complete guided flight, actual cabinet driver poses, countdown/pause/recovery/anti-skip, two driven race laps and cleanup.');

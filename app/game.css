@@ -69,3 +69,29 @@
 .race-standings{list-style:decimal;padding-left:20px;margin:12px 0;font-size:14px;color:#bfceca;line-height:1.8}.race-standings li i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}.race-standings li.you{color:#ffe0a1;font-weight:bold}.race-countdown{position:absolute;top:48%;left:50%;transform:translate(-50%,-50%);font:bold 96px Georgia,serif;color:#ffffcf;text-shadow:0 4px 0 #15343c,0 0 40px #043a43;pointer-events:none}
 @media(pointer:coarse),(max-width:700px){.race-standings{font-size:12px;line-height:1.65;margin:5px 0}.race-hud .sandbox-score{gap:3px}.race-hud .mode-option{margin:5px 0}.sandbox-hud .mode-option{flex-wrap:wrap;gap:3px}.teleport-notice{bottom:230px;font-size:13px}.next-ring-marker{padding:5px 8px}.next-ring-marker>b{font-size:21px}.next-ring-marker span{font-size:12px}.next-ring-marker small{font-size:12px}}
 @media(pointer:coarse) and (max-height:500px){.race-standings{display:flex;flex-wrap:wrap;gap:0 14px;list-style:none;padding:0;font-size:11px}.race-countdown{font-size:64px}.teleport-notice{bottom:150px}}
+
+/* Keep race information above the road; standings are opened only on demand. */
+.sandbox-hud.race-hud{width:280px;padding:8px 12px;background:#102c33d9}
+.race-hud .sandbox-title strong{font-size:11px;letter-spacing:.08em;min-width:0}
+.race-hud .sandbox-title button{width:44px;height:44px;flex-shrink:0}
+.race-hud [aria-expanded=true] svg{transform:rotate(180deg)}
+.race-summary{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.race-summary b{font-size:25px;line-height:30px;color:#fff0be}.race-summary small{font-size:13px;font-weight:400;color:#d5e2db}
+.race-summary span,.race-summary time{font-size:13px;color:#a5f8e6}
+.race-hud p.race-hint{font-size:11px;line-height:16px;margin:2px 0 0}
+.race-details{border-top:1px solid #d6ce9e33;margin-top:8px;padding-top:4px;max-height:calc(100dvh - 350px);overflow-y:auto;overscroll-behavior:contain}
+.race-details[hidden]{display:none}.race-details .mode-option{min-height:44px}.race-details button:disabled{opacity:.5}
+.race-boost-meter{height:18px;position:relative;background:#081d25;border-radius:4px;overflow:hidden;margin-top:5px;font-size:9px;line-height:18px;color:#fff;text-shadow:0 1px 2px #000}
+.race-boost-meter i{position:absolute;inset:0 auto 0 0;background:#367f71;transition:width .1s linear}.race-boost-meter span{position:relative;padding-left:6px}.race-boost-meter small{position:absolute;right:5px;font-size:9px}
+.race-hud p.race-help{font-size:12px;line-height:1.5}.race-actions button{font-size:11px;padding:4px;line-height:1.2}.race-actions button:nth-child(2){background:#65d9c0}.race-actions button:last-child{background:#ead197}.race-actions button:disabled{opacity:.5}
+@media(pointer:coarse),(max-width:700px){
+ .sandbox-hud.race-hud{top:72px;left:12px;width:calc(100% - 112px);max-width:280px;padding:6px 8px;border-radius:9px;box-shadow:none}
+ .game-shell:has(.race-hud) .minimap{top:72px;right:12px;bottom:auto;width:80px;padding:4px}
+ .game-shell:has(.race-hud) .minimap .map-svg{height:72px}
+ .game-shell:has(.race-hud) .minimap-top,.game-shell:has(.race-hud) .minimap-bottom{display:none}
+}
+@media(pointer:coarse) and (max-height:500px){
+ .sandbox-hud.race-hud{top:66px;width:245px;padding:4px 8px}
+ .race-hud p.race-hint{display:none}.race-hud.expanded p.race-hint{display:block}
+ .race-details{max-height:calc(100dvh - 180px)}
+}

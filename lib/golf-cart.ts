@@ -15,7 +15,7 @@ export class GolfCart {
   }
   /** Driver hip aligned with the left seat. The posed avatar supplies .608 m hip height. */
   driverPosition(){return this.local(-.27,.166,.12);}
-  local(x:number,y:number,z:number){return new T.Vector3(x,y,z).applyAxisAngle(new T.Vector3(0,1,0),-this.motor.heading).add(this.object.position);}
+  local(x:number,y:number,z:number){return new T.Vector3(x,y,z).applyEuler(this.object.rotation).add(this.object.position);}
   contains(x:number,z:number,radius=.24){const p=new T.Vector3(x,0,z).sub(this.object.position).applyAxisAngle(new T.Vector3(0,1,0),this.motor.heading);return Math.abs(p.x)<.86+radius&&p.z>-1.45-radius&&p.z<1.5+radius;}
   placeOnCourse(p:T.Vector3,heading:number,distance:number){this.object.position.copy(p);this.motor.heading=heading;this.object.rotation.y=-heading;this.roll+=distance/.246;for(const {node,front}of this.wheels)node.rotation.set(this.roll,front?-.10:0,0,'YXZ');}
   update(dt:number,throttle:number,steer:number,brake:boolean,blocked:(x:number,z:number)=>boolean){

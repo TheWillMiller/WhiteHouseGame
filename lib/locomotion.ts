@@ -23,12 +23,12 @@ export class LocomotionMotor {
 
 /** Bicycle steering: independent throttle and steering, including reverse. */
 export class CartMotor {
-  speed=0;steer=0;heading=0;
+  speed=0;steer=0;heading=0;maxForwardSpeed=8;
   reset(){this.speed=0;this.steer=0;}
   step(throttle:number,steering:number,brake:boolean,dt:number){
     this.steer+=(steering-this.steer)*(1-Math.exp(-dt*9));
     const opposite=throttle*this.speed<-.05;
-    const target=brake?0:throttle*(throttle<0?3.2:8);
+    const target=brake?0:throttle*(throttle<0?3.2:this.maxForwardSpeed);
     const acceleration=brake?12:opposite?8:throttle===0?2.2:3.8;
     this.speed+=Math.sign(target-this.speed)*Math.min(Math.abs(target-this.speed),acceleration*dt);
     // Reduce steering lock at speed; never rotate a stationary vehicle in place.
