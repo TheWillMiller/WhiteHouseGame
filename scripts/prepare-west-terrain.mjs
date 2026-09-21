@@ -9,7 +9,14 @@ import {writeFile} from 'node:fs/promises';
 await MeshoptDecoder.ready;
 const doc=await new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder}).read('public/models/white-house-west-v1.glb');
 await doc.transform(dequantize());
-const fields=[{x:-95,z:-29,w:151,d:111,step:.1,data:new Int16Array(151*111)}];
+// All exterior walking surfaces: north entrance, east-west gallery and its
+// south-running return beside the Rose Garden. The roof starts above 4 m;
+// accept only upward surfaces below 2 m so the ceiling cannot become a floor.
+const fields=[
+ {x:-95,z:-29,w:151,d:111,step:.1},
+ {x:-74,z:-23.5,w:491,d:81,step:.1},
+ {x:-65,z:-15.5,w:81,d:266,step:.1},
+].map(f=>({...f,data:new Int16Array(f.w*f.d)}));
 let triangles=0;
 for(const node of doc.getRoot().listNodes()){
  if(!node.getMesh())continue;const matrix=new T.Matrix4().fromArray(node.getWorldMatrix());
@@ -24,8 +31,6 @@ for(const node of doc.getRoot().listNodes()){
     const top=Math.max(0,Math.ceil((Math.min(a.z,b.z,c.z)-field.z)/field.step)),bottom=Math.min(field.d-1,Math.floor((Math.max(a.z,b.z,c.z)-field.z)/field.step));
     for(let j=top;j<=bottom;j++)for(let k=left;k<=right;k++){
      const x=field.x+k*field.step,z=field.z+j*field.step;
-     // The center of the south portico remains an open ground-level passage.
-     
      const u=((b.z-c.z)*(x-c.x)+(c.x-b.x)*(z-c.z))/den,v=((c.z-a.z)*(x-c.x)+(a.x-c.x)*(z-c.z))/den;
      if(u>=-1e-5&&v>=-1e-5&&u+v<=1.00001){const height=Math.round((u*a.y+v*b.y+(1-u-v)*c.y)*100);field.data[j*field.w+k]=Math.max(field.data[j*field.w+k],height);}
     }

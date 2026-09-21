@@ -24,6 +24,8 @@ export function openDoor(g:T.Group,x:number,z:number,rotation=0){const key=`${x}
  box(door,0,3.62,0,3.3,.17,.32,0xf5f0df);box(door,0,.06,0,3,.04,.5,0xc1baa8);return door;
 }
 export function portraitTile(g:T.Group,i:number,x:number,y:number,z:number,width=.84){const p=COLONNADE_PEOPLE[i],h=width*1.286;const geo=new T.PlaneGeometry(width,h),uv=geo.getAttribute('uv');for(let j=0;j<uv.count;j++)uv.setXY(j,((i%8)+uv.getX(j))/8,1-(Math.floor(i/8)+1-uv.getY(j))/6);const frame=new T.Mesh(geo,galleryMaterial());frame.name='Gallery portrait: '+p.name;frame.position.set(x,y,z);g.add(frame);textPanel(g,p.name+'\n'+p.years,x,y-h*.77,z+.025,width,.43);return frame;}
+// Mount complete frames and plaques in front of the imported south facade.
+export const EXTERIOR_GALLERY_OFFSET=[-18,0,5.34] as const;
 export function exteriorGallery(g:T.Group){for(let i=0;i<8;i++)portraitTile(g,39+i,-36.3+i*1.45,2.18,-27.06,1.04);textPanel(g,'PORTRAIT GALLERY\nEnter the West Colonnade',-41.4,2.25,-27.02,1.3,.65);}
 
 let historicalPhotos:T.MeshStandardMaterial|undefined;

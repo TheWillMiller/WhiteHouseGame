@@ -1,6 +1,6 @@
 import {LocomotionMotor} from './locomotion';
 import {GolfCart,loadGolfCart} from './golf-cart';
-import {fanlight,openDoor,hallDetails,textPanel,corridorFace,corridorRoomSigns,exteriorGallery,clearInteriorDetails} from './interior-details';
+import {fanlight,openDoor,hallDetails,textPanel,corridorFace,corridorRoomSigns,exteriorGallery,EXTERIOR_GALLERY_OFFSET,clearInteriorDetails} from './interior-details';
 import {buildWorksite,type Worksite} from './worksite';
 import {renderEstateMap} from './estate-map';
 import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE} from './grounds-layout';
@@ -63,7 +63,7 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  // Imported West Wing uses the same metre scale and origin as the residence.
  // Ground footprints, not roof overhangs: main block, Oval Office and press connector.
  solid(w,-88,-5.1,29,29.7,10.5);solid(w,-70.7,4.7,11.3,10.9,5.6);solid(w,-49.1,-26.15,48,8.3,5.6);
- openDoor(g,-89,-20.3,Math.PI);openDoor(g,-57,-22.1);const gallery=new T.Group();exteriorGallery(gallery);gallery.position.set(-18,0,5.1);g.add(gallery);
+ openDoor(g,-89,-20.3,Math.PI);openDoor(g,-57,-22.1);const gallery=new T.Group();exteriorGallery(gallery);gallery.position.set(...EXTERIOR_GALLERY_OFFSET);g.add(gallery);
  // Full source colonnade posts also collide at human and vehicle height.
  for(let x=-60;x<-26;x+=2.72)solid(w,x,-19.75,.32,.32,4.5);
  for(let z=-17;z<10;z+=2.72)solid(w,-62.5,z,.32,.32,4.5);

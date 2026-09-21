@@ -42,4 +42,6 @@ assert.equal(rig.follow(1,-1,false,2),1,'standing free look remains where placed
 rig.reset();const wrap=rig.follow(Math.PI-.02,-Math.PI+.02,true,.1);assert(wrap>Math.PI-.02&&wrap<Math.PI+.02,'shortest-path recenter across angle wrap');
 // Source-mesh West Wing portico: a continuous ground-to-door approach.
 game.change('grounds',-89,-29);for(let z=-29;z<=-22.2;z+=.05){assert(!game.blocked(-89,z),'West Wing approach clear');game.player.position.z=z;game.loop(now+=16);assert(game.player.position.y>=residenceHeight(-89,z)-.001);}assert(game.player.position.y<1,'portico ceiling is not mistaken for its walking floor');
-game.dispose();console.log('PASS: four stair routes, physical outdoor scale, elevated landing/jumping, free look and stable third-person recenter.');
+// Both legs of the imported raised colonnade must support feet and jumping.
+for(const [x,z]of [[-57,-20.4],[-40,-20.4],[-61,-10],[-61,5]]){const h=residenceHeight(x,z);assert(h>.1&&h<.3,'raised paving has a floor');game.change('grounds',x,z);assert.equal(game.player.position.y,h);game.jump();game.loop(now+=16);assert(game.player.position.y>h);for(let i=0;i<90;i++)game.loop(now+=16);assert.equal(game.player.position.y,h,'lands on colonnade paving');}
+game.dispose();console.log('PASS: four stair routes, raised colonnade floors and jumping, physical outdoor scale, free look and stable third-person recenter.');
