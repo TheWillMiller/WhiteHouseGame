@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import * as T from 'three';
+import {ControllerInput,stickDeadzone,controllerMenu} from '../.qa/controller.mjs';
+const makePad=(id='Test standard pad',index=0)=>({id,index,connected:true,mapping:'standard',axes:[0,0,0,0],buttons:Array.from({length:17},()=>({pressed:false,value:0}))});
+const button=(pad,i,value=1)=>{pad.buttons[i]={pressed:value>.5,value};};
+const input=new ControllerInput(),pad=makePad();let pads=[null,pad];
+assert.deepEqual(stickDeadzone(.05,-.1),[0,0]);assert(Math.abs(Math.hypot(...stickDeadzone(1,1))-1)<1e-8);
+button(pad,0);assert(!input.poll(.016,false,true,pads).pressed[0]);assert.equal(input.status.state,'release');
+button(pad,0,0);input.poll(.016,false,true,pads);button(pad,0);
+assert(input.poll(.016,false,true,pads).pressed[0]);assert(!input.poll(.016,false,true,pads).pressed[0],'held jump has one rising edge');
+pad.axes=[.7,-.7,.4,-.3];button(pad,7,.45);let f=input.poll(.016,false,true,pads);assert(f.x>0&&f.y>0&&f.lookX>0&&f.lookY<0&&f.gas>.3);
+assert.equal(input.poll(.016,true,true,pads).x,0,'menu transition blocks held movement');
+pad.axes=[0,0,0,0];pad.buttons.forEach((_,i)=>button(pad,i,0));input.poll(.016,true,true,pads);
+button(pad,13);assert.equal(input.poll(.016,true,true,pads).navigate,1);assert.equal(input.poll(.05,true,true,pads).navigate,0);assert.equal(input.poll(.4,true,true,pads).navigate,1);
+input.poll(.016,false,true,[]);assert.equal(input.status.state,'none');
+input.poll(.016,false,true,[{...makePad('Unknown wheel'),mapping:''}]);assert.equal(input.status.state,'unmapped','unknown wheels are not silently mis-mapped');
+input.poll(.016,false,true,[{...makePad(),axes:[NaN,Infinity,0,0]}]);assert(input.status.axes.every(Number.isFinite));
+
+// Exercise actual game movement with a polled browser pad, no WebGL/browser.
+globalThis.DOMRect??=class{};const ctx=new Proxy({},{get:()=>()=>{},set:()=>true});
+globalThis.document=Object.assign(new EventTarget(),{hidden:false,createElement:()=>({getContext:()=>ctx})});
+globalThis.window=Object.assign(new EventTarget(),{devicePixelRatio:1,location:{pathname:'/'}});
+Object.defineProperty(globalThis,'navigator',{configurable:true,value:{getGamepads:()=>pads}});
+globalThis.ResizeObserver=class{constructor(fn){this.fn=fn;}observe(){this.fn();}disconnect(){}};
+globalThis.requestAnimationFrame=()=>1;globalThis.cancelAnimationFrame=()=>{};
+globalThis.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttribute(){},focus(){},remove(){}}),shadowMap:{},setPixelRatio(){},setSize(){},dispose(){},render(scene,camera){scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);}});
+const {Game}=await import('../.qa/game.mjs'),{GolfCart}=await import('../.qa/golf-cart.mjs');
+const game=new Game({appendChild(){},clientWidth:1280,clientHeight:800},()=>{},()=>{},()=>{});
+const active=makePad();pads=[active];let now=1000;const frame=(n=1)=>{for(let i=0;i<n;i++)game.loop(now+=20);};
+const neutral=()=>{active.axes=[0,0,0,0];active.buttons.forEach((_,i)=>button(active,i,0));frame(2);};
+game.change('grounds',0,80);neutral();const start=game.player.position.clone();active.axes=[.6,-.8,.45,-.25];button(active,5);button(active,0);frame(5);
+assert(game.player.position.distanceTo(start)>.2,'run, diagonal movement and jump combine');assert(game.player.position.y>.1,'jump launches');assert(game.yaw>0&&game.pitch<.25,'look works while running and jumping');assert(game.down('ShiftLeft'));
+game.key('KeyW',true);pads=[];frame();assert.equal(game.controllerFrame.x,0);assert(!game.down('ShiftLeft'));assert(game.keys.has('KeyW'),'disconnect cannot release a keyboard-held key');game.keys.clear();
+pads=[active];neutral();game.pause(true);active.axes[1]=-1;const at=game.player.position.clone();frame(10);assert(game.player.position.equals(at),'menus stop gameplay');
+game.pause(false);frame(5);assert.equal(game.controllerFrame.y,0,'held stick cannot move immediately on resume');neutral();active.axes[1]=-1;frame();assert(game.controllerFrame.y>0);
+window.dispatchEvent(new Event('blur'));frame();assert.equal(game.controllerFrame.y,0);window.dispatchEvent(new Event('focus'));frame();assert.equal(game.controllerFrame.y,0);neutral();
+let commands=[];game.controllerCommand=c=>commands.push(c);button(active,9);frame(4);assert.deepEqual(commands,['menu']);assert(game.paused);neutral();button(active,13);frame();assert.equal(commands.at(-1),'next');neutral();button(active,0);frame();assert.equal(commands.at(-1),'accept');
+neutral();game.pause(false);game.change('grounds',0,80);game.cart=new GolfCart(new T.Group());game.cart.object.position.set(0,0,80);game.world.group.add(game.cart.object);game.enterCart();neutral();
+active.axes[0]=.5;button(active,7,.7);frame(35);assert(game.cart.motor.speed>1,'analog trigger accelerates');assert(game.cart.motor.heading>0,'steering combines with trigger throttle');
+button(active,7,0);button(active,6);frame(70);assert(game.cart.motor.speed<0,'left trigger brakes into reverse');button(active,1);frame(20);assert.equal(game.cart.motor.speed,0,'handbrake stops cart');
+neutral();button(active,5);button(active,4);frame();assert(game.down('ShiftLeft')&&game.down('KeyX'),'boost and item available together');pads=[];frame();assert.equal(game.cart.motor.speed,0);assert(!game.down('KeyX'));
+game.dispose();
+
+const controls=Array.from({length:3},()=>({disabled:false,getClientRects:()=>[{}],matches(){return this.disabled;},focus(){document.activeElement=this;},scrollIntoView(){},click(){this.clicked=true;}}));
+document.querySelectorAll=()=>[{getClientRects:()=>[{}],querySelectorAll:()=>controls}];document.activeElement=null;controls[1].disabled=true;
+controllerMenu('next');assert.equal(document.activeElement,controls[0]);controllerMenu('next');assert.equal(document.activeElement,controls[2]);controllerMenu('accept');assert(controls[2].clicked);controllerMenu('next');assert.equal(document.activeElement,controls[0]);
+console.log('PASS: deadzones, analog sticks/triggers, button edges, menu repeat/focus, simultaneous run/look/jump, cart steering/reverse/brake, boost/items, pause/focus/reconnect neutral gate, and keyboard isolation. Hardware not tested.');

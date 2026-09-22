@@ -132,3 +132,12 @@ body {
     @apply font-sans;
   }
 }
+
+.controller-guide { padding-bottom: 1rem; border-bottom: 1px solid #b8a46d55; margin-bottom: 1rem; }
+.controller-name { display: block; overflow-wrap: anywhere; opacity: .8; }
+.controller-check { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1rem 0; }
+.controller-check meter { width: 4rem; height: 1rem; }
+.controller-bindings { display: grid; grid-template-columns: minmax(7rem, 1fr) 2fr; gap: .55rem 1rem; margin: 1rem 0; font-size: .95rem; }
+.controller-bindings dt { color: #b8954f; font-weight: 700; }
+.controller-bindings dd { margin: 0; }
+.game-dialog button:focus, .game-dialog a:focus { outline: 3px solid #cda849; outline-offset: 2px; }
