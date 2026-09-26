@@ -1,3 +1,4 @@
+import {roseTerrace,roseBed} from './garden-planting';
 import * as T from 'three';
 import {material, lamp} from './visuals';
 import {COLONNADE_PEOPLE} from './colonnade-people';
@@ -49,7 +50,7 @@ export function colonnadeGallery(g:T.Group){
  for(let x=19;x<84;x+=4.5){const col=new T.Mesh(new T.CylinderGeometry(.23,.29,4.2,12),material(0xf5f0df));col.position.set(x,2.1,-17.25);g.add(col);box(g,x,.12,-17.25,.73,.24,.73,0xf5f0df);box(g,x,4.2,-17.25,.72,.22,.72,0xf5f0df);}
  box(g,51,4.42,-17.25,66,.3,.75,0xf5f0df);
  // Garden outlook beyond the open colonnade; portal takes the visitor into the full estate.
- box(g,51,-.1,-8,66,.2,17,0x698644);box(g,51,.025,-15,66,.05,2.2,0xc6bfa8);
+ box(g,51,-.1,-8,66,.2,17,0xc8c8b6);roseTerrace(g,51,-7.5,60,11,.025);roseBed(g,51,-14,60,.85);roseBed(g,51,-1,60,.85);box(g,51,.03,-15.4,66,.05,1.5,0xc6bfa8);
  for(const x of doors)openDoor(g,x,-25);
  textPanel(g,'THE PRESIDENTIAL WALK OF FAME',54,4.12,-24.69,10,.38);
 }
