@@ -199,11 +199,19 @@ function fireplace(g: T.Group, solids: Solid[]) {
   for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.4, 0, -6.5); furniturePiece(g,solids,'Oval side table',side*2.4,-6.5,[.75,.71,.75],()=>{g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut);  solids.push({ x: side * 2.4, z: -6.5, w: 1.03, d: .82 }); }); lamp(g,side*2.4,.86,-6.5); }
 }
 function wallDecor(g: T.Group) {
-  portrait(anchor(g, 4.39, .17), 'franklin', .93, 1.14, 3.14);
-  portrait(anchor(g, 5.05, .17), 'jefferson', .89, 1.18, 3.12);
+  portrait(anchor(g, 4.39, .17), 'franklin', .93, 1.14, 3.65);
+  portrait(anchor(g, 5.05, .17), 'jefferson', .89, 1.18, 3.65);
   portrait(anchor(g, 3.51, .17), 'adams', 1.09, 1.34, 3.22);
   portrait(anchor(g, 2.52, .17), 'lincoln', 1.0, 1.34, 3.08);
   portrait(anchor(g, .62, .17), 'jackson', 1.0, 1.34, 3.08);
+  // Gilded mirrors flank the fireplace in the official November 2025 panorama.
+  // A low-cost environment sheen keeps them legible without another scene render.
+  for(const a of [4.37,5.055]){
+    const p=anchor(g,a,.23);p.name='Gilded fireplace mirror';frame(p,0,1.96,-.035,1.0,1.45);
+    const mirror=new T.MeshStandardMaterial({color:0xc2cec5,roughness:.18,metalness:.72});
+    const face=mesh(p,new T.PlaneGeometry(1.0,1.45),mirror,0,1.96,-.065);face.rotation.y=Math.PI;face.userData.environmentSheen=true;face.userData.dynamic=true;
+    for(const side of [-1,1]){orb(p,side*.47,2.75,-.11,.09,.11,.035,C.gold);orb(p,side*.47,1.16,-.11,.09,.09,.035,C.gold);}
+  }
   // Recessed panel doors stay within the tangent wall, with visible hardware.
   for (const a of [.10]) { const p = anchor(g, a, .08); box(p, 0, 1.67, -.005, 1.42, 3.31, .09, C.white); frame(p, 0, 1.69, -.055, 1.50, 3.40, false); for (const y of [.68, 1.73, 2.76]) frame(p, 0, y, -.07, 1.06, .70, false); p.traverse(o => { if (o instanceof T.Mesh) o.material = material(C.white); }); orb(p, .56, 1.47, -.20, .06, .06, .065, C.gold); }
   const clock = anchor(g, 5.78, .52); clock.name = 'Grandfather clock';clock.position.y=.11;furnitureModel(clock,{asset:'vintage_grandfather_clock_01',width:.67,height:2.35,depth:.46,yaw:clock.rotation.y}); box(clock, 0, 1.53, 0, .80, 3.06, .42, C.walnut, .025); box(clock, 0, 1.38, -.23, .55, 1.76, .035, 0x302d24); box(clock, 0, .15, -.01, .94, .30, .55, C.mahogany); box(clock, 0, 3.03, -.01, 1.01, .16, .59, C.mahogany);

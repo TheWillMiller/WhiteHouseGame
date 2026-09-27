@@ -147,3 +147,30 @@ Changes: Source geometry retained; transformed orientation and pivot; compressed
 Commercial refrigerator attribution: Original Commercial Fridge (c)2025 Sean Thomas; cleanup and textures (c)2025 Eric Chadwick / Darmstadt Graphics Group GmbH. CC BY 4.0. Model simplified; doors frozen closed; transmission changed to alpha glass; geometry/textures compressed.
 https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/CommercialRefrigerator/README.md
 https://creativecommons.org/licenses/by/4.0/
+
+
+# Situation Room and Oval Office furniture
+
+All three files are Y-up, metre units, floor-centered. Chair fronts face -Z. The table's long dimension runs along Z. Geometry uses EXT_meshopt_compression; textures use EXT_texture_webp. Keep source GLBs and these records with the delivered assets.
+
+| File | Width / Height / Depth | Triangles | Bytes |
+| --- | --- | ---: | ---: |
+| situation-executive-chair.glb | .680 / 1.200 / .700 m | 3,720 | 397,152 |
+| executive-chair-brown.glb | .800 / 1.200 / .800 m | 3,720 | 405,672 |
+| situation-conference-table.glb | 2.300 / .760 / 7.800 m | 2,544 | 83,976 |
+
+Both chairs have a .46 m seat cushion top above their own base. Add the room furniture base offset when computing seated hip height. The table's actual wooden surface is about .738 m above its base; the cable-box lid reaches .760 m. These are modern visual substitutes, not verified reproductions of a particular White House chair or table.
+
+## Sources and licenses
+
+- Executive chair geometry: [Executive chair with headrest, 3D Assets](https://3dassets.dev/assets/downtown-office-interiors-executive-chair-9801b58f). CC0-1.0, publisher discloses AI/procedural generation with Claude Fable 5.1. Original 3,720 triangles, padded back and seat, arm pads, headrest, swivel column and five-star caster base. Source kept in source-16982.glb.
+- Table geometry: [Boardroom table, twelve person, 3D Assets](https://3dassets.dev/packs/downtown-office-interiors). Exact source ID17014 and record in office-manifest.json. CC0-1.0, same disclosed AI/procedural source. Original 2,544 triangles, rounded rectangular top, slab supports and cable fittings. Source kept in source-17014.glb.
+- Leather PBR: [Brown Leather, Rob Tuytel / Poly Haven](https://polyhaven.com/a/brown_leather), CC0. Grayscale albedo for black variant; brown variant retains source color with a darker tint. Added planar UVs, normal and ARM maps to original untextured model.
+- Wood PBR: [European Walnut Veneer 05, Jenelle van Heerden / Poly Haven](https://polyhaven.com/a/european_walnut_veneer_05), CC0. Applied clean veneer UVs and warmer mahogany tint, subtle normal strength and satin roughness.
+- License texts: https://creativecommons.org/publicdomain/zero/1.0/ and https://polyhaven.com/license
+
+## Adaptation
+
+Chair X/Z extent and upper-back height were normalized while retaining a .46 m cushion top, with originals' arms, welts, headrest and swivel caster geometry intact. The table top and support beam were extended to7.8 m, supports relocated to +/-2.6 m along length, with support thickness and grommet shapes preserved. No Gothic/turned pedestal parts were used. Frozen closed cable box, no animations.
+
+situation-furniture-preview.png is a lightweight software geometry/material preview, not a full physically based GPU render. Thin polygon seams in that image are the preview renderer's antialiasing artifacts, not explicit wireframe geometry.

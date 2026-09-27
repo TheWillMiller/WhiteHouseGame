@@ -18,7 +18,8 @@ export function furniturePiece(parent:T.Group,solids:Solid[],name:string,x:numbe
  const sideways=Math.abs(Math.sin(yaw))>.5,localWidth=sideways?size.z:size.x,localDepth=sideways?size.x:size.z;
  let asset='',width=localWidth,height=size.y,depth=localDepth;
  if(/sofa/i.test(name)||name==='State room seating'&&localWidth>1){asset='Sofa_01';height=.97;}
- else if(/Armchair|fireplace armchair|guest chair|President chair/.test(name)||name==='State room seating'){asset='ArmChair_01';height=1.05;width=Math.max(.62,localWidth);depth=Math.max(.65,localDepth);}
+ else if(name==='President chair'){asset='executive-chair-brown';width=.80;height=1.20;depth=.80;}
+ else if(/Armchair|fireplace armchair|guest chair/.test(name)||name==='State room seating'){asset='ArmChair_01';height=1.05;width=Math.max(.62,localWidth);depth=Math.max(.65,localDepth);}
  else if(name==='Office desk'){asset='antique-desk';height=.76;}
  else if(name==='Resolute desk'){asset='antique-desk';width=1.8288;height=.8255;depth=1.2192;}
  else if(/coffee table/i.test(name)){asset='gothic_coffee_table';height=.46;}

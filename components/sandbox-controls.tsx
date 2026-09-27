@@ -1,10 +1,11 @@
 'use client';
 import type {ArcadeMode,ArcadeState} from '@/lib/arcade';
-import {Crosshair,Rocket,Footprints,RotateCcw,X,Flag,MousePointer2,ChevronDown} from 'lucide-react';
+import {Crosshair,Rocket,Footprints,RotateCcw,X,Flag,MousePointer2,ChevronDown,Radio} from 'lucide-react';
 import type {RaceState} from '@/lib/cart-race';
 import {useState,type PointerEvent} from 'react';
 
-export function SandboxModes({choose,teleport}:{choose:(mode:ArcadeMode)=>void;teleport:()=>void}){return <div className="sandbox-modes">
+export function SandboxModes({choose,teleport,command}:{choose:(mode:ArcadeMode)=>void;teleport:()=>void;command:()=>void}){return <div className="sandbox-modes">
+ <button onClick={command}><Radio/><div><strong>Situation Room</strong><span>Take command. Dispatch rescue teams, restore power, and contain a growing crisis. Three scenarios.</span></div><b>NEW</b></button>
  <button onClick={()=>choose('race')}><Flag/><div><strong>Cabinet Grand Prix</strong><span>Auto throttle, forgiving steering, cabinet rivals. Jump, boost, and outsmart the pack.</span></div><b>RACE</b></button>
  <button onClick={()=>choose('flight')}><Rocket/><div><strong>Sky Rally</strong><span>One-stick flying above the White House. Twelve big gates, perfect passes, and boost.</span></div><b>FLY</b></button>
  <button onClick={()=>choose('blaster')}><Crosshair/><div><strong>The Big Beautiful Shootout</strong><span>Blast tax bills, red tape, inflation, and fictional regime bosses. Six pop-up bays. Three rounds. Beat the clock.</span></div><b>PLAY</b></button>

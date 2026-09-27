@@ -13,7 +13,7 @@ const {Game}=await import('../.qa/game.mjs');
 const game=new Game({appendChild(){},clientWidth:1280,clientHeight:800},()=>{},()=>{},()=>{});
 game.furnitureModels.load=localFurniture;
 let samples=0,pieces=0;
-for(const zone of ['west','state','ground','second','third']){
+for(const zone of ['west','situation','state','ground','second','third']){
  game.change(zone,0,0);const world=game.world;
  await game.furnitureModels.populate(world.group,'/',()=>{});
  world.group.updateMatrixWorld(true);

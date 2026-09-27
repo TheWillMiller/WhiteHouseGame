@@ -329,6 +329,104 @@
       ],
       "bytes": 847328,
       "changes": "Source geometry retained; transformed orientation and pivot; compressed textures and meshopt geometry."
+    },
+    {
+      "id": "situation-executive-chair",
+      "file": "executive-chair.glb",
+      "bytes": 397152,
+      "triangles": 3720,
+      "bounds": {
+        "min": [
+          -0.34001310060554113,
+          0,
+          -0.34998916227372884
+        ],
+        "max": [
+          0.34001310060554113,
+          1.2000000476837158,
+          0.34998916227372884
+        ],
+        "size": [
+          0.6800262012110823,
+          1.2000000476837158,
+          0.6999783245474577
+        ]
+      },
+      "up": "+Y",
+      "front": "-Z",
+      "pivot": "floor-centered",
+      "license": "CC0-1.0",
+      "geometrySource": "https://cdn.3dassets.dev/assets/16982/v1/model.glb",
+      "geometryAuthor": "3D Assets (publisher discloses AI/procedural geometry)",
+      "textureSource": "https://polyhaven.com/a/brown_leather",
+      "textureAuthor": "Rob Tuytel",
+      "adaptation": "Preserved welted cushions, padded arms, headrest and five-star caster base; seat top normalized to.46m, back reduced to1.20m overall; real leather PBR mapped to black or brown finish; original+Z front turned-Z.",
+      "seatHeight": 0.46
+    },
+    {
+      "id": "executive-chair-brown",
+      "file": "executive-chair-brown.glb",
+      "bytes": 405672,
+      "triangles": 3720,
+      "bounds": {
+        "min": [
+          -0.40001253623649635,
+          0,
+          -0.4000338803304069
+        ],
+        "max": [
+          0.4000125362364964,
+          1.2000000476837158,
+          0.4000338803304069
+        ],
+        "size": [
+          0.8000250724729927,
+          1.2000000476837158,
+          0.8000677606608138
+        ]
+      },
+      "up": "+Y",
+      "front": "-Z",
+      "pivot": "floor-centered",
+      "license": "CC0-1.0",
+      "geometrySource": "https://cdn.3dassets.dev/assets/16982/v1/model.glb",
+      "geometryAuthor": "3D Assets (publisher discloses AI/procedural geometry)",
+      "textureSource": "https://polyhaven.com/a/brown_leather",
+      "textureAuthor": "Rob Tuytel",
+      "adaptation": "Preserved welted cushions, padded arms, headrest and five-star caster base; seat top normalized to.46m, back reduced to1.20m overall; real leather PBR mapped to black or brown finish; original+Z front turned-Z.",
+      "seatHeight": 0.46
+    },
+    {
+      "id": "situation-conference-table",
+      "file": "situation-table.glb",
+      "bytes": 83976,
+      "triangles": 2544,
+      "bounds": {
+        "min": [
+          -1.1498733060085715,
+          0,
+          -3.8999998569488525
+        ],
+        "max": [
+          1.1498733060085715,
+          0.7601247941748558,
+          3.8999998569488525
+        ],
+        "size": [
+          2.299746612017143,
+          0.7601247941748558,
+          7.799999713897705
+        ]
+      },
+      "up": "+Y",
+      "front": "-Z",
+      "pivot": "floor-centered",
+      "license": "CC0-1.0",
+      "geometrySource": "https://cdn.3dassets.dev/assets/17014/v1/model.glb",
+      "geometryAuthor": "3D Assets (publisher discloses AI/procedural geometry)",
+      "textureSource": "https://polyhaven.com/a/european_walnut_veneer_05",
+      "textureAuthor": "Jenelle van Heerden",
+      "adaptation": "Retained modern rounded tabletop, slab supports, cable fittings; extended top and beam to7.8m, relocated supports without stretching their thickness, preserved grommet shape; clean walnut PBR tinted mahogany; long axis Z."
     }
   ]
 }

@@ -1,11 +1,12 @@
 import {BLUE_ROOM,STATE_SALON_X,STATE_OUTER_ROOM_X} from './residence-layout';
 import {GARDENS,HELIPAD,SOUTH_FLAG,PRESS_TENTS} from './grounds-layout';
 import {westDestinations} from './west-layout';
-export type Place = 'grounds'|'west'|'state'|'ground'|'second'|'third';
-export const floors: {id:Place;label:string}[]=[{id:'grounds',label:'Grounds'},{id:'west',label:'West Wing'},{id:'ground',label:'Ground floor'},{id:'state',label:'State floor'},{id:'second',label:'Second floor'},{id:'third',label:'Third floor'}];
+export type Place = 'grounds'|'west'|'situation'|'state'|'ground'|'second'|'third';
+export const floors: {id:Place;label:string}[]=[{id:'grounds',label:'Grounds'},{id:'west',label:'West Wing'},{id:'situation',label:'Situation Room'},{id:'ground',label:'Ground floor'},{id:'state',label:'State floor'},{id:'second',label:'Second floor'},{id:'third',label:'Third floor'}];
 export type Destination={id:string;name:string;short?:string;zone:Place;x:number;z:number;description:string;spawn?:[number,number];room?:{w:number;d:number;color:number;style:string;doors?:{north?:number[];south?:number[];west?:number[];east?:number[]}}};
 export const destinations:Destination[]=[
   ...westDestinations,
+  {id:'situation',name:'Situation Room',short:'Command room',zone:'situation',x:0,z:0,spawn:[0,6.6],description:'West Wing lower level · a public-photo interpretation of the JFK conference room. Use the table to take command.',room:{w:12,d:18,color:0x69412d,style:'command'}},
   {id:'cross-hall',name:'Cross Hall',zone:'state',x:0,z:0,spawn:[0,0],description:'The east-west passage linking the ceremonial rooms',room:{w:2*(BLUE_ROOM.w/2+7),d:6,color:0xe7e0c8,style:'corridor',doors:{north:[0],south:[-STATE_SALON_X,0,STATE_SALON_X],west:[0],east:[0]}}},
 
   {id:'colonnade',name:'Presidential Walk of Fame',short:'Portrait gallery',zone:'grounds',x:-43,z:-20.4,spawn:[-43,-20.4],description:'One gallery in the open West Colonnade: Washington at the Residence end, later terms toward the West Wing'},
@@ -66,6 +67,10 @@ export const npcs:NPC[]=[
  {id:'docent',name:'Taylor, the curator',role:'Residence staff · fictional character',zone:'state',x:20,z:5,hair:0x574433,suit:0x696050,greeting:'Welcome to the East Room. It’s one of the great ceremonial spaces of the house.',topics:[{question:'How does this layout work?',answer:'The East Room occupies the eastern end. The Green, Blue, and Red Rooms run along the south side, with the State Dining Room at the west. The Cross Hall connects them.'},{question:'Is the game historically exact?',answer:'The main relationships come from public plans, but this is an adaptation. Furniture, passage widths, and upper-floor arrangements are simplified. The field guide has our references.'}]},
 ];
 export const sources=[
+ {title:'White House · Situation Room photo gallery (2025)',url:'https://www.whitehouse.gov/gallery/president-donald-trump-and-his-national-security-team-meet-in-the-situation-room-of-the-white-house/'},
+ {title:'White House · Situation Room photograph (February 2026)',url:'https://www.flickr.com/photos/whitehouse/55127462186/'},
+ {title:'AP · 2023 Situation Room renovation and public room description',url:'https://apnews.com/article/2662c91507aa4987fad6bc238b8633a4'},
+ {title:'White House · Oval Office furnishings reference (September 2026)',url:'https://www.whitehouse.gov/wp-content/uploads/2026/09/P20260909JB-0777.jpg'},
  {title:'Ford Library · White House Curator room measurements (PDF page 35)',url:'https://www.fordlibrarymuseum.gov/library/document/0018/81556669.pdf'},
  {title:'Google Arts & Culture · White House public tour (2023)',url:'https://artsandculture.google.com/story/aQVRQ1-zMnlrnQ'},
  {title:'Google Arts & Culture · State Floor room history',url:'https://artsandculture.google.com/story/jgXBMr3Z9lSjLw'},

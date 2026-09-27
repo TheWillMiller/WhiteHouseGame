@@ -7,7 +7,7 @@ globalThis.document={createElement:()=>({getContext:()=>ctx})};
 const {interior}=await import('../.qa/game.mjs');
 const {FurnitureModels}=await import('../.qa/furniture-models.mjs');
 const assets=new Set();let count=0;
-for(const zone of ['west','state','ground','second','third']){
+for(const zone of ['west','situation','state','ground','second','third']){
  const w=interior(zone),loader=new FurnitureModels(),sockets=[];loader.load=localFurniture;
  w.group.traverse(o=>{if(o.userData.modelFurniture){sockets.push(o);const f=o.userData.modelFurniture;assets.add(f.asset);assert(statSync('public/models/furniture/'+f.asset+'.glb').size<1_200_000,'bounded download: '+f.asset);}});
  await loader.populate(w.group,'/',()=>{});

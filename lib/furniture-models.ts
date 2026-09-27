@@ -30,6 +30,7 @@ export class FurnitureModels{
  }
  async populate(world:T.Group,pathname:string,onReady:()=>void){
   if(this.worlds.has(world)||this.disposed)return;this.worlds.add(world);
+  if(this.reflection)world.traverse(o=>{if(o.userData.environmentSheen&&o instanceof T.Mesh&&o.material instanceof T.MeshStandardMaterial){o.material.envMap=this.reflection!.texture;o.material.envMapIntensity=.6;o.material.needsUpdate=true;}});
   const sockets:T.Group[]=[];world.traverse(o=>{if(o.userData.modelFurniture&&!o.userData.furnitureReady)sockets.push(o as T.Group);});
   const assets=[...new Set(sockets.map(o=>(o.userData.modelFurniture as FurnitureSpec).asset))];
   // Two decodes at a time keeps first-room entry from saturating mobile memory.

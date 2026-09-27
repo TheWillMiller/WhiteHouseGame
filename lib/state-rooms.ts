@@ -7,7 +7,7 @@ import { material } from './visuals';
 import type { Destination } from './world-data';
 
 type Solid={x:number;z:number;w:number;d:number;height?:number};
-type World={group:T.Group;solids:Solid[];cameraOnly?:{x:number;z:number;w:number;d:number;height:number;y:number}[];spots:{id:string;label:string;kind:'seat'|'npc'|'door'|'lectern'|'equipment'|'vehicle';x:number;z:number;pose?:[number,number,number];hipHeight?:number}[]};
+type World={group:T.Group;solids:Solid[];cameraOnly?:{x:number;z:number;w:number;d:number;height:number;y:number}[];spots:{id:string;label:string;kind:'seat'|'npc'|'door'|'lectern'|'equipment'|'vehicle'|'command';x:number;z:number;pose?:[number,number,number];hipHeight?:number}[]};
 const WHITE=0xf5f0df,GOLD=0xd9b458,WOOD=0x69412d,CREAM=0xe0cf9e;
 export const STATE_ROOM_IDS=['east-room','green','blue','red','dining'];
 export const isStateRoom=(d:Destination)=>d.zone==='state'&&STATE_ROOM_IDS.includes(d.id);
