@@ -387,7 +387,7 @@ if(d.id==='colonnade'){for(let cx=19;cx<84;cx+=4.5)solid(w,cx,-17.25,.6,.6,4.4);
  }else if(style==='flowers'){
    desk(w,x,z+2,Math.min(5,r.w-4),1.8);for(let i=0;i<5;i++){const px=x-.95+i*.475;cyl(g,px,1.02,z+2,.13,.30,0x7e9ca2,8,.25);const bouquet=new T.Group();bouquet.position.set(px,1.17,z+2);bouquet.scale.setScalar(.32);roseBed(bouquet,0,0,.8,.8);g.add(bouquet);}for(const side of [-1,1])plant(g,x+side*(rx-1.5),0,z+rz-2);
  }else if(style==='games'){
-   furniturePiece(w.group,w.solids,'Billiard table',x,z,[.44,.61,.47],()=>{box(g,x,1,z,3.5,.3,6,C.wood);box(g,x,1.19,z,3.1,.1,5.6,0x477556);for(const sx of [-1,1])for(const sz of [-2,2])box(g,x+sx,.5,z+sz,.2,1,.2,C.wood);for(let i=0;i<7;i++)ball(g,x+Math.sin(i)*.75,1.33,z+Math.cos(i)*1.7,.12,[0xf4e9c9,0xc95240,0xd6aa32][i%3]);solid(w,x,z,3.5,6);});sofa(g,x-rx+2,z,-Math.PI/2);
+   furniturePiece(w.group,w.solids,'Billiard table',x,z,[.44,.61,.47],()=>{box(g,x,1,z,3.5,.3,6,C.wood);box(g,x,1.19,z,3.1,.1,5.6,0x477556);for(const sx of [-1,1])for(const sz of [-2,2])box(g,x+sx,.5,z+sz,.2,1,.2,C.wood);for(let i=0;i<7;i++)ball(g,x+Math.sin(i)*.75,1.33,z+Math.cos(i)*1.7,.12,[0xf4e9c9,0xc95240,0xd6aa32][i%3]);solid(w,x,z,3.5,6);});sofa(g,x-rx+2,z+2.8,-Math.PI/2);
  }else if(style==='music'){
    furniturePiece(w.group,w.solids,'Grand piano',x,z,[.52,.50,.65],()=>{box(g,x,1.2,z,3,.5,3.5,0x272c2c);box(g,x,1.45,z-1.5,2.7,.1,.7,C.white);for(let i=0;i<14;i++)box(g,x-1.2+i*.18,1.54,z-1.4,.08,.06,.25,0x1a2525);const lid=box(g,x,2,z+.3,3,.1,2.8,0x272c2c);lid.rotation.z=.2;for(const sx of [-1.2,1.2])box(g,x+sx,.6,z+1,.15,1.2,.15,0x272c2c);});chair(g,x,z-1.75,0x4d4037,Math.PI);solid(w,x,z,1.56,2.28,1.23);
  }else if(style==='ballroom'){
@@ -395,7 +395,7 @@ if(d.id==='colonnade'){for(let cx=19;cx<84;cx+=4.5)solid(w,cx,-17.25,.6,.6,4.4);
  }else if(style==='hall'){
    for(const sx of [-rx+1,rx-1]){cyl(g,x+sx,2.1,z,.34,4.2,C.white,12);plant(g,x+sx,0,z+3.5);}rug(g,x,z,rx*.65,rz*.65,0xa24f48);
  }else{
-   rug(g,x,z,rx*.71,rz*.62,style==='salon-oval'?0x41627a:0x867660,style==='salon-oval');cyl(g,x,.61,z,.70,.10,C.wood);cyl(g,x,.36,z,.17,.50,C.wood);sofa(g,x-rx+1.6,z,-Math.PI/2);sofa(g,x+rx-1.6,z,Math.PI/2);w.spots.push({id:'sit-'+d.id,label:'Sit on the sofa',kind:'seat',hipHeight:SEATED_HIP,x:x-rx+2.8,z:z-1.5,pose:[x-rx+1.6,z,-Math.PI/2]});plant(g,x-rx+1.1,0,z+rz-1.3);plant(g,x+rx-1.1,0,z+rz-1.3);
+   rug(g,x,z,rx*.71,rz*.62,style==='salon-oval'?0x41627a:0x867660,style==='salon-oval');cyl(g,x,.61,z,.70,.10,C.wood);cyl(g,x,.36,z,.17,.50,C.wood);sofa(g,x-rx+1.6,z+2.8,-Math.PI/2);sofa(g,x+rx-1.6,z+2.8,Math.PI/2);w.spots.push({id:'sit-'+d.id,label:'Sit on the sofa',kind:'seat',hipHeight:SEATED_HIP,x:x-rx+2.8,z:z+1.3,pose:[x-rx+1.6,z+2.8,-Math.PI/2]});plant(g,x-rx+1.1,0,z+rz-1.3);plant(g,x+rx-1.1,0,z+rz-1.3);
  }
 }
 export function interior(zone:Place):World {const w:World={group:new T.Group(),solids:[],spots:[],actors:[],rings:[]};const g=w.group;g.userData.west=zone==='west';if(zone==='west'){for(const r of WEST_FOOTPRINT){box(g,r.x,-.15,r.z,r.w,.3,r.d,0xcfbf98);circulationFloor(g,r.x,r.z,r.w,r.d);}}else box(g,0,-.15,0,60,.3,40,0xcfbf98);if(zone!=='west')floorFinish(g,{id:'residence-circulation',name:'Corridor',zone,x:0,z:0,description:'',room:{w:60,d:40,color:0xe4dfcf,style:'hall'}},.015);for(const d of destinations.filter(d=>d.zone===zone&&d.room))furnish(w,d);
