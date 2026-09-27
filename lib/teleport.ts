@@ -1,3 +1,4 @@
+import {stateRoomVoid} from './state-rooms';
 import {insideEstate} from './grounds-layout';
 import * as T from 'three';
 import {residenceHeight} from './residence-terrain';
@@ -5,6 +6,7 @@ import {insideWest} from './west-layout';
 import type {Place} from './world-data';
 
 export function teleportLanding(zone:Place,x:number,z:number,solids:{x:number;z:number;w:number;d:number}[],people:{x:number;z:number}[],occupied?:(x:number,z:number)=>boolean){
+ if(zone==='state'&&stateRoomVoid(x,z))return null;
  if(!Number.isFinite(x)||!Number.isFinite(z))return null;
  if(zone==='grounds'?(!insideEstate(x,z)):zone==='west'?!insideWest(x,z):(Math.abs(x)>28.7||Math.abs(z)>18.7))return null;
  const radius=zone==='grounds'?.3:.4;
