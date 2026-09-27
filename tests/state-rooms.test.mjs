@@ -9,6 +9,7 @@ const {stateRoomVoid}=await import('../.qa/state-rooms.mjs');
 const {CameraObstacles}=await import('../.qa/render-budget.mjs');
 const {FollowCamera}=await import('../.qa/follow-camera.mjs');
 const w=interior('state');
+const {STATE_SALON_X}=await import('../.qa/residence-layout.mjs');
 const named=name=>{const a=[];w.group.traverse(o=>{if(o.name===name)a.push(o);});return a;};
 assert.equal(named('State room chandelier').length,7,'three East Room chandeliers, one per other room');
 assert.equal(named('State room window').length,18,'all five rooms have explicitly positioned window bays');
@@ -16,7 +17,7 @@ assert.equal(named('State room mantel').length,6,'room-specific mantels replace 
 assert.equal(named('Eagle pier table').length,3,'State Dining has its three eagle pier tables');
 const blocked=(x,z)=>Game.prototype.blocked.call({zone:'state',world:w},x,z);
 for(let x=11.5;x<=23;x+=.15)assert(!blocked(x,0),'East Room entrance crosses an open floor');
-for(let x=-8;x<=8;x+=.12)assert(!blocked(x,9),'Red–Blue–Green passage stays clear');
+for(let x=-STATE_SALON_X;x<=STATE_SALON_X;x+=.12)assert(!blocked(x,9),'Red–Blue–Green passage stays clear');
 for(const x of [-1.15,0,1.15])for(let z=0;z<=5.5;z+=.10)assert(!blocked(x,z),'Cross Hall into Blue Room is clear');
 assert(stateRoomVoid(0,16));assert(blocked(0,16));assert.equal(teleportLanding('state',0,16,w.solids,[]),null,'cannot teleport into the void behind oval walls');
 for(const p of [[0,5.6],[-3.4,9],[3.4,9]])assert(teleportLanding('state',...p,w.solids,[]),'valid Blue Room arrivals remain available');

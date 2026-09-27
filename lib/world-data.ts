@@ -1,3 +1,4 @@
+import {BLUE_ROOM,STATE_SALON_X,STATE_OUTER_ROOM_X} from './residence-layout';
 import {GARDENS,HELIPAD,SOUTH_FLAG,PRESS_TENTS} from './grounds-layout';
 import {westDestinations} from './west-layout';
 export type Place = 'grounds'|'west'|'state'|'ground'|'second'|'third';
@@ -5,7 +6,7 @@ export const floors: {id:Place;label:string}[]=[{id:'grounds',label:'Grounds'},{
 export type Destination={id:string;name:string;short?:string;zone:Place;x:number;z:number;description:string;spawn?:[number,number];room?:{w:number;d:number;color:number;style:string;doors?:{north?:number[];south?:number[];west?:number[];east?:number[]}}};
 export const destinations:Destination[]=[
   ...westDestinations,
-  {id:'cross-hall',name:'Cross Hall',zone:'state',x:0,z:0,spawn:[0,0],description:'The east-west passage linking the ceremonial rooms',room:{w:23,d:6,color:0xe7e0c8,style:'corridor',doors:{north:[0],south:[-8,0,8],west:[0],east:[0]}}},
+  {id:'cross-hall',name:'Cross Hall',zone:'state',x:0,z:0,spawn:[0,0],description:'The east-west passage linking the ceremonial rooms',room:{w:2*(BLUE_ROOM.w/2+7),d:6,color:0xe7e0c8,style:'corridor',doors:{north:[0],south:[-STATE_SALON_X,0,STATE_SALON_X],west:[0],east:[0]}}},
 
   {id:'south',name:'South Lawn',zone:'grounds',x:0,z:38,description:'An open lawn and the South Portico'},
   {id:'helipad',name:'South Lawn helipad',short:'Helipad',zone:'grounds',x:HELIPAD.x,z:HELIPAD.z,description:'Granite presidential-seal landing pad and stone approach'},
@@ -19,13 +20,13 @@ export const destinations:Destination[]=[
   {id:'south-gate',name:'South grounds',zone:'grounds',x:0,z:204,description:'The curved southern boundary and lower lawn'},
   {id:'east-path',name:'East grounds',zone:'grounds',x:109,z:69,description:'Tree-lined perimeter paths'},
   {id:'west-path',name:'West grounds',zone:'grounds',x:-89,z:-60,description:'The west side of the estate'},
-  {id:'east-room',name:'East Room',zone:'state',x:18,z:0,spawn:[13.3,0],description:'The grand ceremonial room',room:{w:13,d:30,color:0xeeeae0,style:'ballroom',doors:{west:[0]}}},
-  {id:'green',name:'Green Room',zone:'state',x:8,z:9,spawn:[8,4.7],description:'The eastern drawing room',room:{w:7,d:12,color:0x7d9b78,style:'salon',doors:{north:[8],west:[9]}}},
-  {id:'blue',name:'Blue Room',zone:'state',x:0,z:8.1,spawn:[0,4.7],description:'The oval drawing room, with cream walls and blue textiles',room:{w:9,d:6.75,color:0xeae3d0,style:'salon-oval',doors:{north:[0],west:[9],east:[9]}}},
-  {id:'red',name:'Red Room',zone:'state',x:-8,z:9,spawn:[-8,4.7],description:'The red parlor west of the Blue Room',room:{w:7,d:12,color:0x994842,style:'salon',doors:{north:[-8],east:[9]}}},
-  {id:'dining',name:'State Dining Room',short:'State Dining',zone:'state',x:-18,z:7.5,spawn:[-13.3,2],description:'Formal dinners and a long banquet table',room:{w:13,d:15,color:0xc9c5ad,style:'dining',doors:{north:[-18],east:[2]}}},
+  {id:'east-room',name:'East Room',zone:'state',x:STATE_OUTER_ROOM_X,z:0,spawn:[STATE_OUTER_ROOM_X-4.7,0],description:'The grand ceremonial room',room:{w:13,d:30,color:0xeeeae0,style:'ballroom',doors:{west:[0]}}},
+  {id:'green',name:'Green Room',zone:'state',x:STATE_SALON_X,z:9,spawn:[STATE_SALON_X,4.7],description:'The eastern drawing room',room:{w:7,d:12,color:0x7d9b78,style:'salon',doors:{north:[STATE_SALON_X],west:[9]}}},
+  {id:'blue',name:'Blue Room',zone:'state',x:BLUE_ROOM.x,z:BLUE_ROOM.z,spawn:[0,4.7],description:'The oval drawing room, with cream walls and blue textiles',room:{w:BLUE_ROOM.w,d:BLUE_ROOM.d,color:0xeae3d0,style:'salon-oval',doors:{north:[0],west:[9],east:[9]}}},
+  {id:'red',name:'Red Room',zone:'state',x:-STATE_SALON_X,z:9,spawn:[-STATE_SALON_X,4.7],description:'The red parlor west of the Blue Room',room:{w:7,d:12,color:0x994842,style:'salon',doors:{north:[-STATE_SALON_X],east:[9]}}},
+  {id:'dining',name:'State Dining Room',short:'State Dining',zone:'state',x:-STATE_OUTER_ROOM_X,z:7.5,spawn:[-STATE_OUTER_ROOM_X+4.7,2],description:'Formal dinners and a long banquet table',room:{w:13,d:15,color:0xc9c5ad,style:'dining',doors:{north:[-STATE_OUTER_ROOM_X],east:[2]}}},
   {id:'entrance',name:'Entrance Hall',zone:'state',x:0,z:-8,spawn:[0,-4.7],description:'The North Portico entrance and Cross Hall',room:{w:13,d:10,color:0xe4dfcf,style:'hall',doors:{north:[0],south:[0],east:[-8],west:[-8]}}},
-  {id:'family-dining',name:'Family Dining Room',short:'Family Dining',zone:'state',x:-18,z:-7.5,spawn:[-18,-1.7],description:'A smaller dining room',room:{w:13,d:15,color:0xd3c4a2,style:'dining',doors:{south:[-18],east:[-7.5]}}},
+  {id:'family-dining',name:'Family Dining Room',short:'Family Dining',zone:'state',x:-STATE_OUTER_ROOM_X,z:-7.5,spawn:[-STATE_OUTER_ROOM_X,-1.7],description:'A smaller dining room',room:{w:13,d:15,color:0xd3c4a2,style:'dining',doors:{south:[-STATE_OUTER_ROOM_X],east:[-7.5]}}},
   {id:'library',name:'Library',zone:'ground',x:19,z:-10,description:'Shelves of books by American authors',room:{w:17,d:14,color:0xc1b5a0,style:'library'}},
   {id:'vermeil',name:'Vermeil Room',zone:'ground',x:22,z:11,description:'A gold-toned sitting room',room:{w:11,d:14,color:0xd8c18a,style:'salon'}},
   {id:'china',name:'China Room',zone:'ground',x:11,z:11,description:'Presidential tableware on display',room:{w:10,d:14,color:0xc79691,style:'china'}},
@@ -64,6 +65,7 @@ export const npcs:NPC[]=[
  {id:'docent',name:'Taylor, the curator',role:'Residence staff · fictional character',zone:'state',x:20,z:5,hair:0x574433,suit:0x696050,greeting:'Welcome to the East Room. It’s one of the great ceremonial spaces of the house.',topics:[{question:'How does this layout work?',answer:'The East Room occupies the eastern end. The Green, Blue, and Red Rooms run along the south side, with the State Dining Room at the west. The Cross Hall connects them.'},{question:'Is the game historically exact?',answer:'The main relationships come from public plans, but this is an adaptation. Furniture, passage widths, and upper-floor arrangements are simplified. The field guide has our references.'}]},
 ];
 export const sources=[
+ {title:'Ford Library · White House Curator room measurements (PDF page 35)',url:'https://www.fordlibrarymuseum.gov/library/document/0018/81556669.pdf'},
  {title:'Google Arts & Culture · White House public tour (2023)',url:'https://artsandculture.google.com/story/aQVRQ1-zMnlrnQ'},
  {title:'Google Arts & Culture · State Floor room history',url:'https://artsandculture.google.com/story/jgXBMr3Z9lSjLw'},
  {title:'Google · October 2023 White House panorama references',url:'https://blog.google/company-news/outreach-and-initiatives/arts-culture/explore-the-white-house-with-google-arts-culture/'},

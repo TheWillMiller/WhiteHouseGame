@@ -22,16 +22,17 @@ function finish(kind: 'oak' | 'stone' | 'carpet' | 'hall-carpet' | 'black-granit
   texture.wrapS = texture.wrapT = T.RepeatWrapping; texture.generateMipmaps = true;
   texture.minFilter = T.LinearMipmapLinearFilter; texture.magFilter = T.LinearFilter; texture.anisotropy = 4; texture.needsUpdate = true;
   const mat = new T.MeshStandardMaterial({ map: texture, roughness: kind === 'black-granite' ? .34 : kind === 'oak' ? .66 : .9 });
+  mat.name='Interior floor: '+kind;
   surfaces.set(kind, mat); return mat;
 }
 export function clearRoomFinishes() { surfaces.forEach(m => { m.map?.dispose(); m.dispose(); }); surfaces.clear(); }
 export function circulationFloor(g:T.Group,x:number,z:number,w:number,d:number){const geo=new T.PlaneGeometry(w,d);geo.rotateX(-Math.PI/2);const uv=geo.getAttribute('uv'),pos=geo.getAttribute('position');for(let i=0;i<uv.count;i++)uv.setXY(i,(pos.getX(i)+x)/4.8,(pos.getZ(i)+z)/4.8);const floor=new T.Mesh(geo,finish('hall-carpet'));floor.position.set(x,.029,z);floor.receiveShadow=true;floor.name='Continuous corridor carpet';g.add(floor);}
-export function floorFinish(g: T.Group, d: Destination) {
+export function floorFinish(g: T.Group, d: Destination, height=.055) {
   const r = d.room!, kind = d.id==='colonnade'?'black-granite':['west-lobby','press-hall','reception','president-secretary'].includes(d.id)?'hall-carpet':['press','press-offices'].includes(r.style) ? 'carpet' : ['corridor','palm','hall','kitchen','flowers'].includes(r.style) ? 'stone' : 'oak';
   const geo = new T.PlaneGeometry(r.w, r.d); geo.rotateX(-Math.PI / 2);
   const uv = geo.getAttribute('uv'), pos = geo.getAttribute('position');
   for (let i = 0; i < uv.count; i++) uv.setXY(i, (pos.getX(i) + d.x) / 4.8, (pos.getZ(i) + d.z) / 4.8);
-  const floor = new T.Mesh(geo, finish(kind)); floor.position.set(d.x, .055, d.z); floor.receiveShadow = true; floor.name = `${d.id}: continuous floor`; g.add(floor);
+  const floor = new T.Mesh(geo, finish(kind)); floor.position.set(d.x, height, d.z); floor.receiveShadow = true; floor.name = `${d.id}: continuous floor`; g.add(floor);
 }
 export function ceiling(g: T.Group, x: number, z: number, w: number, d: number, oval?: {x:number;z:number;rx:number;rz:number}) {
   const shape = new T.Shape(); shape.moveTo(-w/2,-d/2); shape.lineTo(w/2,-d/2); shape.lineTo(w/2,d/2); shape.lineTo(-w/2,d/2); shape.closePath();

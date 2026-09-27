@@ -34,6 +34,17 @@ for(const side of ['Left','Right']){
  console.log('Seated '+side,hip.toArray(),knee.toArray(),ankle.toArray());
 }
 model.pose(null);assert.equal(model.object.position.y,0,'Standing removes sitting height offset');
+// Keep each actual seat height when the character uses metre scale indoors.
+const seatParent=new T.Group();seatParent.scale.setScalar(1.9/3);seatParent.add(model.object);
+for(const hipHeight of [.8,.91,.935,1.125]){
+ model.pose('sit',{hipHeight});for(let i=0;i<20;i++)model.animate(0,1/60,false);seatParent.updateMatrixWorld(true);
+ const hip=model.object.getObjectByName('LeftUpLeg').getWorldPosition(new T.Vector3()),knee=model.object.getObjectByName('LeftLeg').getWorldPosition(new T.Vector3());
+ assert(Math.abs(hip.y-hipHeight)<.02,'scaled character stays on the selected seat');assert(Math.abs(knee.y-hip.y)<.05,'scaled seated thighs remain level');
+}
+model.pose('drive');model.animate(0,1/60,false);seatParent.updateMatrixWorld(true);
+assert(Math.abs(model.object.getObjectByName('LeftUpLeg').getWorldPosition(new T.Vector3()).y-.608)<.02,'cart hip contract is preserved');
+model.pose('briefing',{standingOffset:.25});model.animate(0,1/60,false);assert(Math.abs(model.object.position.y*(1.9/3)-.25)<1e-6,'lectern platform offset remains in world units');
+model.pose(null);seatParent.remove(model.object);model.object.updateMatrixWorld(true);
 model.pose('briefing');for(let i=0;i<120;i++)model.animate(0,1/60,false);model.object.updateMatrixWorld(true);
 assert(model.object.getObjectByName('RightHand').getWorldPosition(new T.Vector3()).y>1,'Briefing hand remains above lectern level');
 model.pose(null);for(let i=0;i<60;i++)model.animate(0,1/60,false);

@@ -9,7 +9,7 @@ export function teleportLanding(zone:Place,x:number,z:number,solids:{x:number;z:
  if(zone==='state'&&stateRoomVoid(x,z))return null;
  if(!Number.isFinite(x)||!Number.isFinite(z))return null;
  if(zone==='grounds'?(!insideEstate(x,z)):zone==='west'?!insideWest(x,z):(Math.abs(x)>28.7||Math.abs(z)>18.7))return null;
- const radius=zone==='grounds'?.3:.4;
+ const radius=.3;
  if(solids.some(o=>Math.abs(x-o.x)<o.w/2+radius&&Math.abs(z-o.z)<o.d/2+radius)||people.some(p=>Math.hypot(x-p.x,z-p.z)<.9)||occupied?.(x,z))return null;
  return new T.Vector3(x,zone==='grounds'?residenceHeight(x,z):0,z);
 }

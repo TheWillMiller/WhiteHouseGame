@@ -22,7 +22,7 @@ export class FollowCamera {
   reset() { this.fresh = true; this.distance = 0; }
   dispose() { this.controls.dispose(); }
   solve(target: T.Vector3, desired: T.Vector3, surfaces: T.Object3D[], dt: number, view?: T.PerspectiveCamera, avatarClearance=2) {
-    if (view) { this.camera.fov = view.fov; this.camera.aspect = view.aspect; this.camera.updateProjectionMatrix(); }
+    if (view) { this.camera.fov = view.fov; this.camera.aspect = view.aspect; this.camera.near=view.near; this.camera.far=view.far; this.camera.updateProjectionMatrix(); }
     const delta = desired.clone().sub(target), sphere = new T.Spherical().setFromVector3(delta);
     this.controls.colliderMeshes = surfaces as T.Mesh[];
     void this.controls.moveTo(target.x, target.y, target.z, false);

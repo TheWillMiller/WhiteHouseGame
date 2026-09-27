@@ -1,15 +1,16 @@
+import {BLUE_ROOM} from './residence-layout';
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { material } from './visuals';
 import type { Destination } from './world-data';
 
 type Solid={x:number;z:number;w:number;d:number;height?:number};
-type World={group:T.Group;solids:Solid[];cameraOnly?:{x:number;z:number;w:number;d:number;height:number;y:number}[];spots:{id:string;label:string;kind:'seat'|'npc'|'door'|'lectern'|'equipment'|'vehicle';x:number;z:number;pose?:[number,number,number]}[]};
+type World={group:T.Group;solids:Solid[];cameraOnly?:{x:number;z:number;w:number;d:number;height:number;y:number}[];spots:{id:string;label:string;kind:'seat'|'npc'|'door'|'lectern'|'equipment'|'vehicle';x:number;z:number;pose?:[number,number,number];hipHeight?:number}[]};
 const WHITE=0xf5f0df,GOLD=0xd9b458,WOOD=0x69412d,CREAM=0xe0cf9e;
 export const STATE_ROOM_IDS=['east-room','green','blue','red','dining'];
 export const isStateRoom=(d:Destination)=>d.zone==='state'&&STATE_ROOM_IDS.includes(d.id);
 // The space outside the curved shell is not a hidden room or a teleport destination.
-export function stateRoomVoid(x:number,z:number){return Math.abs(x)<4.5&&z>4.725&&(x/4.5)**2+((z-8.1)/3.375)**2>1&&!(Math.abs(x)>3.3&&z>7.65&&z<10.35)&&!(Math.abs(x)<1.35&&z<5.2);}
+export function stateRoomVoid(x:number,z:number){const rx=BLUE_ROOM.w/2,rz=BLUE_ROOM.d/2,north=BLUE_ROOM.z-rz;return Math.abs(x)<rx&&z>north&&(x/rx)**2+((z-BLUE_ROOM.z)/rz)**2>1&&!(Math.abs(x)>rx-1.2&&Math.abs(z-BLUE_ROOM.sideDoorZ)<1.35)&&!(Math.abs(x)<1.35&&z<north+.65);}
 const mesh=(g:T.Group,geo:T.BufferGeometry,color:number,x=0,y=0,z=0)=>{const m=new T.Mesh(geo,material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m;};
 const box=(g:T.Group,x:number,y:number,z:number,w:number,h:number,d:number,c:number)=>mesh(g,new T.BoxGeometry(w,h,d),c,x,y,z);
 const cyl=(g:T.Group,x:number,y:number,z:number,r:number,h:number,c:number,top=r)=>mesh(g,new T.CylinderGeometry(top,r,h,16),c,x,y,z);
@@ -68,7 +69,7 @@ function cabinet(w:World,x:number,z:number){const a=anchor(w.group,x,z,Math.PI);
 /** A continuous oval shell, with three genuinely open passages to the hall and salons. */
 export function blueRoomShell(w:World,d:Destination){
  const {x,z}=d,rx=d.room!.w/2,rz=d.room!.d/2;
- const sideAngle=Math.asin((9-z)/rz),openings=[{a:Math.PI*1.5,half:.39},{a:sideAngle,half:.48},{a:Math.PI-sideAngle,half:.48}];
+ const sideAngle=Math.asin((BLUE_ROOM.sideDoorZ-z)/rz),openings=[{a:Math.PI*1.5,half:Math.asin(1.6/rx)},{a:sideAngle,half:Math.asin(1.6/rz)},{a:Math.PI-sideAngle,half:Math.asin(1.6/rz)}];
  const delta=(a:number,b:number)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
  const steps=128;
  for(let i=0;i<steps;i++){
@@ -91,21 +92,22 @@ export function furnishStateRoom(w:World,d:Destination){
  const g=w.group,{x,z}=d;
  if(d.id==='east-room'){
   for(const dz of [-9,0,9]){rug(g,x,dz,9,6.9,0xd8ceb6);chandelier(g,x,dz,1.05);}
-  for(const dz of [-11.9,-6,0,6,11.9])windowBay(g,24.24,dz,-Math.PI/2,0xc9a146,1.75);
-  for(const end of [-1,1])for(const px of [15.4,20.6])windowBay(g,px,end*14.74,end>0?Math.PI:0,0xc9a146,1.65);
-  for(const dz of [-7,7])mantel(w,11.77,dz,Math.PI/2,true,undefined,2.45);
-  for(const dz of [-11.4,11.4])settee(w,12.36,dz,-Math.PI/2,CREAM,2.8,true);
-  for(const dz of [-3.2,3.2]){const a=anchor(g,11.76,dz,Math.PI/2);frame(a,0,2.8,.05,1.65,2.2,dz<0?'washington':undefined);}
+  for(const dz of [-11.9,-6,0,6,11.9])windowBay(g,x+6.24,dz,-Math.PI/2,0xc9a146,1.75);
+  for(const end of [-1,1])for(const px of [x-2.6,x+2.6])windowBay(g,px,end*14.74,end>0?Math.PI:0,0xc9a146,1.65);
+  for(const dz of [-7,7])mantel(w,x-6.23,dz,Math.PI/2,true,undefined,2.45);
+  for(const dz of [-11.4,11.4])settee(w,x-5.64,dz,-Math.PI/2,CREAM,2.8,true);
+  for(const dz of [-3.2,3.2]){const a=anchor(g,x-6.24,dz,Math.PI/2);frame(a,0,2.8,.05,1.65,2.2,dz<0?'washington':undefined);}
   return;
  }
  if(d.id==='blue'){
-  rug(g,x,z,8.05,5.65,0x41627a,true);chandelier(g,x,z,.72);
+  const rx=d.room!.w/2,rz=d.room!.d/2;
+  rug(g,x,z,d.room!.w-1,d.room!.d-1,0x41627a,true);chandelier(g,x,z,.72);
   // The blue is in the textiles; the tour shows cream upper walls and white lower panels.
-  for(const a of [Math.PI/2-.47,Math.PI/2,Math.PI/2+.47]){const px=Math.cos(a)*4.30,pz=z+Math.sin(a)*3.19;windowBay(g,px,pz,Math.atan2(-px/4.5**2,-(pz-z)/3.375**2),0x41627a,1.17);}
+  for(const a of [Math.PI/2-.47,Math.PI/2,Math.PI/2+.47]){const px=Math.cos(a)*(rx-.25),pz=z+Math.sin(a)*(rz-.25);windowBay(g,px,pz,Math.atan2(-px/rx**2,-(pz-z)/rz**2),0x41627a,1.17);}
   table(w,0,7.55,.61);bouquet(g,0,1.08,7.55);
-  chair(w,2.25,6.85,Math.PI/2,0x41627a,true);chair(w,-2,10.2,0,0x41627a,true);
-  mantel(w,-3.116,6.075,.97,false,undefined,1.5);
-  w.spots.push({id:'sit-blue',label:'Sit in the Blue Room',kind:'seat',x:1.20,z:6.85,pose:[2.25,6.85,Math.PI/2]});
+  chair(w,3.3,6.1,Math.PI/2,0x41627a,true);chair(w,-3,10.6,0,0x41627a,true);
+  const ma=4;mantel(w,Math.cos(ma)*(rx-.45),z+Math.sin(ma)*(rz-.45),Math.atan2(-Math.cos(ma)/rx,-Math.sin(ma)/rz),false,undefined,1.5);
+  w.spots.push({id:'sit-blue',label:'Sit in the Blue Room',kind:'seat',hipHeight:.8,x:2.1,z:6.1,pose:[3.3,6.1,Math.PI/2]});
   return;
  }
  if(d.id==='green'||d.id==='red'){
@@ -116,17 +118,17 @@ export function furnishStateRoom(w:World,d:Destination){
   chair(w,x-side*2.05,12.1,-side*Math.PI/2,green?0xa76545:0x953a39);
   table(w,x,11.7,.62);bouquet(g,x,1.08,11.7);
   mantel(w,x-side*3.23,5.75,side*Math.PI/2,false,undefined,1.85);
-  w.spots.push({id:'sit-'+d.id,label:'Sit in the '+d.name,kind:'seat',x:x+side*1.3,z:11.8,pose:[x+side*2.55,11.8,side*Math.PI/2]});
+  w.spots.push({id:'sit-'+d.id,label:'Sit in the '+d.name,kind:'seat',hipHeight:.8,x:x+side*1.3,z:11.8,pose:[x+side*2.55,11.8,side*Math.PI/2]});
   return;
  }
  // State Dining: west-wall fireplace and Healy's Lincoln, rather than an office table and flag.
  rug(g,x,z,10.2,12.7,0xc7c6b8);chandelier(g,x,z,1.0);
- mantel(w,-24.22,7.5,Math.PI/2,false,'lincoln',3.2);
- for(const dz of [3.05,11.95])windowBay(g,-24.23,dz,Math.PI/2,0xd2bd81,1.65);
+ mantel(w,x-6.22,7.5,Math.PI/2,false,'lincoln',3.2);
+ for(const dz of [3.05,11.95])windowBay(g,x-6.23,dz,Math.PI/2,0xd2bd81,1.65);
  const top=soft(g,x,1.07,z,2.65,.16,8.5,WOOD);top.name='State Dining banquet table';
  for(const dz of [-2.9,2.9]){box(g,x,.55,z+dz,1.7,1.0,.38,WOOD);box(g,x,.15,z+dz,2.05,.13,.64,WOOD);}footprint(w,x,z,2.65,8.5,0,1.16);
  for(let i=0;i<5;i++)for(const side of [-1,1]){const pz=z-3.3+i*1.65;chair(w,x+side*2.05,pz,side*Math.PI/2,0xb7b19b);cyl(g,x+side*.79,1.166,pz,.21,.018,WHITE);cyl(g,x+side*1.01,1.25,pz-.35,.055,.16,0xc7d2ce);}
  for(const dz of [-2,0,2])bouquet(g,x,1.16,z+dz);
  // Three eagle-base pier tables, placed against walls clear of both door approaches.
- for(const [px,pz,yaw]of [[-22.1,.65,0],[-14.1,.65,0],[-18,14.25,Math.PI]]){const a=anchor(g,px,pz,yaw);box(a,0,1.03,0,1.95,.13,.69,WHITE);cyl(a,0,.5,0,.13,.8,GOLD,.2);for(const s of [-1,1]){const wing=mesh(a,new T.SphereGeometry(1,10,6),GOLD,s*.35,.68,0);wing.scale.set(.44,.11,.12);wing.rotation.z=s*.4;}cyl(a,0,.90,.13,.09,.19,GOLD);box(a,0,.15,0,1.18,.12,.51,WOOD);footprint(w,px,pz,1.95,.69,yaw,1.1);mark(g,'Eagle pier table',px,pz);}
+ for(const [px,pz,yaw]of [[x-4.1,.65,0],[x+3.9,.65,0],[x,14.25,Math.PI]]){const a=anchor(g,px,pz,yaw);box(a,0,1.03,0,1.95,.13,.69,WHITE);cyl(a,0,.5,0,.13,.8,GOLD,.2);for(const s of [-1,1]){const wing=mesh(a,new T.SphereGeometry(1,10,6),GOLD,s*.35,.68,0);wing.scale.set(.44,.11,.12);wing.rotation.z=s*.4;}cyl(a,0,.90,.13,.09,.19,GOLD);box(a,0,.15,0,1.18,.12,.51,WOOD);footprint(w,px,pz,1.95,.69,yaw,1.1);mark(g,'Eagle pier table',px,pz);}
 }
