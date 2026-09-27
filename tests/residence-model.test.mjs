@@ -1,3 +1,4 @@
+globalThis.DOMRect??=class{};
 import assert from 'node:assert/strict';
 import {readFileSync,statSync} from 'node:fs';
 import {NodeIO} from '@gltf-transform/core';
@@ -7,10 +8,10 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import * as T from 'three';
 import {FollowCamera} from '../.qa/follow-camera.mjs';
 import {residenceModelUrl} from '../.qa/residence-model.mjs';
-const filename='public/models/white-house-residence-v2.glb';
+const filename='public/models/white-house-residence-v3.glb';
 assert(statSync(filename).size<5_000_000,'bounded download size');
-assert.equal(residenceModelUrl('/trumpgame/'),'/trumpgame/models/white-house-residence-v2.glb');
-assert.equal(residenceModelUrl('/'),'/models/white-house-residence-v2.glb');
+assert.equal(residenceModelUrl('/trumpgame/'),'/trumpgame/models/white-house-residence-v3.glb');
+assert.equal(residenceModelUrl('/'),'/models/white-house-residence-v3.glb');
 await MeshoptDecoder.ready;
 const doc=await new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder}).read(filename);
 await doc.transform(dequantize());

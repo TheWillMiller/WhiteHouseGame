@@ -55,7 +55,8 @@ export function buildGroundsLandmarks(parent:T.Group,solids:Solid[]):GroundsLand
  const flagGeo=new T.PlaneGeometry(7.62,4.01,28,16),positions=flagGeo.getAttribute('position'),rest=Float32Array.from(positions.array);
  const flag=mesh(pole,flagGeo,new T.MeshStandardMaterial({map:flagTexture,roughness:.92,side:T.DoubleSide}),3.85,h-2.28,0);flag.userData.dynamic=true;
 
- box(parent,-43.5,.028,-52,2.5,.05,25,stone);
+ // Follow the relocated canopy row, beside the west fence and perimeter walk.
+ box(parent,PRESS_TENTS[0][0]+3.5,.028,-52,2.5,.05,25,stone);
  for(const [index,[x,z]]of PRESS_TENTS.entries()){
   const tent=new T.Group();tent.name='Press live-shot canopy '+(index+1);tent.position.set(x,0,z);tent.rotation.y=PRESS_TENT_YAW;parent.add(tent);
   // All equipment collisions use the same transform as the rotated canopy.

@@ -13,11 +13,10 @@ const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'
 const doc=await io.read(path.join(source,'scene.gltf')),root=doc.getRoot(),scene=root.listScenes()[0];
 for(const node of root.listNodes()){node.setTranslation([0,0,0]).setRotation([0,0,0,1]).setScale([1,1,1]);if(node.getMesh())scene.addChild(node);}
 for(const mesh of root.listMeshes())for(const p of mesh.listPrimitives()){
- const positions=p.getAttribute('POSITION').getArray(),indices=p.getIndices(),sourceIndices=indices.getArray(),kept=[];
- // Keep the residence, preserving original texture coordinates and facade details.
- // Wings are retained in the source archive for later adaptation.
- for(let i=0;i<sourceIndices.length;i+=3){const tri=sourceIndices.subarray(i,i+3);if([...tri].every(v=>positions[v*3]>2575))kept.push(...tri);}
- indices.setArray(new Uint32Array(kept));
+ // Clip crossing faces at the residence seam. Discarding complete triangles
+ // removed long walls, entrance paving and cornice faces far from that seam.
+ carveOpenings(doc,p,[{min:[-1e7,-1e7,-1e7],max:[2600,1e7,1e7]}]);
+ const positions=p.getAttribute('POSITION').getArray();
  for(let i=0;i<positions.length;i+=3){positions[i]*=-.0097;positions[i+1]=positions[i+1]*.0097+.01;positions[i+2]=-positions[i+2]*.0097-22;}
  for(const semantic of ['NORMAL','TANGENT']){const a=p.getAttribute(semantic);if(a){const values=a.getArray(),stride=a.getElementSize();for(let i=0;i<values.length;i+=stride){values[i]*=-1;values[i+2]*=-1;}}}
  carveOpenings(doc,p,[{min:[-90.25,.04,-20.85],max:[-87.75,3.25,-19.4]},{min:[-58.25,.04,-22.8],max:[-55.75,3.25,-21.3]}]);compactPrimitive(p);
@@ -33,5 +32,5 @@ let triangles=0;for(const m of root.listMeshes())for(const p of m.listPrimitives
 scene.setName('White House West Wing • Void • CC BY 4.0');
 scene.setExtras({source:'https://sketchfab.com/3d-models/the-white-house-dbdb320ba4c6427ca4f2b2c2438034f9',author:'Void',license:'CC-BY-4.0',adaptation:'West Wing and press connection extracted, upright, scaled and oriented for the game, mesh simplified, textures optimized.'});
 await doc.transform(meshopt({encoder:MeshoptEncoder,level:'high'}),prune());
-await mkdir('public/models',{recursive:true});await io.write('public/models/white-house-west-v1.glb',doc);
+await mkdir('public/models',{recursive:true});await io.write('public/models/white-house-west-v2.glb',doc);
 await writeFile('.qa/west-build.json',JSON.stringify({triangles},null,2));console.log({triangles});

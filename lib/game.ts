@@ -13,7 +13,7 @@ import {GolfCart,loadGolfCart} from './golf-cart';
 import {fanlight,openDoor,hallDetails,textPanel,corridorFace,corridorRoomSigns,exteriorGallery,EXTERIOR_GALLERY_OFFSET,clearInteriorDetails} from './interior-details';
 import {buildWorksite,type Worksite} from './worksite';
 import {renderEstateMap} from './estate-map';
-import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE} from './grounds-layout';
+import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE,WEST_PORTICO} from './grounds-layout';
 import {floorFinish,circulationFloor,ceiling,wallPanels,clearRoomFinishes} from './room-finishes';
 import {insideWest,WEST_FOOTPRINT} from './west-layout';
 import * as T from 'three';
@@ -71,7 +71,11 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  // Imported West Wing uses the same metre scale and origin as the residence.
  // Ground footprints, not roof overhangs: main block, Oval Office and press connector.
  solid(w,-88,-5.1,29,29.7,10.5);solid(w,-70.7,4.7,11.3,10.9,5.6);solid(w,-49.1,-26.15,48,8.3,5.6);
- openDoor(g,-89,-20.3,Math.PI);openDoor(g,-57,-22.1);const gallery=new T.Group();exteriorGallery(gallery);gallery.position.set(...EXTERIOR_GALLERY_OFFSET);g.add(gallery);
+ // A continuous stone landing meets the column plinths and door threshold.
+ const p=WEST_PORTICO;box(g,p.x,p.height/2,p.z,p.w,p.height,p.d,0xcac8b0).name='West Wing portico stone landing';
+ for(let x=p.x-p.w/2+1.2;x<p.x+p.w/2;x+=1.2)box(g,x,p.height+.001,p.z,.014,.002,p.d-.12,0xb5b3a4);
+ for(let z=p.z-p.d/2+1.2;z<p.z+p.d/2;z+=1.2)box(g,p.x,p.height+.001,z,p.w-.12,.002,.014,0xb5b3a4);
+ const entryDoor=openDoor(g,-89,-20.3,Math.PI);entryDoor.position.y=p.height;entryDoor.scale.set(.8,.86,1);openDoor(g,-57,-22.1);const gallery=new T.Group();exteriorGallery(gallery);gallery.position.set(...EXTERIOR_GALLERY_OFFSET);g.add(gallery);
  // Full source colonnade posts also collide at human and vehicle height.
  for(let x=-60;x<-26;x+=2.72)solid(w,x,-19.75,.32,.32,4.5);
  for(let z=-17;z<10;z+=2.72)solid(w,-62.5,z,.32,.32,4.5);
@@ -95,7 +99,7 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
    }
  }
  gardenApproaches(g);
- for(let i=0;i<28;i++){const z=-80+i*7.2;tree(w,-122+(i%3)*2,z,i);tree(w,119-(i%3)*2,z,i+30);}for(let i=0;i<16;i++){const x=-77+i*10;tree(w,x,-92,i+70);if(Math.abs(x)>22)tree(w,x,122,i+100);}for(const [x,z,s]of [[-62,78,34],[65,80,37],[-38,97,23],[38,95,18],[-54,43,16],[103,87,17],[-43,-63,2],[46,-67,5]])tree(w,x,z,s);
+ for(let i=0;i<28;i++){const z=-80+i*7.2;tree(w,z>-66&&z<-37?-122.5:-122+(i%3)*2,z,i);tree(w,119-(i%3)*2,z,i+30);}for(let i=0;i<16;i++){const x=-77+i*10;tree(w,x,-92,i+70);if(Math.abs(x)>22)tree(w,x,122,i+100);}for(const [x,z,s]of [[-62,78,34],[65,80,37],[-38,97,23],[38,95,18],[-54,43,16],[103,87,17],[-43,-63,2],[46,-67,5]])tree(w,x,z,s);
  // The former placeholder South Lawn fountain occupied the landing area.
  w.water=new GardenWater(g,w.solids);w.marine=new MarineOne(g);
  // Pool, putting green, benches and garden path details.
@@ -367,7 +371,7 @@ if(d.id==='colonnade'){for(let cx=19;cx<84;cx+=4.5)solid(w,cx,-17.25,.6,.6,4.4);
  }
 }
 export function interior(zone:Place):World {const w:World={group:new T.Group(),solids:[],spots:[],actors:[],rings:[]};const g=w.group;g.userData.west=zone==='west';if(zone==='west'){for(const r of WEST_FOOTPRINT){box(g,r.x,-.15,r.z,r.w,.3,r.d,0xcfbf98);circulationFloor(g,r.x,r.z,r.w,r.d);}}else box(g,0,-.15,0,60,.3,40,0xcfbf98);if(zone!=='west')floorFinish(g,{id:'residence-circulation',name:'Corridor',zone,x:0,z:0,description:'',room:{w:60,d:40,color:0xe4dfcf,style:'hall'}});for(const d of destinations.filter(d=>d.zone===zone&&d.room))furnish(w,d);
- if(zone==='west'){openDoor(g,-5.5,-22,Math.PI);openDoor(g,96,-23,Math.PI/2);ring(w,{id:'exit-west',label:'Exit to the Rose Garden',kind:'door',x:44,z:-18.5,zone:'grounds',spawn:[...GARDEN_EXIT]});ring(w,{id:'residence-west',label:'Palm Room: enter the residence',kind:'door',x:93,z:-23,zone:'ground',spawn:[-26,0]});ring(w,{id:'exit-west-north',label:'North lobby entrance',kind:'door',x:-5.5,z:-20,zone:'grounds',spawn:[-60,-40]});}
+ if(zone==='west'){openDoor(g,-5.5,-22,Math.PI);openDoor(g,96,-23,Math.PI/2);ring(w,{id:'exit-west',label:'Exit to the Rose Garden',kind:'door',x:44,z:-18.5,zone:'grounds',spawn:[...GARDEN_EXIT]});ring(w,{id:'residence-west',label:'Palm Room: enter the residence',kind:'door',x:93,z:-23,zone:'ground',spawn:[-26,0]});ring(w,{id:'exit-west-north',label:'North lobby entrance',kind:'door',x:-5.5,z:-20,zone:'grounds',spawn:[-89,-24.5]});}
  else {if(zone==='ground'){ring(w,{id:'residence-exit',label:'Exit to the South Lawn',kind:'door',x:0,z:16.2,target:'south'});openDoor(g,0,18);}if(zone==='state'){ring(w,{id:'residence-exit',label:'Exit to the North Lawn',kind:'door',x:0,z:-11.5,target:'north'});openDoor(g,0,-13,Math.PI);}const order:Place[]=['ground','state','second','third'];const index=order.indexOf(zone);if(index<3)ring(w,{id:'stairs-up',label:`Up to the ${floors.find(f=>f.id===order[index+1])?.label}`,kind:'door',x:9,z:zone==='state'?-8:0,zone:order[index+1],spawn:[5,0]});if(index>0)ring(w,{id:'stairs-down',label:`Down to the ${floors.find(f=>f.id===order[index-1])?.label}`,kind:'door',x:-9,z:zone==='state'?-8:0,zone:order[index-1],spawn:[-5,0]});if(zone==='ground')ring(w,{id:'to-west',label:'Palm Room and West Wing',kind:'door',x:-27,z:0,zone:'west',spawn:[91,-23]});for(const x of [-9,9]){for(let step=0;step<5;step++)box(g,x-1+step*.45,.06+step*.08,zone==='state'?-9.6:-1.6,.4,.1+step*.16,1.8,0xdbcbaa);}}
  // Continuous outer shell closes the exposed ends of circulation areas.
  if(zone==='west'){

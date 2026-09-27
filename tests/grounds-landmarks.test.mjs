@@ -20,7 +20,7 @@ for(const [i,[x,z]]of PRESS_TENTS.entries()){
  const tent=g.getObjectByName('Press live-shot canopy '+(i+1));assert.equal(tent.rotation.y,PRESS_TENT_YAW);
  assert(!blocked(x+2.2,z),'east-facing tent front is open');assert(!blocked(x+.9,z),'rotated tent interior has a walking aisle');
  assert(blocked(x+.3,z+.9),'rotated camera tripod has collision');assert(blocked(x-2.1,z),'rear curtain collision follows rotation');
- assert.equal(x,PRESS_TENTS[0][0],'tents form a north-south row');
+ assert.equal(x,PRESS_TENTS[0][0],'tents form a north-south row');assert(x<-110&&x>-122,'press row sits inside the west fence');
 }
 assert(HELIPAD.z-HELIPAD.radius>30,'landing circle sits well beyond the South Drive');
 assert(SOUTH_FLAG.z<HELIPAD.z-HELIPAD.radius,'flag stands beside the approach, before the pad');
