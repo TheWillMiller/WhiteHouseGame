@@ -16,7 +16,7 @@ export const destinations:Destination[]=[
   {id:'kennedy',name:'Jacqueline Kennedy Garden',short:'East Garden',zone:'grounds',x:GARDENS[1].x,z:GARDENS[1].z,description:'The garden east of the residence'},
   {id:'ballroom',name:'Ballroom construction',short:'Ballroom',zone:'grounds',x:77,z:66,description:'Steelwork, a crane and the construction crew'},
   {id:'pool',name:'Pool & putting green',short:'Pool',zone:'grounds',x:-81,z:36,description:'The outdoor pool south of the West Wing; putting green toward the lawn'},
-  {id:'south-gate',name:'South grounds',zone:'grounds',x:0,z:113,description:'Walk the full southern perimeter'},
+  {id:'south-gate',name:'South grounds',zone:'grounds',x:0,z:204,description:'The curved southern boundary and lower lawn'},
   {id:'east-path',name:'East grounds',zone:'grounds',x:109,z:69,description:'Tree-lined perimeter paths'},
   {id:'west-path',name:'West grounds',zone:'grounds',x:-89,z:-60,description:'The west side of the estate'},
   {id:'east-room',name:'East Room',zone:'state',x:18,z:0,spawn:[13.3,0],description:'The grand ceremonial room',room:{w:13,d:30,color:0xe7dcae,style:'ballroom',doors:{west:[0]}}},

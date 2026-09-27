@@ -30,17 +30,18 @@ global.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttri
  assert(world.group.children.some(o=>o.isMesh),'world has rendered geometry');
  if(zone==='west')assert(world.group.children.filter(o=>o.isMesh&&o.userData.cameraBlocker).length>2,'architectural camera surfaces survive static batching');
   const minX = zone === 'grounds' ? -123 : -28.5, maxX = zone === 'west' ? 95.5 : -minX;
-  const minZ = zone === 'grounds' ? -95 : zone === 'west' ? -39.5 : -18.5, maxZ = zone === 'grounds' ? 126 : zone === 'west' ? 24.5 : 18.5;
+  const minZ = zone === 'grounds' ? -130 : zone === 'west' ? -39.5 : -18.5, maxZ = zone === 'grounds' ? 222 : zone === 'west' ? 24.5 : 18.5;
   const step = .5, width = Math.round((maxX-minX)/step)+1, height = Math.round((maxZ-minZ)/step)+1;
   const blocked = new Uint8Array(width*height), reached = new Uint8Array(width*height);
   const index = (x,z) => Math.round((z-minZ)/step)*width+Math.round((x-minX)/step);
   const {insideWest}=await import(pathToFileURL(path.join(output, 'west-layout.mjs')));
-  const blockedAt=(x,z)=>(zone==='west'&&!insideWest(x,z))||world.solids.some(o=>Math.abs(x-o.x)<o.w/2+.36&&Math.abs(z-o.z)<o.d/2+.36);
+  const {insideEstate}=await import(pathToFileURL(path.join(output, 'grounds-layout.mjs')));
+  const blockedAt=(x,z)=>(zone==='grounds'&&!insideEstate(x,z))||(zone==='west'&&!insideWest(x,z))||world.solids.some(o=>Math.abs(x-o.x)<o.w/2+.36&&Math.abs(z-o.z)<o.d/2+.36);
   for (const o of world.solids) {
    for(let j=Math.max(0,Math.ceil((o.z-o.d/2-.36-minZ)/step));j<=Math.min(height-1,Math.floor((o.z+o.d/2+.36-minZ)/step));j++)
     for(let i=Math.max(0,Math.ceil((o.x-o.w/2-.36-minX)/step));i<=Math.min(width-1,Math.floor((o.x+o.w/2+.36-minX)/step));i++) blocked[j*width+i]=1;
   }
-  if(zone==='west')for(let j=0;j<height;j++)for(let i=0;i<width;i++)if(!insideWest(minX+i*step,minZ+j*step))blocked[j*width+i]=1;
+  if(zone==='west'||zone==='grounds')for(let j=0;j<height;j++)for(let i=0;i<width;i++)if(!(zone==='west'?insideWest:insideEstate)(minX+i*step,minZ+j*step))blocked[j*width+i]=1;
   const start=index(zone==='west'?-6:0,zone==='grounds'?38:zone==='west'?-6:0), queue=[start];assert(!blocked[start],zone+' starting point is clear');reached[start]=1;
   for(let n=0;n<queue.length;n++){const cell=queue[n],x=cell%width,z=Math.floor(cell/width);for(const [dx,dz] of [[0,1],[0,-1],[1,0],[-1,0]]){const nx=x+dx,nz=z+dz,next=nz*width+nx;if(nx>=0&&nx<width&&nz>=0&&nz<height&&!blocked[next]&&!reached[next]){reached[next]=1;queue.push(next);}}}
   for(const d of destinations.filter(d=>d.zone===zone)){

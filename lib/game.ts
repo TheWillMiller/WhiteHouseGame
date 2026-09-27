@@ -10,10 +10,10 @@ import {teleportLanding,teleportRayTarget} from './teleport';
 import {Arcade,SKY_PATH,type ArcadeMode,type ArcadeState} from './arcade';
 import {LocomotionMotor} from './locomotion';
 import {GolfCart,loadGolfCart} from './golf-cart';
-import {fanlight,openDoor,hallDetails,textPanel,corridorFace,corridorRoomSigns,exteriorGallery,EXTERIOR_GALLERY_OFFSET,clearInteriorDetails} from './interior-details';
+import {fanlight,exteriorVestibules,openDoor,hallDetails,textPanel,corridorFace,corridorRoomSigns,exteriorGallery,EXTERIOR_GALLERY_OFFSET,clearInteriorDetails} from './interior-details';
 import {buildWorksite,type Worksite} from './worksite';
 import {renderEstateMap} from './estate-map';
-import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE,WEST_PORTICO} from './grounds-layout';
+import {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE,WEST_PORTICO,ESTATE_BENCHES,SOUTH_FOUNTAIN,HELIPAD,NORTH_FOUNTAIN,insideEstate} from './grounds-layout';
 import {floorFinish,circulationFloor,ceiling,wallPanels,clearRoomFinishes} from './room-finishes';
 import {insideWest,WEST_FOOTPRINT} from './west-layout';
 import * as T from 'three';
@@ -23,7 +23,7 @@ import { buildOvalOffice, OVAL_SEATS } from './oval-office';
 import { FollowCamera, ThirdPersonOrbit } from './follow-camera';
 import {OUTDOOR_HUMAN_SCALE,residenceHeight,residenceStepBlocked,residenceStepCamera} from './residence-terrain';
 import {CameraObstacles,RenderBudget} from './render-budget';
-import {gardenTree,gardenFinishes,gardenApproaches,roseDining,estateDrives} from './landscape';
+import {gardenTree,gardenFinishes,gardenApproaches,roseDining,estateDrives,pathClearance} from './landscape';
 import {StaffModels,type StaffActor} from './npc-model';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -48,19 +48,20 @@ function mergeStatic(g:T.Group){
  for(const {material,geos,cameraBlocker}of batches.values()){const merged=mergeGeometries(geos,false);geos.forEach(geo=>geo.dispose());if(!merged)throw new Error('Unable to assemble world geometry');const m=new T.Mesh(merged,material);m.castShadow=true;m.receiveShadow=true;m.userData.cameraBlocker=cameraBlocker;g.add(m);}
 }
 function solid(w:World,x:number,z:number,width:number,depth:number,height?:number){w.solids.push({x,z,w:width,d:depth,height});}
-function tree(w:World,x:number,z:number,seed:number){gardenTree(w.group,x,z,seed);solid(w,x,z,.9,.9);}
+function tree(w:World,x:number,z:number,seed:number){
+ if(!insideEstate(x,z)||Math.hypot(x-NORTH_FOUNTAIN.x,z-NORTH_FOUNTAIN.z)<8||pathClearance(x,z)<1.2||Math.hypot(x-HELIPAD.x,z-HELIPAD.z)<HELIPAD.radius+3||Math.hypot(x-SOUTH_FOUNTAIN.x,z-SOUTH_FOUNTAIN.z)<SOUTH_FOUNTAIN.radius+12||Math.abs(x-POOL.x)<POOL.w/2+5&&Math.abs(z-POOL.z)<POOL.d/2+5||x>54&&x<104&&z>-40&&z<65)return;
+ gardenTree(w.group,x,z,seed);solid(w,x,z,.9,.9);(w.group.userData.trees??=[]).push({x,z});
+}
 const bench=estateBench;
 function flag(g:T.Group,x:number,y:number,z:number,scale=1,presidential=false){detailedFlag(g,x,y,z,scale,presidential);}
 function ring(w:World,spot:Hotspot){w.spots.push(spot);const m=new T.Mesh(new T.TorusGeometry(1.0,.055,6,32),new T.MeshBasicMaterial({color:spot.kind==='npc'?0xe7cf8c:0x99dacf,transparent:true,opacity:.85}));m.rotation.x=Math.PI/2;m.position.set(spot.x,(spot.y??0)+.10,spot.z);m.userData.dynamic=true;w.group.add(m);w.rings.push(m);}
 
 export function grounds():World{const w:World={group:new T.Group(),solids:[],spots:[],actors:[],rings:[]},g=w.group;
- lawnWithPoolOpening(g,0,-.35,14,450,.6,450,0x6c8745);lawnWithPoolOpening(g,-5,-.035,16,240,.06,225,0x547249);
+ lawnWithPoolOpening(g,0,-.35,14,450,.6,450,0x547249);lawnWithPoolOpening(g,0,-.035,46,250,.06,356,0x547249);
  // One continuous lawn surface avoids mismatched repeating texture tiles.
 
  // Public-plan arrangement: north is -Z, east is +X. Gameplay dimensions are approximate.
- const ellipse=(cx:number,cz:number,rx:number,rz:number,width:number)=>{const shape=new T.Shape();shape.absellipse(cx,cz,rx,rz,0,Math.PI*2,false,0);const hole=new T.Path();hole.absellipse(cx,cz,rx-width,rz-width,0,Math.PI*2,true,0);shape.holes.push(hole);const m=new T.Mesh(new T.ShapeGeometry(shape,80),mat(0x666a66));m.rotation.x=Math.PI/2;m.position.y=.04; // Shape Y becomes world Z.
- m.material.side=T.DoubleSide;g.add(m);};ellipse(0,-63,38,22,5);estateDrives(g);
- box(g,0,.025,-48,10,.05,24,C.path);box(g,0,.025,112,8,.05,24,C.path);box(g,-114,.025,16,5,.05,175,C.path);box(g,108,.025,16,5,.05,175,C.path);box(g,-3,.025,-88,227,.05,5,C.path);box(g,-3,.025,111,227,.05,5,C.path);box(g,-82,.025,19,60,.05,6,C.path);box(g,105,.025,65,14,.05,5,C.path);
+ estateDrives(g);
  const fallback=new T.Group();fallback.name='Residence loading fallback';residenceExterior(fallback);fallback.traverse(o=>{o.userData.dynamic=true;});g.add(fallback);
  // Ground-level footprint of the imported residence, measured from its mesh.
  solid(w,0,-27.2,50,25.7);solid(w,0,-11.3,6.4,7.7);
@@ -75,7 +76,7 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
  const p=WEST_PORTICO;box(g,p.x,p.height/2,p.z,p.w,p.height,p.d,0xcac8b0).name='West Wing portico stone landing';
  for(let x=p.x-p.w/2+1.2;x<p.x+p.w/2;x+=1.2)box(g,x,p.height+.001,p.z,.014,.002,p.d-.12,0xb5b3a4);
  for(let z=p.z-p.d/2+1.2;z<p.z+p.d/2;z+=1.2)box(g,p.x,p.height+.001,z,p.w-.12,.002,.014,0xb5b3a4);
- const entryDoor=openDoor(g,-89,-20.3,Math.PI);entryDoor.position.y=p.height;entryDoor.scale.set(.8,.86,1);openDoor(g,-57,-22.1);const gallery=new T.Group();exteriorGallery(gallery);gallery.position.set(...EXTERIOR_GALLERY_OFFSET);g.add(gallery);
+ const entryDoor=openDoor(g,-89,-20.3,Math.PI);entryDoor.position.y=p.height;entryDoor.scale.set(.8,.86,1);openDoor(g,-57,-22.1);exteriorVestibules(g);const gallery=new T.Group();exteriorGallery(gallery);gallery.position.set(...EXTERIOR_GALLERY_OFFSET);g.add(gallery);
  // Current black-granite surface along the south-facing West Colonnade.
  box(g,-43.5,.179,-20.7,33,.016,2.25,0x333938);
  // Full source colonnade posts also collide at human and vehicle height.
@@ -92,22 +93,34 @@ export function grounds():World{const w:World={group:new T.Group(),solids:[],spo
      for(const side of [-1,1]){
        roseBed(g,x+side*(lawnW/2+.55),z,.9,lawnD);
        roseBed(g,x,z+side*(lawnD/2+.55),lawnW+.2,.9);
-       bench(g,x+side*(width/2-1.1),z,side<0?-Math.PI/2:Math.PI/2);
-       solid(w,x+side*(width/2-1.1),z,.75,2.1,1.5);
+
      }
    }else{
      roseBed(g,x,z-7,23,1.4);roseBed(g,x,z+7,23,1.4);roseBed(g,x-11,z,1.5,11);roseBed(g,x+11,z,1.5,11);
-     box(g,x,.15,z,3,.08,14,C.path);bench(g,x-7,z,-Math.PI/2);bench(g,x+7,z,Math.PI/2);
+     box(g,x,.15,z,3,.08,14,C.path);
    }
  }
  gardenApproaches(g);
- for(let i=0;i<28;i++){const z=-80+i*7.2;tree(w,z>-66&&z<-37?-122.5:-122+(i%3)*2,z,i);tree(w,119-(i%3)*2,z,i+30);}for(let i=0;i<16;i++){const x=-77+i*10;tree(w,x,-92,i+70);if(Math.abs(x)>22)tree(w,x,122,i+100);}for(const [x,z,s]of [[-17,-6,122],[17,-6,126],[-76,18,128],[-97,57,135],[-69,42,132],[-60,58,133],[39,91,136],[-62,78,34],[65,80,37],[-38,97,23],[38,95,18],[-54,43,16],[103,87,17],[-43,-63,2],[46,-67,5]])tree(w,x,z,s);
+ for(let i=0;i<28;i++){const z=-80+i*7.2;tree(w,z>-66&&z<-37?-122.5:-122+(i%3)*2,z,i);tree(w,119-(i%3)*2,z,i+30);}for(let i=0;i<16;i++){const x=-77+i*10;tree(w,x+(i%3-1)*2.6,-118+(i%4)*3.8,i+70);}for(const [x,z,s]of [[-17,-6,122],[17,-6,126],[-76,18,128],[-97,57,135],[-69,42,132],[-60,58,133],[39,91,136],[-62,78,34],[65,80,37],[-38,97,23],[38,95,18],[-54,43,16],[103,87,17],[-43,-63,2],[46,-67,5]])tree(w,x,z,s);
  // The former placeholder South Lawn fountain occupied the landing area.
  w.water=new GardenWater(g,w.solids);w.marine=new MarineOne(g);
  // Pool, putting green, benches and garden path details.
  const putting=cyl(g,-43,.07,44,6,.08,0x628349,48);putting.scale.z=.70;cyl(g,-43,.12,44,.07,.03,0x263924);cyl(g,-43,.92,44,.015,1.8,0xe5e1d3,6);box(g,-42.84,1.66,44,.32,.22,.012,0xf2d05b);
- for(let i=0;i<8;i++){const a=i/8*Math.PI*2,x=Math.cos(a)*65,z=56+Math.sin(a)*49;bench(g,x,z,-a+Math.PI/2);}
- for(let i=0;i<61;i++){const x=-124+i*4.1;for(const z of [-97,128]){box(g,x,1.05,z,.13,2.1,.13,0x2e4140);}box(g,x,1.6,-97,4.1,.09,.1,0x2e4140);box(g,x,1.6,128,4.1,.09,.1,0x2e4140);}for(let i=0;i<55;i++){for(const x of [-125,125]){const z=-97+i*4.1;box(g,x,1.05,z,.13,2.1,.13,0x2e4140);box(g,x,1.6,z,.1,.09,4.1,0x2e4140);}}
+ for(const p of ESTATE_BENCHES){bench(g,p.x,p.z,p.yaw);solid(w,p.x,p.z,.85,2.2,1.3);}g.userData.benches=ESTATE_BENCHES;
+ // Woodland shoulders follow the public aerial; the central lawn remains open.
+ for(const [x,z,seed]of [[-101,17,181],[-106,31,182],[-103,55,183],[-80,56,184],[-77,68,185],[-87,80,186],[-46,91,187],[-37,96,188],[-24,90,189],[31,91,190],[40,83,191],[41,111,192],[-43,119,193],[-86,122,194],[91,130,195],[-84,145,196],[77,151,197]])tree(w,x,z,seed);
+ // The southern estate boundary curves around the lower lawn, not a rectangle.
+ const boundary=[new T.Vector3(-125,0,-132),new T.Vector3(125,0,-132),new T.Vector3(125,0,107),...Array.from({length:65},(_,i)=>{const a=i*Math.PI/64;return new T.Vector3(Math.cos(a)*125,0,107+Math.sin(a)*117);}),new T.Vector3(-125,0,-132)];
+ for(let j=1;j<boundary.length;j++){
+  const a=boundary[j-1],b=boundary[j],length=a.distanceTo(b);if(length<.001)continue;const count=Math.ceil(length/1.75);
+  for(let i=0;i<count;i++){const u=a.clone().lerp(b,i/count),v=a.clone().lerp(b,(i+1)/count),mid=u.clone().lerp(v,.5);
+   // Leave the paved entrance mouths open instead of running rails across them.
+   if(pathClearance(mid.x,mid.z)<.8)continue;
+   box(g,u.x,1.05,u.z,.055,2.1,.055,0x2e4140);
+   for(const y of [.68,1.65]){const rail=box(g,mid.x,y,mid.z,.055,.065,u.distanceTo(v),0x2e4140);rail.rotation.y=Math.atan2(v.x-u.x,v.z-u.z);}
+  }
+ }
+ for(const [x,z,seed]of [[-96,150,201],[-91,174,202],[-68,196,203],[-36,202,204],[35,197,205],[66,184,206],[87,163,207],[89,126,208],[-58,123,209],[53,122,210],[-51,-105,211],[47,-113,212],[-84,-112,213],[89,-111,214]])tree(w,x,z,seed);
  // NCPC March 2026 illustrative plan: long north-south hall and east connector.
  // Outer works 42 x 94 m; the 36 x 57 m central event area is about 22,000 sq ft.
  // This is an illustrative construction stage, not a claim of live site progress.
@@ -232,7 +245,7 @@ export class Game{
  private fireBlaster(clientX?:number,clientY?:number){if(!this.arcade?.canFire||this.paused)return;this.camera.updateMatrixWorld();const origin=this.camera.getWorldPosition(new T.Vector3()),direction=this.camera.getWorldDirection(new T.Vector3());if(clientX!==undefined&&clientY!==undefined){const rect=this.renderer.domElement.getBoundingClientRect(),raycaster=new T.Raycaster();raycaster.setFromCamera(new T.Vector2((clientX-rect.left)/rect.width*2-1,1-(clientY-rect.top)/rect.height*2),this.camera);direction.copy(raycaster.ray.direction);}else {const r=new T.Raycaster();r.setFromCamera(this.arcade.aim,this.camera);direction.copy(r.ray.direction);}const ray=new T.Ray(origin,direction);let stop=120;for(const box of this.flightBoxes){const hit=ray.intersectBox(box,new T.Vector3());if(hit)stop=Math.min(stop,hit.distanceTo(origin));}const hit=this.arcade.fire(origin,direction,stop);this.shotSound(hit);this.publish();}
  private shotSound(hit:boolean){const ctx=this.audioContext;if(!ctx||!this.gain||this.gain.gain.value<.01)return;const osc=ctx.createOscillator(),gain=ctx.createGain(),t=ctx.currentTime;osc.type=hit?'sine':'triangle';osc.frequency.setValueAtTime(hit?720:180,t);osc.frequency.exponentialRampToValueAtTime(hit?1100:65,t+.08);gain.gain.setValueAtTime(.10,t);gain.gain.exponentialRampToValueAtTime(.001,t+.13);osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+.14);}
  floorAt(x:number,z:number){return this.zone==='grounds'?residenceHeight(x,z):0;}
- blocked(x:number,z:number){if(this.zone==='grounds'&&(x<-123||x>123||z<-95||z>126))return true;if(this.zone==='west'&&!insideWest(x,z))return true;if(this.zone!=='grounds'&&this.zone!=='west'&&(x<-28.7||x>28.7||z<-18.7||z>18.7))return true;const radius=this.zone==='grounds'?.24:.36;if(this.zone==='grounds'&&this.cart&&!this.cart.driving&&this.cart.contains(x,z,radius))return true;if(this.zone==='grounds'&&this.player){const feet=this.player.position.y;if(residenceStepBlocked(x,z,feet))return true;}return this.world.solids.some(o=>Math.abs(x-o.x)<o.w/2+radius&&Math.abs(z-o.z)<o.d/2+radius);}
+ blocked(x:number,z:number){if(this.zone==='grounds'&&!insideEstate(x,z))return true;if(this.zone==='west'&&!insideWest(x,z))return true;if(this.zone!=='grounds'&&this.zone!=='west'&&(x<-28.7||x>28.7||z<-18.7||z>18.7))return true;const radius=this.zone==='grounds'?.24:.36;if(this.zone==='grounds'&&this.cart&&!this.cart.driving&&this.cart.contains(x,z,radius))return true;if(this.zone==='grounds'&&this.player){const feet=this.player.position.y;if(residenceStepBlocked(x,z,feet))return true;}return this.world.solids.some(o=>Math.abs(x-o.x)<o.w/2+radius&&Math.abs(z-o.z)<o.d/2+radius);}
  travel(id:string){const d=destinations.find(d=>d.id===id);if(!d)throw new Error('Unknown destination');this.change(d.zone,d.spawn?.[0]??d.x,d.spawn?.[1]??(d.room?(d.z>2?d.z-d.room.d/2+1.6:d.z<-2?d.z+d.room.d/2-1.6:d.z):d.z));this.visited.add(id);this.publish();}
  change(zone:Place,x:number,z:number){this.race?.stop();this.teleportArmed=false;if(this.arcade&&this.arcade.mode!=='off'){this.arcade.setMode('off');this.playerModel?.pose(null);this.firstPerson=this.preArcadeCamera;}if(this.cart?.driving){this.cart.driving=false;this.cart.motor.reset();this.cart.motor.maxForwardSpeed=8;this.cart.object.rotation.x=0;this.cart.object.position.y=this.floorAt(this.cart.object.position.x,this.cart.object.position.z);this.playerModel?.pose(null);}this.motor.reset();this.stick={x:0,y:0};this.stickRunning=false;this.stopActivity();this.renderer.shadowMap.needsUpdate=true;this.playerModel?.emote(null);if(zone!==this.zone){this.scene.remove(this.world.group);if(!this.worlds.has(zone)){const w=interior(zone);this.addNPCs(w,zone);this.worlds.set(zone,w);}this.zone=zone;this.world=this.worlds.get(zone)!;this.scene.add(this.world.group);}if(this.staffEnabled)void this.loadStaff().catch(error=>console.warn('Staff could not load; re-enter the room to retry.',error));this.player.position.set(x,this.floorAt(x,z),z);this.player.scale.setScalar(zone==='grounds'?OUTDOOR_HUMAN_SCALE:1);this.player.rotation.set(0,0,0);this.orbit.reset();this.cameraFeetY=this.player.position.y;this.player.visible=true;this.followCamera.reset();this.camera.fov=zone==='grounds'?60:66;this.camera.updateProjectionMatrix();this.yaw=0;this.pitch=.16;this.velocityY=0;this.keys.clear();this.nearby=null;this.scene.background=new T.Color(zone==='grounds'?0xa4cee0:0xabb9b7);this.scene.fog=zone==='grounds'?new T.Fog(0xa4cee0,140,360):null;this.hemi.intensity=zone==='grounds'?1.85:1.7;this.hemi.groundColor.setHex(zone==='grounds'?0x596142:0x817158);this.sun.intensity=zone==='grounds'?2.15:1.8;this.camera.position.set(x,5,z+9);this.publish();}
  interact(){if(this.paused||(this.arcade&&this.arcade.mode!=='off'))return;if(this.cart?.driving){this.exitCart();return;}if(this.activePose){this.stopActivity();this.publish();return;}if(!this.nearby)return;const n=this.nearby;if(n.kind==='vehicle'){this.enterCart();return;}if(n.kind==='npc'){this.keys.clear();this.met.add(n.id);this.publish();this.talk(n.id);}else if(n.kind==='equipment'){this.activity=this.world.worksite?.signal()??'';this.activityTime=8;this.publish();}else if((n.kind==='seat'||n.kind==='lectern')&&n.pose){this.returnPosition.copy(this.player.position);this.activePose=n;this.player.position.set(n.pose[0],0,n.pose[1]);this.player.rotation.y=n.pose[2];this.playerModel?.emote(null);this.playerModel?.pose(n.kind==='seat'?'sit':'briefing');this.motor.reset();this.stick={x:0,y:0};this.stickRunning=false;this.keys.clear();this.velocityY=0;this.activity=n.kind==='seat'?'Seated · E or move to stand':'At the lectern · E or move to leave';this.followCamera.reset();this.publish();}else if(n.target)this.travel(n.target);else if(n.zone&&n.spawn)this.change(n.zone,...n.spawn);}

@@ -7,6 +7,26 @@ import {insideWest,westDestinations} from './west-layout';
 import {wallPanels} from './room-finishes';
 
 function box(g:T.Group,x:number,y:number,z:number,w:number,h:number,d:number,c:number){const m=new T.Mesh(new T.BoxGeometry(w,h,d),material(c));m.position.set(x,y,z);g.add(m);return m;}
+
+/** The exterior GLB is a shell. Close each carved entrance with a shallow foyer. */
+export function exteriorVestibules(parent:T.Group){
+ for(const [x,z,direction]of [[-89,-20.8,1],[-57,-21.3,-1]]){
+  const g=new T.Group();g.name='West Wing entrance vestibule';g.position.set(x,.18,z);if(direction<0)g.rotation.y=Math.PI;parent.add(g);
+  const depth=3.8,w=3.6,h=3.22;
+  box(g,0,h/2,depth,w,h,.18,0xaba99f);
+  for(const side of [-1,1]){box(g,side*(w/2-.09),h/2,depth/2,.18,h,depth+.2,0xd8d5c9);box(g,side*(w/2-.19),.16,depth/2,.05,.25,depth,0xeeeadd);}
+  box(g,0,-.02,depth/2,w,.04,depth+.2,0xb8b5a8);box(g,0,h+.03,depth/2,w,.16,depth+.2,0xe7e2d6);
+  box(g,0,.008,depth/2,1.55,.014,depth-.24,0x314b51);
+  // Closed inner door and side panel create architectural depth behind the portal.
+  box(g,.55,1.22,depth-.12,1.18,2.44,.10,0x604b37);
+  for(const sx of [-.1,1.2])box(g,sx,1.25,depth-.21,.10,2.58,.12,0xeae5d8);
+  box(g,.55,2.53,depth-.21,1.4,.11,.12,0xeae5d8);
+  for(const yy of [.6,1.65])box(g,.55,yy,depth-.19,.90,.78,.035,0x715c43);
+  box(g,.99,1.12,depth-.26,.07,.12,.04,0xbda671);
+  box(g,-.88,1.82,depth-.16,.7,.93,.08,0xb89d62);box(g,-.88,1.82,depth-.21,.59,.82,.04,0x394f54);
+  const light=box(g,0,h-.05,depth/2,.52,.035,.52,0xf2e5c5);light.material=new T.MeshStandardMaterial({color:0xf2e5c5,emissive:0xffebbc,emissiveIntensity:.35});
+ }
+}
 const resources:T.Material[]=[];
 let gallery:T.MeshStandardMaterial|undefined;
 function galleryMaterial(){if(!gallery){gallery=new T.MeshStandardMaterial({color:0xffffff,roughness:.8,alphaTest:.15});resources.push(gallery);if(typeof document.createElementNS==='function'){const base=window.location.pathname.startsWith('/trumpgame')?'/trumpgame/':'/';new T.TextureLoader().load(base+'art/colonnade-portraits.webp',tx=>{if(!gallery){tx.dispose();return;}tx.colorSpace=T.SRGBColorSpace;tx.anisotropy=4;gallery.map=tx;gallery.needsUpdate=true;});}}return gallery;}

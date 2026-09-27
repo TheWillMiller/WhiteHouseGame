@@ -1,4 +1,4 @@
-import {GARDENS,WEST_APPROACH,WEST_WALKS} from './grounds-layout';
+import {GARDENS,WEST_APPROACH,WEST_WALKS,SOUTH_DRIVE,DRIVE_BRANCHES,SOUTH_FOUNTAIN,NORTH_DRIVE} from './grounds-layout';
 import * as T from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {material} from './visuals';
@@ -43,11 +43,6 @@ export function gardenTree(parent:T.Group,x:number,z:number,seed:number){
 export function gardenFinishes(g:T.Group){
  const stone=material(0xd7d4c7),iron=material(0x263330);
  const slab=(x:number,y:number,z:number,w:number,h:number,d:number,m:T.Material)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);g.add(o);return o;};
- // Broad, subtle mowing bands clipped to the South Lawn ellipse.
- for(let i=-5;i<=5;i++){
-  const x=i*9.2,half=40*Math.sqrt(Math.max(0,1-(x/55)**2));
-  slab(x,.007,58,9.15,.013,half*2,material(i%2===0?0x587346:0x546e43));
- }
  for(const {id,x,z,w,d} of GARDENS){
   for(const dz of [-d/2,d/2])slab(x,.13,z+dz,w,.15,.18,stone);
   for(const dx of [-w/2,w/2])slab(x+dx,.13,z,.18,.15,d,stone);
@@ -58,7 +53,7 @@ export function gardenFinishes(g:T.Group){
   }
  }
  // Fine wrought-iron uprights provide a proper perimeter silhouette.
- for(const z of [-97,128])for(let x=-99;x<=99;x+=1){slab(x,1.18,z,.045,2.36,.045,iron);}
+ for(const z of [-132])for(let x=-99;x<=99;x+=1){if(pathClearance(x,z)<.5)continue;slab(x,1.18,z,.045,2.36,.045,iron);}
 }
 
 // Match the residence's pale masonry, deep window reveals and layered cornices.
@@ -114,35 +109,31 @@ export function westWingFinishes(g:T.Group){
  for(const [x,z]of [[GARDENS[0].x-7.1,GARDENS[0].z],[GARDENS[0].x+7.1,GARDENS[0].z],[28,18],[42,18]])for(let j=0;j<3;j++)slab(x,1+j*.14,z,.72,.045,1.95,bronze);
 }
 
-/** Flat path ribbons share one cached material and batch with the grounds. */
-export function gardenApproaches(g:T.Group){
- const ribbon=(points:readonly (readonly [number,number])[],width:number,color:number,y:number)=>{
-  const curve=new T.CatmullRomCurve3(points.map(([x,z])=>new T.Vector3(x,y,z))),vertices:number[]=[],uvs:number[]=[],indices:number[]=[];
-  const samples=64,length=curve.getLength();
-  for(let i=0;i<=samples;i++){
-   const t=i/samples,p=curve.getPoint(t),tangent=curve.getTangent(t),normal=new T.Vector3(-tangent.z,0,tangent.x).normalize();
-   for(const side of [-1,1]){vertices.push(p.x+normal.x*width/2*side,y,p.z+normal.z*width/2*side);uvs.push(side<0?0:1,t*length/width);}
-   if(i<samples){const a=i*2;indices.push(a,a+1,a+2,a+1,a+3,a+2);}
-  }
-  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();
-  const m=new T.Mesh(geo,material(color));m.receiveShadow=true;m.name='West approach path';g.add(m);
- };
- ribbon(WEST_APPROACH,6.2,0x777e77,.073);
- for(const points of WEST_WALKS)ribbon(points,2.1,0xcac8b0,.078);
-}
+type Route={name:string;points:readonly (readonly number[])[];width:number;closed?:boolean;surface:'drive'|'walk'};
+// All paths, scenery exclusions and QA use the same curves. No legacy rectangles.
+export const ESTATE_ROUTES:Route[]=[
+ {name:'North Drive',points:NORTH_DRIVE,width:7, surface:'drive'},
+ {name:'South Drive',points:SOUTH_DRIVE,width:7.6,closed:true,surface:'drive'},
+ ...DRIVE_BRANCHES.map((points,i)=>({name:'South Drive junction '+i,points,width:7.6,surface:'drive' as const})),
+ {name:'West entrance drive',points:WEST_APPROACH,width:6.2,surface:'drive'},
+ ...WEST_WALKS.map((points,i)=>({name:'Garden walk '+i,points,width:2.1,surface:'walk' as const})),
+ {name:'North Portico approach',points:[[0,-55],[0,-42]],width:4,surface:'walk'},
+ {name:'Southern perimeter walk',points:[[-106.8,103.9],[-107,135],[-97,164],[-71,193],[-36,209],[0,214],[36,209],[71,193],[97,164],[107,135],[107,106.8]],width:2.2,surface:'walk'},
 
-/** Traced relationships from NCPC 8733, p.30; adjusted for the game's estate bounds. */
-export function estateDrives(g:T.Group){
- const routes=[{closed:true,points:[[0,7],[25,13],[43,31],[49,57],[59,79],[56,99],[29,110],[-12,109],[-47,99],[-59,79],[-57,51],[-43,23],[-20,10]]},
- {closed:false,points:[[-119,109],[-91,109],[-71,92],[-59,64]]},
- {closed:false,points:[[58,79],[78,107],[109,109]]}];
- for(const route of routes){const curve=new T.CatmullRomCurve3(route.points.map(([x,z])=>new T.Vector3(x,0,z)),route.closed,'centripetal');
-  for(const [width,y,color]of [[6.9,.026,0xb8b6a9],[6.4,.031,0x636963]]){
-   const v:number[]=[],uv:number[]=[];for(let i=0;i<160;i++)for(const [u,side]of [[i/160,-1],[i/160,1],[(i+1)/160,-1],[i/160,1],[(i+1)/160,1],[(i+1)/160,-1]]){const p=curve.getPoint(u),t=curve.getTangent(u),n=new T.Vector3(-t.z,0,t.x).normalize();v.push(p.x+n.x*width/2*side,y,p.z+n.z*width/2*side);uv.push(side,u*60);}
-   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(v,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeVertexNormals();const m=new T.Mesh(geo,material(color));m.name='South Drive and branches';m.receiveShadow=true;g.add(m);
-  }
- }
+];
+const curves=ESTATE_ROUTES.map(r=>new T.CatmullRomCurve3(r.points.map(([x,z])=>new T.Vector3(x,0,z)),r.closed??false,'centripetal'));
+const samples=curves.map(c=>c.getPoints(240));
+export function pathClearance(x:number,z:number){let clearance=Infinity;for(let j=0;j<samples.length;j++){const p=samples[j];for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],dx=b.x-a.x,dz=b.z-a.z,t=T.MathUtils.clamp(((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz),0,1);clearance=Math.min(clearance,Math.hypot(x-a.x-dx*t,z-a.z-dz*t)-ESTATE_ROUTES[j].width/2);}}
+ if(Math.abs(x)<1.8&&z>-4.8&&z<35)clearance=Math.min(clearance,-.1);
+ return clearance;}
+function routeSurface(g:T.Group,j:number){const r=ESTATE_ROUTES[j],curve=curves[j],v:number[]=[],uv:number[]=[];
+ for(let i=0;i<240;i++)for(const [u,side]of [[i/240,-1],[i/240,1],[(i+1)/240,-1],[i/240,1],[(i+1)/240,1],[(i+1)/240,-1]]){const p=curve.getPoint(u),t=curve.getTangent(u),n=new T.Vector3(-t.z,0,t.x).normalize();v.push(p.x+n.x*r.width/2*side,r.surface==='drive'?.035:.043,p.z+n.z*r.width/2*side);uv.push(side,u*60);}
+ // Tight junctions can reverse the inside edge; orient every surface upward.
+ const clean:number[]=[],tex:number[]=[];for(let i=0;i<v.length;i+=9){const cross=(v[i+5]-v[i+2])*(v[i+6]-v[i])-(v[i+3]-v[i])*(v[i+8]-v[i+2]);if(Math.abs(cross)<1e-8)continue;for(const k of cross>0?[0,1,2]:[0,2,1]){clean.push(...v.slice(i+k*3,i+k*3+3));tex.push(...uv.slice(i/3*2+k*2,i/3*2+k*2+2));}}
+ const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(clean,3));geo.setAttribute('uv',new T.Float32BufferAttribute(tex,2));geo.computeVertexNormals();const m=new T.Mesh(geo,material(r.surface==='drive'?0x666a66:0xcac8b0));m.name=r.name;m.receiveShadow=true;g.add(m);
 }
+export function estateDrives(g:T.Group){ESTATE_ROUTES.forEach((r,j)=>{if(r.surface==='drive')routeSurface(g,j);});}
+export function gardenApproaches(g:T.Group){ESTATE_ROUTES.forEach((r,j)=>{if(r.surface==='walk')routeSurface(g,j);});}
 
 /** September 2026 official Rose Garden photos: white lattice chairs and striped parasols. */
 export function roseDining(g:T.Group,solids:{x:number;z:number;w:number;d:number;height?:number}[]){

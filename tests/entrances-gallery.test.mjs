@@ -13,6 +13,11 @@ for(const [x,z,dir]of [[-89,-20.2,-1],[-57,-22.15,1]])for(const dx of [-.85,0,.8
  assert.equal(ray.intersectObjects(facadeMeshes,false).length,0,'no masonry or window behind entrance '+[x,z,dx,y]);
 }
 const gallery=new T.Group();colonnadeGallery(gallery);assert.equal(gallery.children.filter(o=>o.name.startsWith('Gallery portrait:')).length,47);
+// Looking through an open door must meet the foyer, never distant grass or sky.
+for(const [x,z,dz]of [[-89,-22,1],[-57,-20.3,-1]])for(const dx of [-.7,0,.7])for(const y of [.6,1.6,2.8]){
+ const hit=new T.Raycaster(new T.Vector3(x+dx,y,z),new T.Vector3(0,0,dz),0,8).intersectObjects(facadeMeshes,false)[0];
+ assert(hit&&hit.distance>1.4&&hit.distance<6,'opaque vestibule behind open entrance '+[x,z,dx,y]);
+}
 // The visible facade, rather than its simplified collision box, must clear every
 // portrait and the lower plaque. Previously the facade hid their lower halves.
 const placedGallery=new T.Group();exteriorGallery(placedGallery);placedGallery.position.set(...EXTERIOR_GALLERY_OFFSET);placedGallery.updateMatrixWorld(true);const outsidePortraits=[];placedGallery.traverse(o=>{if(o.name.startsWith('Gallery portrait:'))outsidePortraits.push(o);});

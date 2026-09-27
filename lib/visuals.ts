@@ -196,13 +196,7 @@ function fireplace(g:T.Group){
   block(g,0,1.62,-.11,2.85,.17,.86,0xf5f0df);block(g,0,2.7,.01,1.9,1.72,.14,0xd9b458);block(g,0,2.7,-.08,1.68,1.5,.025,0x69888b);
   for(const side of [-1,1]){cylinder(g,side*.95,1.93,-.1,.05,.51,0xd9b458);cylinder(g,side*.95,2.23,-.1,.06,.24,0xf6e8bf);}
 }
-export function groundsDetails(g:T.Group){
-  // Iron garden lanterns, path edging and planted urns.
-  for(const x of [-7.1,7.1])for(const z of [7,25,77,105]){
-    cylinder(g,x,.10,z,.3,.2,0x243b36);cylinder(g,x,1.62,z,.075,3,0x263a35);block(g,x,3.26,z,.39,.61,.39,0xf0db9a,.03);
-    for(const dx of [-.22,.22])for(const dz of [-.22,.22])block(g,x+dx,3.26,z+dz,.035,.69,.035,0x23352f);
-    cylinder(g,x,3.68,z,.34,.21,0x243b36,.07);orb(g,x,3.86,z,.07,.13,.07,0xd9b458);
-  }
-  for(const side of [-1,1])for(let z=5;z<31;z+=1.0)block(g,side*5.65,.095,z,.32,.16,.94,0xe0dccb);
-
+export function groundsDetails(_g:T.Group){
+ // Retired the obsolete axial lamps and 52 detached curb blocks. Ground paths
+ // are now built by the shared estate route network in landscape.ts.
 }

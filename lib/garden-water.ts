@@ -1,5 +1,7 @@
 import * as T from 'three';
 import {material} from './visuals';
+import {SOUTH_FOUNTAIN,NORTH_FOUNTAIN} from './grounds-layout';
+import {annualFlowerRing} from './garden-planting';
 
 export const POOL={x:-88,z:36,w:6.706,d:16.459,depth:1.85};
 type Solid={x:number;z:number;w:number;d:number;height?:number};
@@ -17,8 +19,8 @@ export class GardenWater{
  private time={value:0};private spray:T.Points;private southSpray:T.Points;private acc=0;
  private drops=new Float32Array(780*3);
  constructor(g:T.Group,solids:Solid[]){
-  this.pool(g);this.spray=this.fountain(g,0,-63,5);this.southSpray=this.fountain(g,0,99,7);this.southSpray.parent!.name='South Lawn fountain beyond the helipad';this.southSpray.geometry=this.southSpray.geometry.clone();
-  solids.push({x:POOL.x,z:POOL.z,w:POOL.w,d:POOL.d,height:.18},{x:0,z:-63,w:8.5,d:8.5,height:.6},{x:0,z:99,w:14,d:14,height:.6});
+  this.pool(g);this.spray=this.fountain(g,NORTH_FOUNTAIN.x,NORTH_FOUNTAIN.z,NORTH_FOUNTAIN.radius);this.southSpray=this.fountain(g,SOUTH_FOUNTAIN.x,SOUTH_FOUNTAIN.z,SOUTH_FOUNTAIN.radius);this.southSpray.parent!.name='South Lawn fountain beyond the helipad';this.southSpray.geometry=this.southSpray.geometry.clone();
+  solids.push({x:POOL.x,z:POOL.z,w:POOL.w,d:POOL.d,height:.18},{x:NORTH_FOUNTAIN.x,z:NORTH_FOUNTAIN.z,w:10,d:10,height:.6},{x:SOUTH_FOUNTAIN.x,z:SOUTH_FOUNTAIN.z,w:14,d:14,height:.6});
  }
  private water(){
   const m=new T.MeshStandardMaterial({color:0x619b9e,roughness:.19,metalness:.24,transparent:true,opacity:.68,depthWrite:false});
@@ -62,17 +64,14 @@ export class GardenWater{
   const rim=add(g,new T.TorusGeometry(r-.16,.18,10,72),stone,0,.38);rim.rotation.x=Math.PI/2;
   const geo=new T.CircleGeometry(r-.35,72);geo.rotateX(-Math.PI/2);const water=add(g,geo,this.water(),0,.36);water.userData.dynamic=true;
   for(let i=0;i<16;i++){const a=i*Math.PI/8;add(g,new T.CylinderGeometry(.055,.065,.18,8),material(0x818b86),Math.cos(a)*2,.40,Math.sin(a)*2);}
-  // The current lawn fountains are encircled by low red annual planting.
-  const blooms=new T.InstancedMesh(new T.SphereGeometry(.13,5,4),material(0xa93c40),200),dummy=new T.Object3D();
-  blooms.name='Red annual flower border';
-  for(let i=0;i<200;i++){const a=i*2.39996,rr=r+.42+(i%4)*.16;dummy.position.set(Math.cos(a)*rr,.15+(i%3)*.03,Math.sin(a)*rr);dummy.scale.set(1,.7,1);dummy.updateMatrix();blooms.setMatrixAt(i,dummy.matrix);}blooms.castShadow=true;blooms.userData.dynamic=true;g.add(blooms);
+  annualFlowerRing(g,r+.20,r+1.05);
   // Real ballistic droplets: no opaque tubular arcs or ornamental tiered pedestal.
   const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(this.drops,3));geometry.boundingSphere=new T.Sphere(new T.Vector3(0,2,0),6);
   const m=new T.PointsMaterial({color:0xe4f1ed,size:.055,transparent:true,opacity:.64,depthWrite:false,sizeAttenuation:true});
   m.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(length(gl_PointCoord-vec2(.5))>.5)discard;');};
   const spray=new T.Points(geometry,m);spray.name='Animated fountain droplets';spray.userData.dynamic=true;g.add(spray);return spray;
  }
- update(dt:number,p:T.Vector3){this.time.value+=dt;this.acc+=dt;if(this.acc<1/30)return;this.acc=0;this.spray.visible=Math.hypot(p.x,p.z+63)<120;this.southSpray.visible=Math.hypot(p.x,p.z-99)<120;if(!this.spray.visible&&!this.southSpray.visible)return;
+ update(dt:number,p:T.Vector3){this.time.value+=dt;this.acc+=dt;if(this.acc<1/30)return;this.acc=0;this.spray.visible=Math.hypot(p.x,p.z-NORTH_FOUNTAIN.z)<120;this.southSpray.visible=Math.hypot(p.x,p.z-SOUTH_FOUNTAIN.z)<120;if(!this.spray.visible&&!this.southSpray.visible)return;
   const t=this.time.value;
   for(let i=0;i<this.drops.length/3;i++){
    const jet=i%17,phase=(t*.72+i*.61803398875)%1,a=jet*Math.PI/8,central=jet===16;
