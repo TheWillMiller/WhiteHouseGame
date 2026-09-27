@@ -1,7 +1,7 @@
 import * as T from 'three';
 import {material} from './visuals';
 
-export const POOL={x:-72,z:50,w:12,d:24,depth:1.85};
+export const POOL={x:-88,z:36,w:6.706,d:16.459,depth:1.85};
 type Solid={x:number;z:number;w:number;d:number;height?:number};
 const add=(g:T.Group,geo:T.BufferGeometry,m:T.Material,x=0,y=0,z=0)=>{const o=new T.Mesh(geo,m);o.position.set(x,y,z);o.receiveShadow=true;g.add(o);return o;};
 const box=(g:T.Group,x:number,y:number,z:number,w:number,h:number,d:number,m:T.Material)=>add(g,new T.BoxGeometry(w,h,d),m,x,y,z);
@@ -14,11 +14,11 @@ export function lawnWithPoolOpening(g:T.Group,x:number,y:number,z:number,w:numbe
 }
 
 export class GardenWater{
- private time={value:0};private spray:T.Points;private acc=0;
+ private time={value:0};private spray:T.Points;private southSpray:T.Points;private acc=0;
  private drops=new Float32Array(780*3);
  constructor(g:T.Group,solids:Solid[]){
-  this.pool(g);this.spray=this.fountain(g,0,-63,5);
-  solids.push({x:POOL.x,z:POOL.z,w:POOL.w,d:POOL.d,height:.18},{x:0,z:-63,w:8.5,d:8.5,height:.6});
+  this.pool(g);this.spray=this.fountain(g,0,-63,5);this.southSpray=this.fountain(g,0,99,7);this.southSpray.parent!.name='South Lawn fountain beyond the helipad';this.southSpray.geometry=this.southSpray.geometry.clone();
+  solids.push({x:POOL.x,z:POOL.z,w:POOL.w,d:POOL.d,height:.18},{x:0,z:-63,w:8.5,d:8.5,height:.6},{x:0,z:99,w:14,d:14,height:.6});
  }
  private water(){
   const m=new T.MeshStandardMaterial({color:0x619b9e,roughness:.19,metalness:.24,transparent:true,opacity:.68,depthWrite:false});
@@ -40,10 +40,10 @@ export class GardenWater{
    box(g,x+side*(w/2-.09),-.32,z,.025,.35,d,tile);box(g,x,-.32,z+side*(d/2-.09),w,.35,.025,tile);
    // Deck slabs remain outside the basin; fine joints read at a human scale.
    box(g,x+side*(w/2+1.9),.015,z,2.2,.10,d+6,stone);box(g,x,.015,z+side*(d/2+1.9),w+1.6,.10,2.2,stone);
-   for(let i=-12;i<=12;i+=1.5)box(g,x+side*(w/2+1.9),.071,z+i,2.2,.006,.016,material(0xb6b7ac));
+   for(let i=-d/2;i<=d/2;i+=1.5)box(g,x+side*(w/2+1.9),.071,z+i,2.2,.006,.016,material(0xb6b7ac));
   }
-  for(let row=-11;row<=11;row+=.5)box(g,x,-depth+.063,z+row,w,.006,.012,material(0xa9c8c2));
-  for(let col=-5.5;col<=5.5;col+=.5)box(g,x+col,-depth+.064,z,.012,.007,d,material(0xa9c8c2));
+  for(let row=-d/2+.5;row<d/2;row+=.5)box(g,x,-depth+.063,z+row,w,.006,.012,material(0xa9c8c2));
+  for(let col=-w/2+.5;col<w/2;col+=.5)box(g,x+col,-depth+.064,z,.012,.007,d,material(0xa9c8c2));
   // Entry stairs visible through the water, with stainless handrails.
   for(let i=0;i<4;i++)box(g,x,-.25-i*.39,z-d/2+.45+i*.4,3,.18,.8,plaster);
   for(const side of [-1,1]){
@@ -52,7 +52,7 @@ export class GardenWater{
   }
   const geo=new T.PlaneGeometry(w-.18,d-.18);geo.rotateX(-Math.PI/2);const surface=add(g,geo,this.water(),x,-.19,z);surface.name='Pool water below coping';surface.userData.dynamic=true;
   // Canvas chaises with separate seat/back and slender frames, not park benches.
-  for(const zz of [42,48,54,60]){const chaise=new T.Group();chaise.position.set(x-8.1,0,zz);parent.add(chaise);const cloth=material(0xe5dfce);box(chaise,0,.4,0,1,.10,1.75,cloth);const back=box(chaise,0,.78,.92,1,.10,1.1,cloth);back.rotation.x=-.62;for(const xx of [-.48,.48])for(const dz of [-.6,.65])box(chaise,xx,.22,dz,.045,.44,.045,steel);}
+  for(const zz of [z-5,z,z+5]){const chaise=new T.Group();chaise.position.set(x-w/2-1.8,0,zz);parent.add(chaise);const cloth=material(0xe5dfce);box(chaise,0,.4,0,1,.10,1.75,cloth);const back=box(chaise,0,.78,.92,1,.10,1.1,cloth);back.rotation.x=-.62;for(const xx of [-.48,.48])for(const dz of [-.6,.65])box(chaise,xx,.22,dz,.045,.44,.045,steel);}
  }
  private fountain(parent:T.Group,x:number,z:number,r:number){
   const g=new T.Group();g.name='North Lawn spray fountain';g.position.set(x,0,z);parent.add(g);
@@ -62,18 +62,22 @@ export class GardenWater{
   const rim=add(g,new T.TorusGeometry(r-.16,.18,10,72),stone,0,.38);rim.rotation.x=Math.PI/2;
   const geo=new T.CircleGeometry(r-.35,72);geo.rotateX(-Math.PI/2);const water=add(g,geo,this.water(),0,.36);water.userData.dynamic=true;
   for(let i=0;i<16;i++){const a=i*Math.PI/8;add(g,new T.CylinderGeometry(.055,.065,.18,8),material(0x818b86),Math.cos(a)*2,.40,Math.sin(a)*2);}
+  // The current lawn fountains are encircled by low red annual planting.
+  const blooms=new T.InstancedMesh(new T.SphereGeometry(.13,5,4),material(0xa93c40),200),dummy=new T.Object3D();
+  blooms.name='Red annual flower border';
+  for(let i=0;i<200;i++){const a=i*2.39996,rr=r+.42+(i%4)*.16;dummy.position.set(Math.cos(a)*rr,.15+(i%3)*.03,Math.sin(a)*rr);dummy.scale.set(1,.7,1);dummy.updateMatrix();blooms.setMatrixAt(i,dummy.matrix);}blooms.castShadow=true;blooms.userData.dynamic=true;g.add(blooms);
   // Real ballistic droplets: no opaque tubular arcs or ornamental tiered pedestal.
   const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(this.drops,3));geometry.boundingSphere=new T.Sphere(new T.Vector3(0,2,0),6);
   const m=new T.PointsMaterial({color:0xe4f1ed,size:.055,transparent:true,opacity:.64,depthWrite:false,sizeAttenuation:true});
   m.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(length(gl_PointCoord-vec2(.5))>.5)discard;');};
   const spray=new T.Points(geometry,m);spray.name='Animated fountain droplets';spray.userData.dynamic=true;g.add(spray);return spray;
  }
- update(dt:number,p:T.Vector3){this.time.value+=dt;this.acc+=dt;if(this.acc<1/30)return;this.acc=0;this.spray.visible=Math.hypot(p.x,p.z+63)<120;if(!this.spray.visible)return;
+ update(dt:number,p:T.Vector3){this.time.value+=dt;this.acc+=dt;if(this.acc<1/30)return;this.acc=0;this.spray.visible=Math.hypot(p.x,p.z+63)<120;this.southSpray.visible=Math.hypot(p.x,p.z-99)<120;if(!this.spray.visible&&!this.southSpray.visible)return;
   const t=this.time.value;
   for(let i=0;i<this.drops.length/3;i++){
    const jet=i%17,phase=(t*.72+i*.61803398875)%1,a=jet*Math.PI/8,central=jet===16;
    const radius=central?.18*Math.sin(i*7):2-1.75*phase,height=.45+(central?4.7:3.0)*4*phase*(1-phase),j=i*3;
    this.drops[j]=Math.cos(a)*radius+Math.sin(i*17+t)*.045;this.drops[j+1]=height;this.drops[j+2]=Math.sin(a)*radius+Math.cos(i*11+t)*.045;
-  }this.spray.geometry.attributes.position.needsUpdate=true;
+  }this.spray.geometry.attributes.position.needsUpdate=true;const south=this.southSpray.geometry.attributes.position as T.BufferAttribute;for(let i=0;i<south.count;i++)south.setXYZ(i,this.drops[i*3]*1.4,this.drops[i*3+1]*.72,this.drops[i*3+2]*1.4);south.needsUpdate=true;
  }
 }

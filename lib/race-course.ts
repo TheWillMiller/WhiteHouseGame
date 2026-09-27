@@ -1,7 +1,7 @@
 import * as T from 'three';
 
 // A temporary arcade circuit, installed only while racing. North is -Z.
-const route=[[0,106],[40,105],[82,78],[83,48],[83,16],[83,-15],[83,-47],[44,-78],[0,-83],[-48,-78],[-109,-55],[-112,-22],[-112,20],[-104,65],[-60,108]];
+const route=[[0,114],[40,111],[82,78],[83,48],[83,16],[83,-15],[83,-47],[44,-78],[0,-83],[-48,-78],[-107,-55],[-110,-22],[-110,20],[-104,65],[-60,108]];
 const curve=new T.CatmullRomCurve3(route.map(([x,z])=>new T.Vector3(x,0,z)),true,'centripetal');
 curve.arcLengthDivisions=2048;
 export const COURSE_LENGTH=curve.getLength(),TAU=Math.PI*2,CHECKPOINTS=16;

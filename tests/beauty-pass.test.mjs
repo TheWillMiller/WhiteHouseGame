@@ -24,7 +24,7 @@ for(const d of destinations.filter(d=>d.room&&d.room.style!=='oval')){
 const sample={group:new T.Group(),solids:[]};assembleWalls(sample,[{x:0,z:0,length:10,vertical:false,color:0xffffff,doors:[0],inward:1},{x:0,z:0,length:10,vertical:false,color:0xffffff,doors:[],inward:-1}]);
 assert.equal(sample.solids.length,2);assert.equal(sample.cameraOnly.length,1);assert(sample.solids.every(s=>Math.abs(s.x)>1.6));
 const estate=grounds();estate.group.updateMatrixWorld(true);
-const ray=new T.Raycaster(new T.Vector3(-72,3,50),new T.Vector3(0,-1,0));
+const ray=new T.Raycaster(new T.Vector3(-88,3,36),new T.Vector3(0,-1,0));
 const meshes=[];estate.group.traverse(o=>{if(o instanceof T.Mesh)meshes.push(o);});
 const hits=ray.intersectObjects(meshes,false).filter(h=>h.point.y<1);
 assert(hits.some(h=>Math.abs(h.point.y+.19)<.02),'pool water below deck');

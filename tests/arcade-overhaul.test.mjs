@@ -42,12 +42,26 @@ for(const size of [[390,844],[1366,768]]){
   const event=type=>{const e=new Event(type);Object.assign(e,{pointerId:11,clientX,clientY,pointerType:'touch',button:0});game.renderer.domElement.dispatchEvent(e);};
   const hits=a.hits;event('pointerdown');event('pointerup');assert.equal(a.hits,hits+1,'tap hits the selected cutout without dragging the camera');frame(14);
  }
- assert(a.score>500&&a.combo===5);const shots=a.shots;
+ assert(a.score>500&&a.combo===6);const shots=a.shots;
  const cancel=new Event('pointercancel');Object.assign(cancel,{pointerId:99});game.renderer.domElement.dispatchEvent(cancel);assert.equal(a.shots,shots);
  const combo=a.combo;a.fire(game.camera.position,new T.Vector3(0,1,0));assert.equal(a.combo,0);assert(a.bestCombo>=combo);
  a.update(61);assert(a.finished);const old=a.score;assert(!a.fire(game.camera.position,new T.Vector3(0,0,-1)));assert.equal(a.score,old);
  game.startArcade('blaster');assert.equal(a.hits,0);assert.equal(a.combo,0);assert.equal(a.seconds,60);
 }
+// Continuous touch aim does not orbit the camera; losing capture stops firing.
+game.startArcade('blaster');frame(15);const cameraPose=game.camera.quaternion.clone();
+for(const [type,x,y]of [['pointerdown',200,300],['pointermove',700,350],['lostpointercapture',700,350]]){const e=new Event(type);Object.assign(e,{pointerId:12,clientX:x,clientY:y,pointerType:'touch',button:0});game.renderer.domElement.dispatchEvent(e);frame(2);}
+assert(cameraPose.equals(game.camera.quaternion));assert(!game.keys.has('KeyX'));
+// Reload prevents firing, completes automatically, and starts a fresh full magazine.
+const range=new Arcade();range.setMode('blaster');const origin=new T.Vector3(0,5,195),miss=new T.Vector3(0,1,0);
+for(let i=0;i<8;i++){range.fire(origin,miss);range.update(.17);}
+assert.equal(range.ammo,0);assert(range.reloadTime>0);const dryShots=range.shots;range.fire(origin,miss);assert.equal(range.shots,dryShots);
+range.update(1);assert.equal(range.ammo,8);assert.equal(range.reloadTime,0);
+range.seconds=18;for(const t of range.targets)t.cooldown=.01;range.update(.02);range.update(.18);
+const boss=range.targets.find(t=>t.kind===3);assert.equal(boss.health,3);
+for(let i=0;i<3;i++){const direction=boss.mesh.position.clone().sub(origin).normalize();assert(range.fire(origin,direction));if(i<2){assert.equal(range.cleared,0);range.update(.17);}}
+assert.equal(range.cleared,1);assert(boss.cooldown>0);
+range.update(3.4);assert(range.missed>0,'expired targets count as escapes');range.dispose();
 // Even a full steering slam while boosting cannot spin the cart in a fraction of a second.
 for(const speed of [8,14,22]){const motor=new CartMotor();motor.speed=speed;motor.maxForwardSpeed=speed;for(let i=0;i<60;i++)motor.step(1,1,false,1/60);assert(motor.heading<1.4);for(let i=0;i<30;i++)motor.step(1,0,false,1/60);assert(Math.abs(motor.steer)<.002,'steering recenters quickly');for(let i=0;i<90;i++)motor.step(0,0,true,1/60);assert.equal(motor.speed,0,'braking is reliable at boost speed');}
 game.dispose();console.log('PASS: clear sky corridor, 12 perfect gates at 30/60/120 fps, missed-gate recovery, fixed rings, background pause, portrait/landscape direct tap hits, combos/restart/results, capped cart steering and braking.');

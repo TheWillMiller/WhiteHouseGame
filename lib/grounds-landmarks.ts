@@ -55,6 +55,8 @@ export function buildGroundsLandmarks(parent:T.Group,solids:Solid[]):GroundsLand
  const flagGeo=new T.PlaneGeometry(7.62,4.01,28,16),positions=flagGeo.getAttribute('position'),rest=Float32Array.from(positions.array);
  const flag=mesh(pole,flagGeo,new T.MeshStandardMaterial({map:flagTexture,roughness:.92,side:T.DoubleSide}),3.85,h-2.28,0);flag.userData.dynamic=true;
 
+ const northPole=pole.clone(true);northPole.name='North Lawn 88-foot flagpole';northPole.position.set(-18,0,-76);parent.add(northPole);solids.push({x:-18,z:-76,w:.55,d:.55,height:h});
+
  // Follow the relocated canopy row, beside the west fence and perimeter walk.
  box(parent,PRESS_TENTS[0][0]+3.5,.028,-52,2.5,.05,25,stone);
  for(const [index,[x,z]]of PRESS_TENTS.entries()){

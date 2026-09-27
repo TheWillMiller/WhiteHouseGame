@@ -15,7 +15,7 @@ export const destinations:Destination[]=[
   {id:'rose',name:'Rose Garden',zone:'grounds',x:GARDENS[0].x,z:GARDENS[0].z,description:'Between the residence and West Wing, south of the press-room connection'},
   {id:'kennedy',name:'Jacqueline Kennedy Garden',short:'East Garden',zone:'grounds',x:GARDENS[1].x,z:GARDENS[1].z,description:'The garden east of the residence'},
   {id:'ballroom',name:'Ballroom construction',short:'Ballroom',zone:'grounds',x:77,z:66,description:'Steelwork, a crane and the construction crew'},
-  {id:'pool',name:'Pool & putting green',short:'Pool',zone:'grounds',x:-61,z:50,description:'A quiet corner of the grounds'},
+  {id:'pool',name:'Pool & putting green',short:'Pool',zone:'grounds',x:-81,z:36,description:'The outdoor pool south of the West Wing; putting green toward the lawn'},
   {id:'south-gate',name:'South grounds',zone:'grounds',x:0,z:113,description:'Walk the full southern perimeter'},
   {id:'east-path',name:'East grounds',zone:'grounds',x:109,z:69,description:'Tree-lined perimeter paths'},
   {id:'west-path',name:'West grounds',zone:'grounds',x:-89,z:-60,description:'The west side of the estate'},
@@ -66,6 +66,9 @@ export const npcs:NPC[]=[
 export const sources=[
  {title:'Helipad seal and grounds-detail credits',url:'textures/helipad-credits.txt'},
  {title:'White House Historical Association: outdoor press positions',url:'https://www.whitehousehistory.org/galleries/beyond-the-press-room'},
+ {title:'Official helipad photographs · September 21, 2026',url:'https://www.whitehouse.gov/gallery/president-donald-j-trump-participates-in-a-ribbon-cutting-ceremony-of-the-new-white-house-helipad/'},
+ {title:'Official Rose Garden photographs · September 17, 2026',url:'https://www.whitehouse.gov/gallery/president-donald-j-trump-hosts-a-rose-garden-dinner-for-americas-hunters-and-fishermen-while-announcing-new-executive-orders-september-17-2026/'},
+ {title:'NCPC · 2026 estate plan and ballroom elevations',url:'https://www.ncpc.gov/docs/actions/2026April/8733_East_Wing_Modernization_Project_Staff_Report_Apr2026.pdf'},
  {title:'White House: South Lawn flagpole photo reference',url:'https://www.whitehouse.gov/gallery/president-trump-raises-new-american-flag-on-south-lawn-of-the-white-house/'},
  {title:'Helipad scale and white-stone approach: published reporting',url:'https://www.washingtonpost.com/politics/2026/07/06/trump-speeds-up-white-house-helipad-driveway-changes-xi-visit-looms/'},
  {title:'White House Historical Association: published residence dimensions',url:'https://www.whitehousehistory.org/press-room/press-backgrounders/white-house-dimensions'},

@@ -130,3 +130,36 @@ export function gardenApproaches(g:T.Group){
  ribbon(WEST_APPROACH,6.2,0x777e77,.073);
  for(const points of WEST_WALKS)ribbon(points,2.1,0xcac8b0,.078);
 }
+
+/** Traced relationships from NCPC 8733, p.30; adjusted for the game's estate bounds. */
+export function estateDrives(g:T.Group){
+ const routes=[{closed:true,points:[[0,7],[25,13],[43,31],[49,57],[59,79],[56,99],[29,110],[-12,109],[-47,99],[-59,79],[-57,51],[-43,23],[-20,10]]},
+ {closed:false,points:[[-119,109],[-91,109],[-71,92],[-59,64]]},
+ {closed:false,points:[[58,79],[78,107],[109,109]]}];
+ for(const route of routes){const curve=new T.CatmullRomCurve3(route.points.map(([x,z])=>new T.Vector3(x,0,z)),route.closed,'centripetal');
+  for(const [width,y,color]of [[6.9,.026,0xb8b6a9],[6.4,.031,0x636963]]){
+   const v:number[]=[],uv:number[]=[];for(let i=0;i<160;i++)for(const [u,side]of [[i/160,-1],[i/160,1],[(i+1)/160,-1],[i/160,1],[(i+1)/160,1],[(i+1)/160,-1]]){const p=curve.getPoint(u),t=curve.getTangent(u),n=new T.Vector3(-t.z,0,t.x).normalize();v.push(p.x+n.x*width/2*side,y,p.z+n.z*width/2*side);uv.push(side,u*60);}
+   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(v,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeVertexNormals();const m=new T.Mesh(geo,material(color));m.name='South Drive and branches';m.receiveShadow=true;g.add(m);
+  }
+ }
+}
+
+/** September 2026 official Rose Garden photos: white lattice chairs and striped parasols. */
+export function roseDining(g:T.Group,solids:{x:number;z:number;w:number;d:number;height?:number}[]){
+ const white=material(0xe9e6d8),gold=material(0xd6ad4c),cloth=material(0xf2e6ba);
+ const canopyWhite=white.clone(),canopyGold=gold.clone();canopyWhite.side=canopyGold.side=T.DoubleSide;
+ const part=(p:T.Group,geo:T.BufferGeometry,m:T.Material,x:number,y:number,z:number)=>{const o=new T.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;p.add(o);return o;};
+ const box=(p:T.Group,x:number,y:number,z:number,w:number,h:number,d:number)=>part(p,new T.BoxGeometry(w,h,d),white,x,y,z);
+ for(const x of [-50.5,-38])for(const z of [-9.6,-2.3]){
+  const table=new T.Group();table.name='Rose Garden striped-parasol dining setting';table.position.set(x,0,z);g.add(table);
+  part(table,new T.CylinderGeometry(.82,.82,.08,32),cloth,0,.87,0);part(table,new T.CylinderGeometry(.07,.12,.7,8),white,0,.48,0);
+  part(table,new T.CylinderGeometry(.025,.03,2.7,8),white,0,1.47,0);
+  for(let i=0;i<16;i++){const a=i*Math.PI/8,b=(i+1)*Math.PI/8,geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute([0,3.05,0,Math.cos(a)*2.1,2.63,Math.sin(a)*2.1,Math.cos(b)*2.1,2.63,Math.sin(b)*2.1],3));geo.computeVertexNormals();part(table,geo,i%2?canopyWhite:canopyGold,0,0,0);}
+  solids.push({x,z,w:1.65,d:1.65,height:.92});
+  for(let i=0;i<4;i++){const a=i*Math.PI/2,c=new T.Group();c.position.set(Math.sin(a)*1.4,0,Math.cos(a)*1.4);c.rotation.y=a;table.add(c);box(c,0,.54,0,.52,.08,.52);box(c,0,1.05,.26,.56,.055,.055);
+   for(const side of [-1,1]){box(c,side*.25,.80,.26,.035,.55,.035);for(const dz of [-.22,.22])box(c,side*.23,.30,dz,.035,.5,.035);}
+   for(const dx of [-.15,0,.15])for(const sign of [-1,1]){const l=box(c,dx,.81,.265,.025,.45,.025);l.rotation.z=sign*.65;}
+   solids.push({x:x+Math.sin(a)*1.4,z:z+Math.cos(a)*1.4,w:.58,d:.58,height:1.1});
+  }
+ }
+}

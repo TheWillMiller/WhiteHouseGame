@@ -3,7 +3,10 @@ import * as T from 'three';
 const ctx=new Proxy({},{get:()=>()=>{},set:()=>true});globalThis.document={createElement:()=>({getContext:()=>ctx})};
 const {grounds,interior}=await import('../.qa/game.mjs');
 const {GARDENS,GARDEN_EXIT,GARDEN_ENTRANCE}=await import('../.qa/grounds-layout.mjs');
-const {gardenApproaches}=await import('../.qa/landscape.mjs');
+const {gardenApproaches,estateDrives}=await import('../.qa/landscape.mjs');
+const drives=new T.Group();estateDrives(drives);drives.updateMatrixWorld(true);
+for(const m of drives.children){const n=m.geometry.attributes.normal;for(let i=0;i<n.count;i++)assert(n.getY(i)>.95,'drive surfaces face upward and render from above');}
+assert(new T.Raycaster(new T.Vector3(0,10,7),new T.Vector3(0,-1,0)).intersectObject(drives,true).length>0,'front approach has visible roadway');
 const {destinations,npcs}=await import('../.qa/world-data.mjs');
 const world=grounds(),garden=GARDENS[0];
 assert(garden.x-garden.w/2>-62.5,'garden east of West Wing wall');
