@@ -21,7 +21,7 @@ export function furniturePiece(parent:T.Group,solids:Solid[],name:string,x:numbe
  else if(name==='President chair'){asset='executive-chair-brown';width=.80;height=1.20;depth=.80;}
  else if(/Armchair|fireplace armchair|guest chair/.test(name)||name==='State room seating'){asset='ArmChair_01';height=1.05;width=Math.max(.62,localWidth);depth=Math.max(.65,localDepth);}
  else if(name==='Office desk'){asset='antique-desk';height=.76;}
- else if(name==='Resolute desk'){asset='antique-desk';width=1.8288;height=.8255;depth=1.2192;}
+ else if(name==='Resolute desk'){asset='resolute-desk';width=1.8288;height=.8255;depth=1.2192;}
  else if(/coffee table/i.test(name)){asset='gothic_coffee_table';height=.46;}
  else if(/side table/i.test(name)){asset='ClassicNightstand_01';height=.75;}
  else if(/round table/i.test(name)){asset='round_wooden_table_01';height=.76;}

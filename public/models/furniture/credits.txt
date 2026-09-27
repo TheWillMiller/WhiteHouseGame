@@ -4,6 +4,13 @@ Period-style game furnishings and adapted models, not authenticated replicas of 
 
 CC0 assets: https://creativecommons.org/publicdomain/zero/1.0/
 
+resolute-desk.glb - Resolute Desk
+Creator: Stefan Ciupu
+License: 3D Warehouse General Model License; incorporated as part of the White House game, not offered as a standalone model library.
+https://3dwarehouse.sketchup.com/model/u6c5ae29d-9839-47ab-b8c1-671e94e86ae0/Resolute-Desk
+https://3dwarehouse.sketchup.com/tos/#license
+Changes: Rescaled to 72 x 48 x 32.5 inches, reoriented with the eagle panel facing visitors, optimized for real-time rendering. Original carved geometry retained; dark leather desktop finish adapted for the game. This is an artist's model, not a scan of the White House desk.
+
 antique-desk.glb - Carved walnut pedestal desk
 Creators: Kirill Sannikov, Ulan Cabanilla
 License: CC0-1.0 https://polyhaven.com/license

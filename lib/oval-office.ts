@@ -182,11 +182,8 @@ function resoluteDesk(g: T.Group, solids: Solid[]) {
   for (const side of [-1, 1]) { box(g, side * 1.66, .62, z, 1.0, 1.08, 1.48, C.walnut); for (const dx of [-.39, .39]) { cyl(g, side * 1.66 + dx, .64, z - .79, .065, .90, C.mahogany); for (const y of [.20, 1.07]) box(g, side * 1.66 + dx, y, z - .80, .17, .09, .15, C.mahogany); } }
   deskDetails(g, 0, z, 4.55, 1.67, true); solids.push({ x: 0, z, w: 4.65, d: 1.75, height:1.325 });
   });desktopObjects(g,0,.9355,z,1.8288,1.2192,true);
-  // Keep the Resolute's distinctive public-facing center panel on the detailed
-  // carved desk adaptation; the sitter's knee space remains open behind it.
-  const panel=new T.Group();deskDetails(panel,0,0,4.55,1.67,true);
-  for(const child of panel.children.slice())if(child.position.y>1.2)panel.remove(child);
-  panel.position.set(0,.11,z);panel.scale.set(1.8288/4.65,.8255/1.325,1.2192/1.75);g.add(panel);
+  // The imported Resolute model includes its carved eagle panel. Keep the
+  // desktop props separate so they survive replacement of the fallback mesh.
 }
 function fireplace(g: T.Group, solids: Solid[]) {
   const p = anchor(g, Math.PI * 1.5, .18); p.name = 'North centered fireplace';

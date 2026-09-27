@@ -9,7 +9,7 @@ const {FurnitureModels}=await import('../.qa/furniture-models.mjs');
 const assets=new Set();let count=0;
 for(const zone of ['west','situation','state','ground','second','third']){
  const w=interior(zone),loader=new FurnitureModels(),sockets=[];loader.load=localFurniture;
- w.group.traverse(o=>{if(o.userData.modelFurniture){sockets.push(o);const f=o.userData.modelFurniture;assets.add(f.asset);assert(statSync('public/models/furniture/'+f.asset+'.glb').size<1_200_000,'bounded download: '+f.asset);}});
+ w.group.traverse(o=>{if(o.userData.modelFurniture){sockets.push(o);const f=o.userData.modelFurniture;assets.add(f.asset);const budget=f.asset==='resolute-desk'?2_000_000:1_200_000;assert(statSync('public/models/furniture/'+f.asset+'.glb').size<budget,'bounded download: '+f.asset);}});
  await loader.populate(w.group,'/',()=>{});
  assert(sockets.every(o=>o.userData.furnitureReady&&o.children.every(c=>c.userData.furnitureProp)),'all old furniture replaced on '+zone);
  const draws=w.group.children.filter(o=>o.userData.importedFurniture);

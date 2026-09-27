@@ -2,6 +2,21 @@
   "note": "Period-style game furnishings and adapted models, not authenticated replicas of specific White House artifacts. Gallery location and scale use public photographic references, not survey measurements.",
   "assets": [
     {
+      "file": "resolute-desk.glb",
+      "name": "Resolute Desk",
+      "license": "3D Warehouse General Model License",
+      "licenseUrl": "https://3dwarehouse.sketchup.com/tos/#license",
+      "authors": {
+        "Stefan Ciupu": "Original model"
+      },
+      "sources": [
+        "https://3dwarehouse.sketchup.com/model/u6c5ae29d-9839-47ab-b8c1-671e94e86ae0/Resolute-Desk"
+      ],
+      "bytes": 1972240,
+      "triangles": 105143,
+      "changes": "Reoriented with the carved eagle face toward visitors; fitted to 72 x 48 x 32.5 inches. Original carved geometry retained with conservative simplification; non-rendered SketchUp edges removed, meshopt compressed and textures encoded as WebP. Leather inset changed to dark oxblood brown. Used as part of the White House game under the 3D Warehouse General Model License; not a scanned replica or standalone model library."
+    },
+    {
       "file": "antique-desk.glb",
       "name": "Carved walnut pedestal desk",
       "license": "CC0-1.0",
