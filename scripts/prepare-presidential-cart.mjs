@@ -2,20 +2,15 @@
 // Usage: node scripts/prepare-presidential-cart.mjs path/to/original.glb
 import {NodeIO} from '@gltf-transform/core';
 import {ALL_EXTENSIONS} from '@gltf-transform/extensions';
-import {weld,compactPrimitive,prune,textureCompress,meshopt,getBounds} from '@gltf-transform/functions';
-import {MeshoptSimplifier,MeshoptEncoder} from 'meshoptimizer';
+import {compactPrimitive,prune,textureCompress,meshopt,getBounds} from '@gltf-transform/functions';
+import {MeshoptEncoder} from 'meshoptimizer';
 import sharp from 'sharp';
-await Promise.all([MeshoptSimplifier.ready,MeshoptEncoder.ready]);
+await MeshoptEncoder.ready;
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.encoder':MeshoptEncoder});
-const doc=await io.read(process.argv[2]||'../assets/golf-cart/Meshy_AI_Golden_Presidential_G_0927005603_texture.glb');
-await doc.transform(weld());
+const doc=await io.read(process.argv[2]||'../assets/golf-cart/Meshy_AI_Golden_Presidential_G_0927012820_texture.glb');
 const root=doc.getRoot(),scene=root.listScenes()[0],source=root.listMeshes()[0].listPrimitives()[0];
-if(!process.argv.includes('--reduced')){
- const pos=source.getAttribute('POSITION').getArray(),uv=source.getAttribute('TEXCOORD_0').getArray(),norm=source.getAttribute('NORMAL').getArray(),attributes=new Float32Array(pos.length/3*5);
- for(let i=0;i<pos.length/3;i++)attributes.set([norm[i*3],norm[i*3+1],norm[i*3+2],uv[i*2],uv[i*2+1]],i*5);
- const [indices,error]=MeshoptSimplifier.simplifyWithAttributes(new Uint32Array(source.getIndices().getArray()),pos,3,attributes,5,[.1,.1,.1,.3,.3],null,90000,.02,['Permissive']);
- source.setIndices(doc.createAccessor().setType('SCALAR').setArray(indices));compactPrimitive(source);console.log('Simplified triangles',indices.length/3,'error',error);
-}
+// The replacement was retopologized and baked in Meshy. Preserve EVERY supplied
+// triangle and its UVs: another simplification would damage the baked mapping.
 const pos=source.getAttribute('POSITION').getArray(),indices=source.getIndices().getArray(),scale=1.55,ground=-getBounds(scene).min[1];
 // Meshy supplies a single fused object. Detach the four tyres/hubs at the axle,
 // keeping the fenders and chassis static; coordinates are in the source space.
@@ -35,6 +30,6 @@ for(let i=0;i<5;i++){
  if(i){const [x,y,z]=centers[i-1],center=[-z*scale,(y+ground)*scale,x*scale],a=primitive.getAttribute('POSITION'),v=a.getArray();for(let j=0;j<v.length;j+=3)for(let k=0;k<3;k++)v[j+k]-=center[k];const pivot=doc.createNode(name).setTranslation(center);node.setName('tyre-'+name.slice(6));scene.removeChild(node);pivot.addChild(node);scene.addChild(pivot);primitive.setMaterial(wheelMaterial);}
  console.log(name,parts[i].length/3,'triangles');
 }
-scene.setName('Golden Presidential Golf Cart');scene.setExtras({source:'User-provided Meshy_AI_Golden_Presidential_G_0927005603_texture.glb',driverSeat:[-.30,.90,.36],wheelRadius:.275});
-await doc.transform(prune(),textureCompress({encoder:sharp,targetFormat:'webp',resize:[2048,2048],quality:85}),meshopt({encoder:MeshoptEncoder,level:'high'}));
-await io.write('public/models/presidential-golf-cart-v1.glb',doc);console.log('Prepared cart',getBounds(scene));
+scene.setName('Golden Presidential Golf Cart');scene.setExtras({source:'User-provided Meshy_AI_Golden_Presidential_G_0927012820_texture.glb',driverSeat:[-.30,.90,.36],wheelRadius:.275});
+await doc.transform(prune(),textureCompress({encoder:sharp,targetFormat:'webp',resize:[2048,2048],quality:95}),meshopt({encoder:MeshoptEncoder,level:'high'}));
+await io.write('public/models/presidential-golf-cart-v2.glb',doc);console.log('Prepared cart',getBounds(scene));

@@ -32,4 +32,4 @@ export class GolfCart {
   dispose(){this.object.parent?.remove(this.object);disposeResidence(this.object);this.reflection?.dispose();}
 }
 export function cartDriverSeat(object:T.Group):[number,number,number]{return object.userData.driverSeat??[-.27,.78,.12];}
-export async function loadGolfCart(pathname:string,renderer:T.WebGLRenderer){const base=pathname==='/trumpgame'||pathname.startsWith('/trumpgame/')?'/trumpgame/':'/';const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(base+'models/presidential-golf-cart-v1.glb');return new GolfCart(gltf.scene,renderer);}
+export async function loadGolfCart(pathname:string,renderer:T.WebGLRenderer){const base=pathname==='/trumpgame'||pathname.startsWith('/trumpgame/')?'/trumpgame/':'/';const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(base+'models/presidential-golf-cart-v2.glb');return new GolfCart(gltf.scene,renderer);}

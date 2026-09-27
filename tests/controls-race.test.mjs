@@ -25,7 +25,7 @@ game.startArcade('flight');game.moveStick(0,1);for(let i=0;i<4500&&!game.arcade.
 game.startArcade('off');
 // Use shipped GLBs and independent Rocketbox skeletons for all three drivers.
 await MeshoptDecoder.ready;const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);loader.register(()=>({name:'EXT_texture_webp',loadTexture:()=>Promise.resolve(new T.Texture())}));const parsed=new Map();async function load(path){const bytes=readFileSync(path);return loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');}
-const cart=await load('public/models/presidential-golf-cart-v1.glb');game.cart=new GolfCart(cart.scene);game.world.group.add(game.cart.object);
+const cart=await load('public/models/presidential-golf-cart-v2.glb');game.cart=new GolfCart(cart.scene);game.world.group.add(game.cart.object);
 for(const file of ['business_male_03','business_male_04','business_male_07'])parsed.set(file,await load('public/models/staff/'+file+'-v1.glb'));
 const original=GLTFLoader.prototype.loadAsync;GLTFLoader.prototype.loadAsync=async url=>{const found=[...parsed].find(([key])=>url.includes(key));assert(found,'only expected cabinet assets load');return found[1];};
 game.startArcade('race');await game.raceLoad;await Promise.resolve();assert(game.race&&game.cart.driving);assert.equal(game.race.rivals.length,3);assert.deepEqual(game.race.rivals.map(r=>r.name),RACERS.map(r=>r.name));
