@@ -14,6 +14,7 @@ globalThis.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setA
 const {Game}=await import('../.qa/game.mjs'),{GolfCart}=await import('../.qa/golf-cart.mjs'),{CartMotor,LocomotionMotor}=await import('../.qa/locomotion.mjs');
 const bytes=readFileSync('public/models/presidential-golf-cart-v1.glb'),gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).register(()=>({name:'EXT_texture_webp',loadTexture:()=>Promise.resolve(new T.Texture())})).parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
 assert.equal(['fl','fr','rl','rr'].filter(id=>gltf.scene.getObjectByName('wheel-'+id)).length,4,'four preserved wheel pivots');
+for(const id of ['fl','fr','rl','rr']){const pivot=gltf.scene.getObjectByName('wheel-'+id);assert.deepEqual(pivot.scale.toArray(),[1,1,1],'mesh compression must not move or scale the axle pivot');assert.equal(pivot.children.length,1);assert(Math.abs(pivot.position.y-.2742)<.001,'axle height is preserved');}
 let draws=0,triangles=0;gltf.scene.traverse(o=>{if(o.isMesh){draws++;triangles+=o.geometry.index.count/3;}});assert(draws<=24,'cart geometry batches within the mobile draw-call budget');assert(triangles<=30000);assert(draws<=5);assert(bytes.length<3_000_000,'mobile download budget');
 const game=new Game({appendChild(){},clientWidth:1280,clientHeight:800},()=>{},()=>{},()=>{});let now=1000;const frame=(n=1)=>{for(let i=0;i<n;i++)game.loop(now+=1000/60);};frame();
 // Walking, jumping and looking can all remain active in the same frame.

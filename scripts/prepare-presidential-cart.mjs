@@ -32,7 +32,7 @@ for(const child of [...scene.listChildren()])scene.removeChild(child);
 for(let i=0;i<5;i++){
  const primitive=source.clone().setIndices(doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(parts[i])));compactPrimitive(primitive);
  const name=i===0?'Presidential gold body':`wheel-${i<3?'f':'r'}${centers[i-1][2]>0?'l':'r'}`,node=doc.createNode(name),mesh=doc.createMesh(name).addPrimitive(primitive);node.setMesh(mesh);scene.addChild(node);
- if(i){const [x,y,z]=centers[i-1],center=[-z*scale,(y+ground)*scale,x*scale],a=primitive.getAttribute('POSITION'),v=a.getArray();for(let j=0;j<v.length;j+=3)for(let k=0;k<3;k++)v[j+k]-=center[k];node.setTranslation(center);primitive.setMaterial(wheelMaterial);}
+ if(i){const [x,y,z]=centers[i-1],center=[-z*scale,(y+ground)*scale,x*scale],a=primitive.getAttribute('POSITION'),v=a.getArray();for(let j=0;j<v.length;j+=3)for(let k=0;k<3;k++)v[j+k]-=center[k];const pivot=doc.createNode(name).setTranslation(center);node.setName('tyre-'+name.slice(6));scene.removeChild(node);pivot.addChild(node);scene.addChild(pivot);primitive.setMaterial(wheelMaterial);}
  console.log(name,parts[i].length/3,'triangles');
 }
 scene.setName('Golden Presidential Golf Cart');scene.setExtras({source:'User-provided Meshy_AI_Golden_Presidential_G_0927005603_texture.glb',driverSeat:[-.30,.90,.36],wheelRadius:.275});
