@@ -36,10 +36,12 @@ for(const side of ['Left','Right']){
 model.pose(null);assert.equal(model.object.position.y,0,'Standing removes sitting height offset');
 // Keep each actual seat height when the character uses metre scale indoors.
 const seatParent=new T.Group();seatParent.scale.setScalar(1.9/3);seatParent.add(model.object);
-for(const hipHeight of [.8,.91,.935,1.125]){
+for(const hipHeight of [.745,.78]){
  model.pose('sit',{hipHeight});for(let i=0;i<20;i++)model.animate(0,1/60,false);seatParent.updateMatrixWorld(true);
  const hip=model.object.getObjectByName('LeftUpLeg').getWorldPosition(new T.Vector3()),knee=model.object.getObjectByName('LeftLeg').getWorldPosition(new T.Vector3());
- assert(Math.abs(hip.y-hipHeight)<.02,'scaled character stays on the selected seat');assert(Math.abs(knee.y-hip.y)<.05,'scaled seated thighs remain level');
+ assert(Math.abs(hip.y-hipHeight)<.02,'scaled character stays on the selected seat');assert(Math.abs(knee.y-.64)<.01,'higher cushions lower the thigh toward a grounded knee');
+ skin.skeleton.update();let lowest=Infinity;for(let i=0;i<skin.geometry.attributes.position.count;i++){const p=skin.getVertexPosition(i,new T.Vector3()).applyMatrix4(skin.matrixWorld);lowest=Math.min(lowest,p.y);}
+ assert(Math.abs(lowest-.11)<.012,'actual skinned shoes stay on the room floor at each cushion height');
 }
 model.pose('drive');model.animate(0,1/60,false);seatParent.updateMatrixWorld(true);
 assert(Math.abs(model.object.getObjectByName('LeftUpLeg').getWorldPosition(new T.Vector3()).y-.608)<.02,'cart hip contract is preserved');

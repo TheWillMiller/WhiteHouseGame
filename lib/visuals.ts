@@ -128,7 +128,7 @@ export function detailedFlag(g:T.Group,x:number,y:number,z:number,scale=1,presid
   for(let i=0;i<positions.count;i++){const u=(positions.getX(i)+width/2)/width;positions.setXYZ(i,positions.getX(i),positions.getY(i)-u*.22,Math.sin(u*16)*.105*u);}
   geo.computeVertexNormals();const canvas=document.createElement('canvas');canvas.width=520;canvas.height=400;const ctx=canvas.getContext('2d')!;
   ctx.fillStyle=presidential?'#193957':'#f3eddb';ctx.fillRect(0,0,520,400);
-  if(!presidential){for(let i=0;i<13;i+=2){ctx.fillStyle='#ac3437';ctx.fillRect(0,i*400/13,520,400/13);}ctx.fillStyle='#253e61';ctx.fillRect(0,0,215,216);ctx.fillStyle='#f7edce';for(let row=0;row<9;row++)for(let col=0;col<(row%2?5:6);col++){const cx=18+col*35+(row%2?17:0),cy=13+row*23;ctx.beginPath();for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?3:7;k?ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r):ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);}ctx.closePath();ctx.fill();}}
+  if(!presidential){for(let i=0;i<13;i+=2){ctx.fillStyle='#ac3437';ctx.fillRect(0,i*400/13,520,400/13);}ctx.fillStyle='#253e61';ctx.fillRect(0,0,215,216);ctx.fillStyle='#f7edce';for(let row=0;row<9;row++)for(let col=0;col<(row%2?5:6);col++){const cx=18+col*35+(row%2?17:0),cy=13+row*23;ctx.beginPath();for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?3:7;if(k)ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);else ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);}ctx.closePath();ctx.fill();}}
   const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const flagMat=new T.MeshStandardMaterial({map:texture,roughness:.9,side:T.DoubleSide});const flag=new T.Mesh(geo,flagMat);flag.position.set(1,5.02,0);flag.castShadow=true;p.add(flag);
   if(presidential){eagle(p,1,4.92,-.12,.58);for(let i=0;i<20;i++){const a=i*Math.PI/10;star(p,1+Math.cos(a)*.62,4.96+Math.sin(a)*.61,-.12,.034,0xf1df9a);}}
 }
@@ -154,6 +154,14 @@ export function deskDetails(g:T.Group,x:number,z:number,width:number,depth:numbe
   block(g,x+Math.min(.92,width*.29),1.40,z-.14,.38,.14,.26,0x1e2931,.05);const handset=block(g,x+Math.min(.92,width*.29),1.49,z-.13,.45,.08,.11,0x15212a,.035);handset.rotation.y=.15;
   cylinder(g,x-Math.min(.8,width*.29),1.46,z,.08,.27,0x69412d);for(let i=0;i<3;i++)cylinder(g,x-Math.min(.84,width*.3)+i*.035,1.65,z,.012,.25,0xd9b458);
   if(hero){for(const side of [-1,1]){block(g,x+side*1.75,1.53,z+.38,.45,.43,.045,0xd9b458,.015);block(g,x+side*1.75,1.54,z+.35,.35,.32,.016,0x405c6c);} }
+}
+/** Desktop objects use the finished model's real tabletop elevation. */
+export function desktopObjects(g:T.Group,x:number,y:number,z:number,width:number,depth:number,hero=false){
+ block(g,x,y+.008,z,width*.42,.014,depth*.58,0x243b34,.004);
+ for(const side of [-1,1]){const paper=block(g,x+side*.15,y+.026,z-.03,.22,.01,.28,0xf4efdb);paper.rotation.y=side*.07;}
+ const phoneX=x+Math.min(.58,width*.32);block(g,phoneX,y+.065,z,.24,.10,.19,0x202b2b,.023);block(g,phoneX,y+.125,z+.015,.28,.035,.065,0x131c1e,.014);
+ cylinder(g,x-Math.min(.55,width*.3),y+.09,z,.045,.18,0x765837);for(let i=0;i<3;i++)cylinder(g,x-Math.min(.55,width*.3)+(i-1)*.02,y+.2,z,.007,.15,0xc3a75d);
+ if(hero)for(const side of [-1,1]){block(g,x+side*width*.37,y+.16,z-depth*.29,.22,.30,.025,0xb79750,.009);block(g,x+side*width*.37,y+.16,z-depth*.29+.018,.17,.24,.012,0x40565c);}
 }
 export function carpetDetail(g:T.Group,x:number,z:number,rx:number,rz:number,oval=false){
   if(!oval){for(const factor of [.91,.86]){for(const side of [-1,1]){block(g,x,.12,z+side*rz*factor,rx*2*factor,.008,.024,0xc6ba94);block(g,x+side*rx*factor,.12,z,.024,.008,rz*2*factor,0xc6ba94);}}return;}
@@ -189,12 +197,6 @@ export function roomDetails(g:T.Group,d:Destination){
    if(r.style==='press'||r.style==='press-offices'){block(drape,0,2.55,0,1.7,2.7,.08,0x70949c);for(const sx of [-.89,.89])block(drape,sx,2.55,-.08,.1,2.9,.16,0xf5f0df);block(drape,0,2.55,-.1,.07,2.7,.1,0xf5f0df);for(const y of [1.17,2.1,3,3.93])block(drape,0,y,-.1,1.88,.08,.13,0xf5f0df);}else windowDressing(drape,0,0,1.4,false);g.add(drape);
   }
  }
-}
-function fireplace(g:T.Group){
-  block(g,0,.77,0,2.5,1.55,.5,0xf5f0df);block(g,0,.67,-.26,1.57,1.2,.035,0x25312f);
-  for(const side of [-1,1]){block(g,side*1.04,.80,-.35,.35,1.6,.27,0xe0dccb);block(g,side*1.04,.14,-.4,.45,.2,.33,0xf5f0df);}
-  block(g,0,1.62,-.11,2.85,.17,.86,0xf5f0df);block(g,0,2.7,.01,1.9,1.72,.14,0xd9b458);block(g,0,2.7,-.08,1.68,1.5,.025,0x69888b);
-  for(const side of [-1,1]){cylinder(g,side*.95,1.93,-.1,.05,.51,0xd9b458);cylinder(g,side*.95,2.23,-.1,.06,.24,0xf6e8bf);}
 }
 export function groundsDetails(_g:T.Group){
  // Retired the obsolete axial lamps and 52 detached curb blocks. Ground paths

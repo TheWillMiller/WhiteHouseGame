@@ -1,6 +1,8 @@
 // Run after world.test.cjs: actual room geometry, capsule routes and camera obstruction.
 import assert from 'node:assert/strict';
 import * as T from 'three';
+import {localFurniture} from './load-furniture.mjs';
+const {FurnitureModels}=await import('../.qa/furniture-models.mjs');
 globalThis.DOMRect??=class DOMRect{};
 const ctx=new Proxy({},{get:()=>()=>{},set:()=>true});globalThis.document={createElement:()=>({getContext:()=>ctx})};
 const {interior,Game}=await import('../.qa/game.mjs');
@@ -8,13 +10,13 @@ const {teleportLanding}=await import('../.qa/teleport.mjs');
 const {stateRoomVoid}=await import('../.qa/state-rooms.mjs');
 const {CameraObstacles}=await import('../.qa/render-budget.mjs');
 const {FollowCamera}=await import('../.qa/follow-camera.mjs');
-const w=interior('state');
+const w=interior('state');const furniture=new FurnitureModels();furniture.load=localFurniture;await furniture.populate(w.group,'/',()=>{});
 const {STATE_SALON_X}=await import('../.qa/residence-layout.mjs');
 const named=name=>{const a=[];w.group.traverse(o=>{if(o.name===name)a.push(o);});return a;};
 assert.equal(named('State room chandelier').length,7,'three East Room chandeliers, one per other room');
 assert.equal(named('State room window').length,18,'all five rooms have explicitly positioned window bays');
 assert.equal(named('State room mantel').length,6,'room-specific mantels replace generic salon furniture');
-assert.equal(named('Eagle pier table').length,3,'State Dining has its three eagle pier tables');
+assert.equal(named('Carved pier console').length,3,'State Dining has its three carved pier consoles');
 const blocked=(x,z)=>Game.prototype.blocked.call({zone:'state',world:w},x,z);
 for(let x=11.5;x<=23;x+=.15)assert(!blocked(x,0),'East Room entrance crosses an open floor');
 for(let x=-STATE_SALON_X;x<=STATE_SALON_X;x+=.12)assert(!blocked(x,9),'Red–Blue–Green passage stays clear');
@@ -32,5 +34,5 @@ for(const scale of [.6,.72,.84])for(let i=0;i<96;i++){
 }
 assert(samples>25);obstacles.dispose();camera.dispose();
 let draws=0,triangles=0;w.group.traverse(o=>{if(o.isMesh){draws++;triangles+=(o.geometry.index?.count??o.geometry.attributes.position.count)/3;}});
-assert(draws<120,'room details remain statically batched');assert(triangles<200000,'bounded geometry budget');
+assert(draws<120,'spatial furniture batches and architecture remain bounded');assert(triangles<350000,'bounded detailed-furniture geometry budget');
 console.log(`PASS: State Floor windows, mantels, seven chandeliers, clear East/Blue routes, curved-room teleport exclusion, ${samples} camera angles, ${draws} meshes / ${Math.round(triangles)} triangles. No browser or device FPS claim.`);

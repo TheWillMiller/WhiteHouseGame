@@ -1,0 +1,149 @@
+Furniture model credits
+
+Period-style game furnishings and adapted models, not authenticated replicas of specific White House artifacts. Gallery location and scale use public photographic references, not survey measurements.
+
+CC0 assets: https://creativecommons.org/publicdomain/zero/1.0/
+
+antique-desk.glb - Carved walnut pedestal desk
+Creators: Kirill Sannikov, Ulan Cabanilla
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/ClassicNightstand_01
+https://polyhaven.com/a/round_wooden_table_01
+Changes: Two carved CC0 nightstands form pedestals; inset rounded drawer fronts and brass pulls added on sitter +Z side. Original PBR tabletop remapped to rounded rectangular outline, with original UVs retained. No center modesty panel; full open knee space.
+
+ArmChair_01.glb - Arm Chair 01
+Creators: Kirill Sannikov
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/ArmChair_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+banquet-table.glb - Round Wooden Table 01
+Creators: Ulan Cabanilla
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/round_wooden_table_01
+Changes: Rounded rectangular tabletop adapted from the original round table, with repeated un-stretched turned pedestals. Original PBR texture retained. Meshopt and WebP compression.
+
+banquet_table_12m.glb - Round Wooden Table 01
+Creators: Ulan Cabanilla
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/round_wooden_table_01
+Changes: Rounded rectangular tabletop adapted from the original round table, with repeated un-stretched turned pedestals. Original PBR texture retained. Meshopt and WebP compression.
+
+banquet_table_6m.glb - Round Wooden Table 01
+Creators: Ulan Cabanilla
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/round_wooden_table_01
+Changes: Rounded rectangular tabletop adapted from the original round table, with repeated un-stretched turned pedestals. Original PBR texture retained. Meshopt and WebP compression.
+
+bookcase.glb - Polished walnut library bookcase
+Creators: Ulan Cabanilla, Jenelle van Heerden, Codex
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/wooden_bookshelf_worn
+https://polyhaven.com/a/european_walnut_veneer_05
+Changes: Original shelf mesh resized, simplified, re-UV-mapped and refinished in clean dark walnut. Added molded cornice/plinth, framed stiles/back, leather bound books with curved spines, gilt bands and page edges. New modeled details dedicated to CC0. Not a verified White House bookcase replica.
+
+brass_pan_01.glb - Brass Pan 01
+Creators: Rico Cilliers
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/brass_pan_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+brass_pot_02.glb - Brass Pot 02
+Creators: Rico Cilliers
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/brass_pot_02
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+ClassicConsole_01.glb - Classic Console 01
+Creators: Kirill Sannikov
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/ClassicConsole_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+ClassicNightstand_01.glb - Classic Nightstand 01
+Creators: Kirill Sannikov
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/ClassicNightstand_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+electric_stove.glb - Electric Stove
+Creators: Kuutti Siitonen
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/electric_stove
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+gothic_coffee_table.glb - Gothic Coffee Table
+Creators: Ulan Cabanilla
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/gothic_coffee_table
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+GothicBed_01.glb - Gothic Bed 01
+Creators: Kirill Sannikov
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/GothicBed_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+GothicCabinet_01.glb - Gothic Cabinet 01
+Creators: Kirill Sannikov
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/GothicCabinet_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+grand-piano.glb - Open-lid grand piano
+Creators: Dante
+License: CC0-1.0 https://creativecommons.org/publicdomain/zero/1.0/
+https://www.sweethome3d.com/models/blendswap-cc-0/pianoAQueue.zip
+Changes: Scaled to1.5m wide,2.2m long,1.4m raised-lid height; lower body/legs proportion adjusted to keyboard top.74m. Rotated180 degrees so keyboard faces-Z. Original keyboard, pedals, soundboard and curved body retained.
+
+kitchen-counter.glb - Stainless kitchen counter
+Creators: Codex
+License: CC0-1.0 https://creativecommons.org/publicdomain/zero/1.0/
+Original modeled asset, no external geometry or textures
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+kitchen-island.glb - Stainless kitchen island
+Creators: Codex
+License: CC0-1.0 https://creativecommons.org/publicdomain/zero/1.0/
+Original modeled asset, no external geometry or textures
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+pool-table.glb - Pool Table Nine Foot
+Creators: 3D Assets
+License: CC0-1.0 https://creativecommons.org/publicdomain/zero/1.0/
+https://3dassets.dev/assets/bowling-alley-and-pool-hall-pool-table-1e7397c5
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP. Rotated to put long axis along Z.
+
+press-chair.glb - Conference Chair
+Creators: 3D Assets
+License: CC0-1.0 https://creativecommons.org/publicdomain/zero/1.0/
+https://3dassets.dev/assets/hotel-and-resort-operations-conference-chair-0ba43359
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+refrigerator.glb - Commercial Refrigerator (mobile adaptation)
+Creators: Eric Chadwick / Darmstadt Graphics Group GmbH, Sean Thomas
+License: CC-BY-4.0 https://creativecommons.org/licenses/by/4.0/
+https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/CommercialRefrigerator/README.md
+Changes: Simplified geometry; glass changed from transmission to alpha blending; door frozen closed and animation removed; compressed textures and meshopt geometry. Base color/emissive limited to 512px; normal/ORM limited to 256px to meet the mobile size budget.
+
+round_wooden_table_01.glb - Round Wooden Table 01
+Creators: Ulan Cabanilla
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/round_wooden_table_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+Sofa_01.glb - Sofa 01
+Creators: Kirill Sannikov
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/Sofa_01
+Changes: Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP.
+
+vintage_grandfather_clock_01.glb - Vintage Grandfather Clock 01
+Creators: James Ray Cock, Yann Kervran
+License: CC0-1.0 https://polyhaven.com/license
+https://polyhaven.com/a/vintage_grandfather_clock_01
+Changes: Source geometry retained; transformed orientation and pivot; compressed textures and meshopt geometry.
+
+Commercial refrigerator attribution: Original Commercial Fridge (c)2025 Sean Thomas; cleanup and textures (c)2025 Eric Chadwick / Darmstadt Graphics Group GmbH. CC BY 4.0. Model simplified; doors frozen closed; transmission changed to alpha glass; geometry/textures compressed.
+https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/CommercialRefrigerator/README.md
+https://creativecommons.org/licenses/by/4.0/

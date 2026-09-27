@@ -1,7 +1,8 @@
 import {furniturePiece} from './furniture-scale';
+import {furnitureModel} from './furniture-models';
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { material, detailedFlag, deskDetails, lamp } from './visuals';
+import { material, detailedFlag, deskDetails, desktopObjects, lamp } from './visuals';
 
 // Coordinates are local to the office. South is +Z; every seat faces local -Z.
 // Keep the floor, shell, openings and collision samples on the same ellipse.
@@ -180,7 +181,12 @@ function resoluteDesk(g: T.Group, solids: Solid[]) {
   box(g, 0, 1.17, z, 4.55, .19, 1.67, C.walnut, .03); box(g, 0, 1.28, z, 4.65, .09, 1.75, C.mahogany, .025);
   for (const side of [-1, 1]) { box(g, side * 1.66, .62, z, 1.0, 1.08, 1.48, C.walnut); for (const dx of [-.39, .39]) { cyl(g, side * 1.66 + dx, .64, z - .79, .065, .90, C.mahogany); for (const y of [.20, 1.07]) box(g, side * 1.66 + dx, y, z - .80, .17, .09, .15, C.mahogany); } }
   deskDetails(g, 0, z, 4.55, 1.67, true); solids.push({ x: 0, z, w: 4.65, d: 1.75, height:1.325 });
-  });
+  });desktopObjects(g,0,.9355,z,1.8288,1.2192,true);
+  // Keep the Resolute's distinctive public-facing center panel on the detailed
+  // carved desk adaptation; the sitter's knee space remains open behind it.
+  const panel=new T.Group();deskDetails(panel,0,0,4.55,1.67,true);
+  for(const child of panel.children.slice())if(child.position.y>1.2)panel.remove(child);
+  panel.position.set(0,.11,z);panel.scale.set(1.8288/4.65,.8255/1.325,1.2192/1.75);g.add(panel);
 }
 function fireplace(g: T.Group, solids: Solid[]) {
   const p = anchor(g, Math.PI * 1.5, .18); p.name = 'North centered fireplace';
@@ -190,7 +196,7 @@ function fireplace(g: T.Group, solids: Solid[]) {
   for (const side of [-1, 1]) { cyl(p, side * .50, .15, -.49, .06, .27, C.gold); orb(p, side * .5, .35, -.49, .12, .12, .09, C.gold); }
   for (let i = 0; i < 5; i++) { cyl(p, -.93 + i * .46, 1.78, -.25, .055, .27, C.gold); cyl(p, -.93 + i * .46, 1.94, -.25, .13, .14, C.gold, .17); }
   portrait(p, 'washington', 1.38, 2.22, 3.04); solids.push({ x: 0, z: -OVAL.rz + .5, w: 3.0, d: .8 });
-  for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.4, 0, -6.5); furniturePiece(g,solids,'Oval side table',side*2.4,-6.5,[.75,.71,.75],()=>{g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut); lamp(table, 0, 1.04, 0); solids.push({ x: side * 2.4, z: -6.5, w: 1.03, d: .82 }); }); }
+  for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.4, 0, -6.5); furniturePiece(g,solids,'Oval side table',side*2.4,-6.5,[.75,.71,.75],()=>{g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut);  solids.push({ x: side * 2.4, z: -6.5, w: 1.03, d: .82 }); }); lamp(g,side*2.4,.86,-6.5); }
 }
 function wallDecor(g: T.Group) {
   portrait(anchor(g, 4.39, .17), 'franklin', .93, 1.14, 3.14);
@@ -200,7 +206,7 @@ function wallDecor(g: T.Group) {
   portrait(anchor(g, .62, .17), 'jackson', 1.0, 1.34, 3.08);
   // Recessed panel doors stay within the tangent wall, with visible hardware.
   for (const a of [.10]) { const p = anchor(g, a, .08); box(p, 0, 1.67, -.005, 1.42, 3.31, .09, C.white); frame(p, 0, 1.69, -.055, 1.50, 3.40, false); for (const y of [.68, 1.73, 2.76]) frame(p, 0, y, -.07, 1.06, .70, false); p.traverse(o => { if (o instanceof T.Mesh) o.material = material(C.white); }); orb(p, .56, 1.47, -.20, .06, .06, .065, C.gold); }
-  const clock = anchor(g, 5.78, .52); clock.name = 'Grandfather clock'; box(clock, 0, 1.53, 0, .80, 3.06, .42, C.walnut, .025); box(clock, 0, 1.38, -.23, .55, 1.76, .035, 0x302d24); box(clock, 0, .15, -.01, .94, .30, .55, C.mahogany); box(clock, 0, 3.03, -.01, 1.01, .16, .59, C.mahogany);
+  const clock = anchor(g, 5.78, .52); clock.name = 'Grandfather clock';clock.position.y=.11;furnitureModel(clock,{asset:'vintage_grandfather_clock_01',width:.67,height:2.35,depth:.46,yaw:clock.rotation.y}); box(clock, 0, 1.53, 0, .80, 3.06, .42, C.walnut, .025); box(clock, 0, 1.38, -.23, .55, 1.76, .035, 0x302d24); box(clock, 0, .15, -.01, .94, .30, .55, C.mahogany); box(clock, 0, 3.03, -.01, 1.01, .16, .59, C.mahogany);
   const face = cyl(clock, 0, 2.54, -.26, .32, .04, 0xf0dfb2); face.rotation.x = Math.PI / 2; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; box(clock, Math.sin(a) * .26, 2.54 + Math.cos(a) * .26, -.29, .025, .04, .015, 0x40382b); } box(clock, 0, 2.63, -.30, .026, .19, .01, 0x302d24); const hand = box(clock, .06, 2.54, -.305, .14, .025, .01, 0x302d24); hand.rotation.z = -.45; cyl(clock, 0, 1.36, -.26, .018, 1.16, C.gold); const pendulum = cyl(clock, 0, .82, -.27, .14, .035, C.gold); pendulum.rotation.x = Math.PI / 2;
 }
 export function buildOvalOffice(parent: T.Group, cx: number, cz: number): Solid[] {

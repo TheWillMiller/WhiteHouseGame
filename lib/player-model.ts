@@ -68,7 +68,14 @@ export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):Play
       }else if(posed==='sit'||posed==='drive'){
         const hip=object.worldToLocal(bones.get('LeftUpLeg')!.getWorldPosition(new T.Vector3()));object.position.y=(poseOptions.hipHeight===undefined?.96:poseOptions.hipHeight/scaleY)-hip.y;
         for(const [i,side] of ['Left','Right'].entries()){
-          aim(side+'UpLeg',new T.Vector3(i===0?.09:-.09,0,1));aim(side+'Leg',new T.Vector3(0,-1,.07));
+          // Preserve leg lengths: slope the thigh down to the seated knee height
+          // rather than raising both feet when a higher cushion lifts the pelvis.
+          const upper=bones.get(side+'UpLeg')!,lower=bones.get(side+'Leg')!;
+          object.updateMatrixWorld(true);
+          const thigh=upper.getWorldPosition(new T.Vector3()).distanceTo(lower.getWorldPosition(new T.Vector3()));
+          const drop=posed==='sit'?T.MathUtils.clamp((poseOptions.hipHeight??.64)-.64,0,thigh*.55):0;
+          const reach=Math.sqrt(thigh*thigh-drop*drop);
+          aim(side+'UpLeg',new T.Vector3((i===0?.09:-.09)*reach,-drop,reach));aim(side+'Leg',new T.Vector3(0,-1,.07));
           const foot=bones.get(side+'Foot')!;object.updateMatrixWorld(true);foot.quaternion.copy(foot.parent!.getWorldQuaternion(new T.Quaternion()).invert().multiply(feet[i]));
           aim(side+'Arm',new T.Vector3(i===0?.12:-.12,-1,posed==='drive'?.9:.14));aim(side+'ForeArm',new T.Vector3(0,posed==='drive'?-.2:-.15,1));
         }

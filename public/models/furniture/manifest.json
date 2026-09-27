@@ -1,0 +1,334 @@
+{
+  "note": "Period-style game furnishings and adapted models, not authenticated replicas of specific White House artifacts. Gallery location and scale use public photographic references, not survey measurements.",
+  "assets": [
+    {
+      "file": "antique-desk.glb",
+      "name": "Carved walnut pedestal desk",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "Original carved cabinet geometry/PBR",
+        "Ulan Cabanilla": "Original tabletop geometry/PBR"
+      },
+      "sources": [
+        "https://polyhaven.com/a/ClassicNightstand_01",
+        "https://polyhaven.com/a/round_wooden_table_01"
+      ],
+      "bytes": 1030700,
+      "changes": "Two carved CC0 nightstands form pedestals; inset rounded drawer fronts and brass pulls added on sitter +Z side. Original PBR tabletop remapped to rounded rectangular outline, with original UVs retained. No center modesty panel; full open knee space."
+    },
+    {
+      "file": "ArmChair_01.glb",
+      "name": "Arm Chair 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/ArmChair_01"
+      ],
+      "bytes": 880636,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "banquet-table.glb",
+      "name": "Round Wooden Table 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/round_wooden_table_01"
+      ],
+      "bytes": 424552,
+      "changes": "Rounded rectangular tabletop adapted from the original round table, with repeated un-stretched turned pedestals. Original PBR texture retained. Meshopt and WebP compression."
+    },
+    {
+      "file": "banquet_table_12m.glb",
+      "name": "Round Wooden Table 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/round_wooden_table_01"
+      ],
+      "bytes": 424816,
+      "changes": "Rounded rectangular tabletop adapted from the original round table, with repeated un-stretched turned pedestals. Original PBR texture retained. Meshopt and WebP compression."
+    },
+    {
+      "file": "banquet_table_6m.glb",
+      "name": "Round Wooden Table 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/round_wooden_table_01"
+      ],
+      "bytes": 424456,
+      "changes": "Rounded rectangular tabletop adapted from the original round table, with repeated un-stretched turned pedestals. Original PBR texture retained. Meshopt and WebP compression."
+    },
+    {
+      "file": "bookcase.glb",
+      "name": "Polished walnut library bookcase",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Ulan Cabanilla": "Original shelf geometry",
+        "Jenelle van Heerden": "Clean walnut PBR material",
+        "Codex": "Cabinet refurbishment, cornice, pilasters, back panel and bound books"
+      },
+      "sources": [
+        "https://polyhaven.com/a/wooden_bookshelf_worn",
+        "https://polyhaven.com/a/european_walnut_veneer_05"
+      ],
+      "bytes": 587884,
+      "changes": "Original shelf mesh resized, simplified, re-UV-mapped and refinished in clean dark walnut. Added molded cornice/plinth, framed stiles/back, leather bound books with curved spines, gilt bands and page edges. New modeled details dedicated to CC0. Not a verified White House bookcase replica."
+    },
+    {
+      "file": "brass_pan_01.glb",
+      "name": "Brass Pan 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Rico Cilliers": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/brass_pan_01"
+      ],
+      "bytes": 573496,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "brass_pot_02.glb",
+      "name": "Brass Pot 02",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Rico Cilliers": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/brass_pot_02"
+      ],
+      "bytes": 501328,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "ClassicConsole_01.glb",
+      "name": "Classic Console 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/ClassicConsole_01"
+      ],
+      "bytes": 857464,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "ClassicNightstand_01.glb",
+      "name": "Classic Nightstand 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/ClassicNightstand_01"
+      ],
+      "bytes": 517824,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "electric_stove.glb",
+      "name": "Electric Stove",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kuutti Siitonen": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/electric_stove"
+      ],
+      "bytes": 692044,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "gothic_coffee_table.glb",
+      "name": "Gothic Coffee Table",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/gothic_coffee_table"
+      ],
+      "bytes": 1005868,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "GothicBed_01.glb",
+      "name": "Gothic Bed 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/GothicBed_01"
+      ],
+      "bytes": 808088,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "GothicCabinet_01.glb",
+      "name": "Gothic Cabinet 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/GothicCabinet_01"
+      ],
+      "bytes": 767840,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "grand-piano.glb",
+      "name": "Open-lid grand piano",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "authors": {
+        "Dante": "Original CC0 model"
+      },
+      "sources": [
+        "https://www.sweethome3d.com/models/blendswap-cc-0/pianoAQueue.zip"
+      ],
+      "bytes": 77752,
+      "changes": "Scaled to1.5m wide,2.2m long,1.4m raised-lid height; lower body/legs proportion adjusted to keyboard top.74m. Rotated180 degrees so keyboard faces-Z. Original keyboard, pedals, soundboard and curved body retained."
+    },
+    {
+      "file": "kitchen-counter.glb",
+      "name": "Stainless kitchen counter",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "authors": {
+        "Codex": "Original cabinet modeling and PBR material setup"
+      },
+      "sources": [
+        "Original modeled asset, no external geometry or textures"
+      ],
+      "bytes": 19020,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "kitchen-island.glb",
+      "name": "Stainless kitchen island",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "authors": {
+        "Codex": "Original cabinet modeling and PBR material setup"
+      },
+      "sources": [
+        "Original modeled asset, no external geometry or textures"
+      ],
+      "bytes": 27716,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "pool-table.glb",
+      "name": "Pool Table Nine Foot",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "authors": {
+        "3D Assets": "AI-assisted/procedural model as disclosed by publisher"
+      },
+      "sources": [
+        "https://3dassets.dev/assets/bowling-alley-and-pool-hall-pool-table-1e7397c5"
+      ],
+      "bytes": 46412,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP. Rotated to put long axis along Z."
+    },
+    {
+      "file": "press-chair.glb",
+      "name": "Conference Chair",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "authors": {
+        "3D Assets": "AI-assisted/procedural model as disclosed by publisher"
+      },
+      "sources": [
+        "https://3dassets.dev/assets/hotel-and-resort-operations-conference-chair-0ba43359"
+      ],
+      "bytes": 22256,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "refrigerator.glb",
+      "name": "Commercial Refrigerator (mobile adaptation)",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "authors": {
+        "Eric Chadwick / Darmstadt Graphics Group GmbH": "Model cleanup, textures (copyright 2025)",
+        "Sean Thomas": "Original Commercial Fridge (copyright 2025)"
+      },
+      "sources": [
+        "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/CommercialRefrigerator/README.md"
+      ],
+      "bytes": 632968,
+      "changes": "Simplified geometry; glass changed from transmission to alpha blending; door frozen closed and animation removed; compressed textures and meshopt geometry. Base color/emissive limited to 512px; normal/ORM limited to 256px to meet the mobile size budget."
+    },
+    {
+      "file": "round_wooden_table_01.glb",
+      "name": "Round Wooden Table 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/round_wooden_table_01"
+      ],
+      "bytes": 452296,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "Sofa_01.glb",
+      "name": "Sofa 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "Kirill Sannikov": "All"
+      },
+      "sources": [
+        "https://polyhaven.com/a/Sofa_01"
+      ],
+      "bytes": 630880,
+      "changes": "Reoriented, resized, meshopt compressed; PBR textures resized and encoded as WebP."
+    },
+    {
+      "file": "vintage_grandfather_clock_01.glb",
+      "name": "Vintage Grandfather Clock 01",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "authors": {
+        "James Ray Cock": "Modeling and texturing",
+        "Yann Kervran": "Source rigging"
+      },
+      "sources": [
+        "https://polyhaven.com/a/vintage_grandfather_clock_01"
+      ],
+      "bytes": 847328,
+      "changes": "Source geometry retained; transformed orientation and pivot; compressed textures and meshopt geometry."
+    }
+  ]
+}

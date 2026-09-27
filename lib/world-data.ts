@@ -8,6 +8,7 @@ export const destinations:Destination[]=[
   ...westDestinations,
   {id:'cross-hall',name:'Cross Hall',zone:'state',x:0,z:0,spawn:[0,0],description:'The east-west passage linking the ceremonial rooms',room:{w:2*(BLUE_ROOM.w/2+7),d:6,color:0xe7e0c8,style:'corridor',doors:{north:[0],south:[-STATE_SALON_X,0,STATE_SALON_X],west:[0],east:[0]}}},
 
+  {id:'colonnade',name:'Presidential Walk of Fame',short:'Portrait gallery',zone:'grounds',x:-43,z:-20.4,spawn:[-43,-20.4],description:'One gallery in the open West Colonnade: Washington at the Residence end, later terms toward the West Wing'},
   {id:'south',name:'South Lawn',zone:'grounds',x:0,z:38,description:'An open lawn and the South Portico'},
   {id:'helipad',name:'South Lawn helipad',short:'Helipad',zone:'grounds',x:HELIPAD.x,z:HELIPAD.z,description:'Granite presidential-seal landing pad and stone approach'},
   {id:'south-flag',name:'South Lawn flagpole',short:'Flagpole',zone:'grounds',x:SOUTH_FLAG.x,z:SOUTH_FLAG.z,spawn:[SOUTH_FLAG.x+3.5,SOUTH_FLAG.z],description:'An 88-foot tapered flagpole with a planted base'},
@@ -81,6 +82,7 @@ export const sources=[
  {title:'Archived official West Wing tour and floor plan',url:'https://obamawhitehouse.archives.gov/node/354641'},
  {title:'Historical hallway photographs: sources and dates',url:'art/west-wing-history-credits.txt'},
  {title:'Colonnade gallery image credits',url:'art/colonnade-credits.txt'},
+ {title:'Furniture models, licenses and adaptations',url:'models/furniture/credits.txt'},
  {title:'Staff characters · Microsoft Rocketbox · MIT license and credits',url:'models/staff/credits.txt'},
  {title:'White House residence · Void · CC BY 4.0 · Model credits',url:'models/credits.txt'},
  {title:'Oval Office artwork · Public-domain paintings and credits',url:'art/credits.txt'},

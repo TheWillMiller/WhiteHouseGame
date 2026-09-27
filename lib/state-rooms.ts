@@ -1,4 +1,5 @@
-import {furniturePiece,SEATED_HIP} from './furniture-scale';
+import {modelAssembly} from './furniture-models';
+import {furniturePiece,SOFA_HIP,SEATED_HIP} from './furniture-scale';
 import {BLUE_ROOM} from './residence-layout';
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -65,7 +66,7 @@ function mantel(w:World,x:number,z:number,yaw:number,dark=false,art?:string,widt
  for(let i=0;i<7;i++)cyl(a,(i-3)*.16,.40,.44,.018,.42,0x525652);box(a,0,.52,.44,1.02,.028,.035,GOLD);
  frame(a,0,2.87,.12,art?1.55:width-.25,2.1,art);footprint(w,x+Math.sin(yaw)*.31,z+Math.cos(yaw)*.31,width+.22,.65,yaw,1.62);
 }
-function cabinet(w:World,x:number,z:number){const a=anchor(w.group,x,z,Math.PI);box(a,0,1.2,0,.91,2.25,.45,WOOD);box(a,0,1.34,.24,.73,1.79,.028,0x36463f);for(const side of [-1,1])box(a,side*.39,1.35,.28,.065,1.9,.09,GOLD);for(let i=0;i<3;i++){box(a,0,.69+i*.53,.28,.80,.045,.13,WOOD);for(const dx of [-.21,.21]){cyl(a,dx,.85+i*.53,.3,.10,.20,WHITE,.055);}}box(a,0,2.39,0,1.06,.12,.58,WOOD);footprint(w,x,z,1.06,.58,0,2.5);}
+function cabinet(w:World,x:number,z:number){modelAssembly(w.group,x,z,{asset:'GothicCabinet_01',width:1.06,height:2.28,depth:.58,yaw:0},()=>{const a=anchor(w.group,x,z,Math.PI);box(a,0,1.2,0,.91,2.25,.45,WOOD);box(a,0,1.34,.24,.73,1.79,.028,0x36463f);for(const side of [-1,1])box(a,side*.39,1.35,.28,.065,1.9,.09,GOLD);for(let i=0;i<3;i++){box(a,0,.69+i*.53,.28,.80,.045,.13,WOOD);for(const dx of [-.21,.21]){cyl(a,dx,.85+i*.53,.3,.10,.20,WHITE,.055);}}box(a,0,2.39,0,1.06,.12,.58,WOOD);});footprint(w,x,z,1.06,.58,0,2.5);}
 
 /** A continuous oval shell, with three genuinely open passages to the hall and salons. */
 export function blueRoomShell(w:World,d:Destination){
@@ -119,17 +120,17 @@ export function furnishStateRoom(w:World,d:Destination){
   chair(w,x-side*2.05,12.1,-side*Math.PI/2,green?0xa76545:0x953a39);
   table(w,x,11.7,.62);bouquet(g,x,.8876,11.7);
   mantel(w,x-side*3.23,5.75,side*Math.PI/2,false,undefined,1.85);
-  w.spots.push({id:'sit-'+d.id,label:'Sit in the '+d.name,kind:'seat',hipHeight:SEATED_HIP,x:x+side*1.3,z:11.8,pose:[x+side*2.55,11.8,side*Math.PI/2]});
+  w.spots.push({id:'sit-'+d.id,label:'Sit in the '+d.name,kind:'seat',hipHeight:SOFA_HIP,x:x+side*1.3,z:11.8,pose:[x+side*2.55,11.8,side*Math.PI/2]});
   return;
  }
  // State Dining: west-wall fireplace and Healy's Lincoln, rather than an office table and flag.
  rug(g,x,z,10.2,12.7,0xc7c6b8);chandelier(g,x,z,1.0);
  mantel(w,x-6.22,7.5,Math.PI/2,false,'lincoln',3.2);
  for(const dz of [3.05,11.95])windowBay(g,x-6.23,dz,Math.PI/2,0xd2bd81,1.65);
- const top=soft(g,x,.81,z,1.85,.10,8.5,WOOD);top.name='State Dining banquet table';
- for(const dz of [-2.9,2.9]){box(g,x,.46,z+dz,1.2,.72,.3,WOOD);box(g,x,.16,z+dz,1.45,.11,.52,WOOD);}footprint(w,x,z,1.85,8.5,0,.86);
+ modelAssembly(g,x,z,{asset:'banquet-table',width:1.85,height:.75,depth:8.5,yaw:0},()=>{const top=soft(g,x,.81,z,1.85,.10,8.5,WOOD);top.name='State Dining banquet table';
+ for(const dz of [-2.9,2.9]){box(g,x,.46,z+dz,1.2,.72,.3,WOOD);box(g,x,.16,z+dz,1.45,.11,.52,WOOD);}});footprint(w,x,z,1.85,8.5,0,.86);
  for(let i=0;i<5;i++)for(const side of [-1,1]){const pz=z-3.3+i*1.65;chair(w,x+side*1.36,pz,side*Math.PI/2,0xb7b19b);cyl(g,x+side*.55,.88,pz,.17,.012,WHITE);cyl(g,x+side*.73,.95,pz-.3,.045,.13,0xc7d2ce);}
  for(const dz of [-2,0,2])bouquet(g,x,.86,z+dz);
  // Three eagle-base pier tables, placed against walls clear of both door approaches.
- for(const [px,pz,yaw]of [[x-4.1,.65,0],[x+3.9,.65,0],[x,14.25,Math.PI]]){const a=anchor(g,px,pz,yaw);box(a,0,1.03,0,1.95,.13,.69,WHITE);cyl(a,0,.5,0,.13,.8,GOLD,.2);for(const s of [-1,1]){const wing=mesh(a,new T.SphereGeometry(1,10,6),GOLD,s*.35,.68,0);wing.scale.set(.44,.11,.12);wing.rotation.z=s*.4;}cyl(a,0,.90,.13,.09,.19,GOLD);box(a,0,.15,0,1.18,.12,.51,WOOD);footprint(w,px,pz,1.95,.69,yaw,1.1);mark(g,'Eagle pier table',px,pz);}
+ for(const [px,pz,yaw]of [[x-4.1,.65,0],[x+3.9,.65,0],[x,14.25,Math.PI]]){modelAssembly(g,px,pz,{asset:'ClassicConsole_01',width:1.95,height:.99,depth:.69,yaw:yaw+Math.PI},()=>{const a=anchor(g,px,pz,yaw);box(a,0,1.03,0,1.95,.13,.69,WHITE);cyl(a,0,.5,0,.13,.8,GOLD,.2);for(const s of [-1,1]){const wing=mesh(a,new T.SphereGeometry(1,10,6),GOLD,s*.35,.68,0);wing.scale.set(.44,.11,.12);wing.rotation.z=s*.4;}cyl(a,0,.90,.13,.09,.19,GOLD);box(a,0,.15,0,1.18,.12,.51,WOOD);});footprint(w,px,pz,1.95,.69,yaw,1.1);mark(g,'Carved pier console',px,pz);}
 }
