@@ -21,7 +21,7 @@ game.change('grounds',0,80);game.moveStick(1,0);frame(20);assert(game.motor.x>3.
 // Teleport validation rejects masonry, water, occupied positions and non-finite input.
 game.change('grounds',0,80);const before=game.player.position.clone();assert(!game.teleportTo('grounds',0,-27));assert(game.player.position.equals(before));assert(!game.teleportTo('grounds',-72,50));assert(!game.teleportTo('grounds',NaN,0));assert(game.teleportTo('grounds',-50,-20.4));assert.equal(game.player.position.y,.17);assert(game.teleportTo('west',-5.5,-18));assert.equal(game.zone,'west');assert.equal(game.velocityY,0);
 const floor=new T.Group(),plane=new T.Mesh(new T.PlaneGeometry(20,20),new T.MeshBasicMaterial({side:T.DoubleSide}));plane.rotation.x=-Math.PI/2;floor.add(plane);const camera=new T.PerspectiveCamera(60,1,.1,100);camera.position.set(0,5,5);camera.lookAt(0,0,0);camera.updateMatrixWorld();assert(teleportRayTarget(camera,new T.Vector2(0,0),floor),'actual floor ray resolves a landing');const wall=new T.Mesh(new T.BoxGeometry(10,8,.3),new T.MeshBasicMaterial());wall.position.set(0,2,2);floor.add(wall);assert.equal(teleportRayTarget(camera,new T.Vector2(0,0),floor),null,'wall cannot teleport through to floor behind it');
-game.startArcade('flight');game.moveStick(0,1);for(let i=0;i<4500&&!game.arcade.finished;i++)frame();assert(game.arcade.finished,`guided flight completes all eight rings: stopped at ${game.arcade.ringIndex}, ${game.player.position.toArray()}`);assert(state.arcade.guided);console.log('Guided course:',game.arcade.seconds.toFixed(1),'seconds');
+game.startArcade('flight');game.moveStick(0,1);for(let i=0;i<4500&&!game.arcade.finished;i++)frame();assert(game.arcade.finished,`guided flight completes the twelve-gate course: stopped at ${game.arcade.ringIndex}, ${game.player.position.toArray()}`);assert(state.arcade.guided);console.log('Guided course:',game.arcade.seconds.toFixed(1),'seconds');
 game.startArcade('off');
 // Use shipped GLBs and independent Rocketbox skeletons for all three drivers.
 await MeshoptDecoder.ready;const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);loader.register(()=>({name:'OFFLINE_TEXTURE',loadTexture:()=>Promise.resolve(new T.Texture())}));const parsed=new Map();async function load(path){const bytes=readFileSync(path);return loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');}
@@ -53,5 +53,12 @@ for(const item of ['gold','shield','deal']){
 }
 game.race.reset();game.race.countdown=0;game.cart.motor.speed=10;const charge=game.race.boost;game.race.beforeDrive(1,game.cart,true,false);assert(game.race.boost<charge);game.race.beforeDrive(1,game.cart,false,false);assert(game.race.boost>charge-34);
 game.race.airborne=true;game.race.recover(game.cart);assert(!game.race.airborne);assert.equal(game.cart.object.rotation.x,0);
+// Beginner assist negotiates a full lap with no throttle/steering juggling.
+game.race.reset();game.race.countdown=0;game.cart.motor.reset();game.cart.placeOnCourse(racePoint(0),raceHeading(0),0);game.keys.clear();game.moveStick(0,0);
+for(let i=0;i<8000&&game.race.passed<CHECKPOINTS;i++)frame();
+assert(game.race.passed>=CHECKPOINTS,`assist negotiates a complete lap: stopped at ${game.race.passed}`);
+const beforeBrake=game.cart.motor.speed;game.key('Space',true);frame(50);assert.equal(game.cart.motor.speed,0,'brake overrides automatic throttle');game.key('Space',false);
+game.toggleRaceAssist();assert(!game.race.assisted);game.moveStick(.3,0);const oldHeading=game.cart.motor.heading;frame(40);assert(Math.abs(game.cart.motor.heading-oldHeading)>.02,'manual steering remains available');
+console.log('PASS: automatic throttle, beginner course assist, brake override, manual steering option.');
 game.startArcade('off');assert(!game.race.group.visible&&!game.cart.driving);assert.equal(game.player.position.y,0);game.dispose();GLTFLoader.prototype.loadAsync=original;
 console.log('PASS: reverse-view stability, both camera angle wraps, auto-run and air control, valid/invalid teleport and occlusion, complete guided flight, actual cabinet driver poses, countdown/pause/recovery/anti-skip, two driven race laps and cleanup.');

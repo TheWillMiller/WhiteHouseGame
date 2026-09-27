@@ -8,7 +8,7 @@ export class ThirdPersonOrbit {
  reset(_yaw=0){this.lookDelay=0;this.looking=false;}
  manualLook(){this.lookDelay=1.2;}
  movementBasis(_input:string,yaw:number){return yaw;}
- follow(yaw:number,heading:number,moving:boolean,dt:number){this.lookDelay=Math.max(0,this.lookDelay-dt);if(!moving||this.looking||this.lookDelay>0)return yaw;const delta=Math.atan2(Math.sin(heading-yaw),Math.cos(heading-yaw));return yaw+delta*(1-Math.exp(-dt*2.2));}
+ follow(yaw:number,heading:number,moving:boolean,dt:number){this.lookDelay=Math.max(0,this.lookDelay-dt);if(!moving||this.looking||this.lookDelay>0)return yaw;const delta=Math.atan2(Math.sin(heading-yaw),Math.cos(heading-yaw));return yaw+delta*(1-Math.exp(-dt*5));}
 }
 /** Library orbit damping and near-plane collision, with an undelayed player anchor. */
 export class FollowCamera {

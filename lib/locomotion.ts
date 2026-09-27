@@ -26,14 +26,17 @@ export class CartMotor {
   speed=0;steer=0;heading=0;maxForwardSpeed=8;
   reset(){this.speed=0;this.steer=0;}
   step(throttle:number,steering:number,brake:boolean,dt:number){
-    this.steer+=(steering-this.steer)*(1-Math.exp(-dt*9));
+    // A soft center gives thumbs room to correct, with fast release to straight.
+    const input=Math.max(-1,Math.min(1,steering));
+    const shaped=Math.sign(input)*Math.pow(Math.abs(input),1.35);
+    this.steer+=(shaped-this.steer)*(1-Math.exp(-dt*(Math.abs(input)<.05?16:10)));
     const opposite=throttle*this.speed<-.05;
     const target=brake?0:throttle*(throttle<0?3.2:this.maxForwardSpeed);
-    const acceleration=brake?12:opposite?8:throttle===0?2.2:3.8;
+    const acceleration=brake?19:opposite?10:throttle===0?3:5.5;
     this.speed+=Math.sign(target-this.speed)*Math.min(Math.abs(target-this.speed),acceleration*dt);
     // Reduce steering lock at speed; never rotate a stationary vehicle in place.
-    const angle=this.steer*(.58-.20*Math.min(1,Math.abs(this.speed)/8));
-    const turn=this.speed/1.65*Math.tan(angle)*dt;
+    const yawLimit=1.35/(1+Math.max(0,Math.abs(this.speed)-10)*.025);
+    const turn=Math.sign(this.speed)*this.steer*yawLimit*Math.min(1,Math.abs(this.speed)/3)*dt;
     const mid=this.heading+turn*.5;this.heading+=turn;
     return {x:Math.sin(mid)*this.speed*dt,z:-Math.cos(mid)*this.speed*dt};
   }

@@ -12,7 +12,7 @@ export const POWERUPS={
  deal:{name:'Art of the Deal',detail:'Slow nearby rivals for four seconds',color:0xcfa6ff}
 } as const;
 export type Powerup=keyof typeof POWERUPS;
-export type RaceState={countdown:number;seconds:number;lap:number;gates:number;rank:number;finished:boolean;offRoad:boolean;standings:{name:string;progress:number;color:number}[];next:{x:number;z:number};message:string;boost:number;boosting:boolean;item:Powerup|null;effect:string;airborne:boolean;speed:number;length:number;route:string;itemName:string;itemDescription:string};
+export type RaceState={assisted:boolean;turn:number;countdown:number;seconds:number;lap:number;gates:number;rank:number;finished:boolean;offRoad:boolean;standings:{name:string;progress:number;color:number}[];next:{x:number;z:number};message:string;boost:number;boosting:boolean;item:Powerup|null;effect:string;airborne:boolean;speed:number;length:number;route:string;itemName:string;itemDescription:string};
 /** Pose the existing Rocketbox skeleton in the seat, preserving shared assets. */
 export function seatRaceDriver(actor:StaffActor,cart:T.Group){
  const root=actor.object;cart.add(root);root.scale.multiplyScalar(1.9/3);cart.updateMatrixWorld(true);
@@ -30,6 +30,7 @@ export class CartRace {
  private shieldMesh:T.Mesh;private flames:T.Group;private pulse:T.Mesh;
  private padCooldown=0;private vy=0;private lastRamp=false;private itemHeld=false;private effectTime=0;private speed=0;
  private turbo=0;private shield=0;private pulseTime=0;
+ assisted=true;turn=0;
  countdown=3;seconds=0;passed=0;finished=false;rank=4;message='';boost=100;boosting=false;item:Powerup|null=null;airborne=false;
  constructor(template:T.Group,actors:StaffActor[]){
   this.group.name='Cabinet Grand Prix';this.group.userData.mapExclude=true;
@@ -74,6 +75,19 @@ export class CartRace {
  reset(){this.countdown=3;this.seconds=0;this.passed=0;this.finished=false;this.rank=4;this.message='';this.boost=100;this.boosting=false;this.item=null;this.airborne=false;this.vy=0;this.lastRamp=false;this.itemHeld=false;this.turbo=0;this.shield=0;this.padCooldown=0;this.effectTime=0;this.pulseTime=0;this.group.visible=true;this.shieldMesh.visible=false;this.flames.visible=false;this.pulse.visible=false;this.pickups.forEach(p=>{p.cooldown=0;p.object.visible=true;});this.rivals.forEach((r,i)=>{r.angle=(3.5+i*3.5)/COURSE_LENGTH*TAU;r.slow=0;r.cart.motor.reset();r.cart.placeOnCourse(racePoint(r.angle,r.lane),raceHeading(r.angle),0);});this.colorGates();}
  private colorGates(){this.gates.forEach((g,i)=>g.children.forEach(o=>((o as T.Mesh).material as T.MeshBasicMaterial).color.setHex(i===(this.passed+1)%CHECKPOINTS?0x35ffd2:0xb9a46f)));}
  ready(){return this.countdown<=0&&!this.finished;}
+ /** Auto throttle separates steering from speed on touch; assist is optional. */
+ driveInput(cart:GolfCart,steering:number,brake:boolean){
+  const p=cart.object.position,projection=projectCourse(p),look=projection.angle+(7+Math.abs(cart.motor.speed)*.45)/COURSE_LENGTH*TAU;
+  const target=racePoint(look),heading=Math.atan2(target.x-p.x,-(target.z-p.z));
+  const error=Math.atan2(Math.sin(heading-cart.motor.heading),Math.cos(heading-cart.motor.heading));
+  this.turn=Math.atan2(Math.sin(raceHeading(look)-raceHeading(projection.angle)),Math.cos(raceHeading(look)-raceHeading(projection.angle)));
+  const input=T.MathUtils.clamp(steering,-1,1);
+  const assist=this.assisted?T.MathUtils.clamp(error*1.8,-.9,.9)*(1-Math.abs(input)*.65):0;
+  const steer=T.MathUtils.clamp(input*.85+assist,-1,1);
+  // Lift gently in tight bends. Boost remains useful on straights, not a spin button.
+  if(this.assisted&&Math.abs(this.turn)>.35)cart.motor.maxForwardSpeed=Math.min(cart.motor.maxForwardSpeed,12);
+  return {throttle:brake?0:1,steer,brake};
+ }
  private announce(message:string){this.message=message;this.effectTime=3;}
  useItem(cart:GolfCart){if(!this.ready()||!this.item)return false;const item=this.item;this.item=null;if(item==='gold'){this.turbo=4;this.announce('Gold Rush!');}else if(item==='shield'){this.shield=6;this.announce('Executive Shield up');}else{let count=0;for(const r of this.rivals)if(r.cart.object.position.distanceTo(cart.object.position)<22){r.slow=4;count++;}this.pulseTime=.8;this.pulse.position.copy(cart.object.position);this.pulse.position.y+=.4;this.announce(count?'Deal struck · rivals slowed!':'No rivals close enough');}return true;}
  beforeDrive(dt:number,cart:GolfCart,boostHeld:boolean,itemHeld:boolean){
@@ -107,7 +121,7 @@ export class CartRace {
   this.speed=Math.round(Math.abs(cart.motor.speed)*3.6);
  }
  resolveContacts(cart:GolfCart,clear:(x:number,z:number)=>boolean){if(this.airborne||this.shield>0)return;for(const r of this.rivals){const away=cart.object.position.clone().sub(r.cart.object.position);away.y=0;const distance=away.length();if(distance>=2.5)continue;if(distance<.01)away.set(Math.cos(cart.motor.heading),0,Math.sin(cart.motor.heading));else away.divideScalar(distance);const next=cart.object.position.clone().addScaledVector(away,Math.min(.18,2.5-distance));if(clear(next.x,next.z))cart.object.position.copy(next);cart.motor.speed*=.94;}}
- snapshot(p:T.Vector3):RaceState{const theta=projectCourse(p).angle,previous=(this.passed%CHECKPOINTS)*SECTOR,part=T.MathUtils.clamp(((theta-previous+TAU)%TAU)/SECTOR,0,1),progress=this.finished?CHECKPOINTS*RACE_LAPS:this.passed+part;const standings=[{name:'Donald Trump',progress,color:0xe5b84c},...this.rivals.map(r=>({name:r.name,progress:r.angle/SECTOR,color:r.color}))].sort((a,b)=>b.progress-a.progress);if(!this.finished)this.rank=standings.findIndex(s=>s.name==='Donald Trump')+1;const next=racePoint(((this.passed+1)%CHECKPOINTS)*SECTOR);return {countdown:Math.ceil(this.countdown),seconds:this.seconds,lap:Math.min(RACE_LAPS,Math.floor(this.passed/CHECKPOINTS)+1),gates:this.passed,rank:this.rank,finished:this.finished,offRoad:raceDeviation(p)>4.5,standings,next:{x:next.x,z:next.z},message:this.message,boost:Math.round(this.boost),boosting:this.boosting,item:this.item,effect:this.shield>0?'Shield':this.turbo>0?'Boost':'',airborne:this.airborne,speed:this.speed,length:Math.round(COURSE_LENGTH),route:MAP_PATH,itemName:this.item?POWERUPS[this.item].name:"Item",itemDescription:this.item?POWERUPS[this.item].detail:"Collect a gold mystery box"};}
+ snapshot(p:T.Vector3):RaceState{const theta=projectCourse(p).angle,previous=(this.passed%CHECKPOINTS)*SECTOR,part=T.MathUtils.clamp(((theta-previous+TAU)%TAU)/SECTOR,0,1),progress=this.finished?CHECKPOINTS*RACE_LAPS:this.passed+part;const standings=[{name:'Donald Trump',progress,color:0xe5b84c},...this.rivals.map(r=>({name:r.name,progress:r.angle/SECTOR,color:r.color}))].sort((a,b)=>b.progress-a.progress);if(!this.finished)this.rank=standings.findIndex(s=>s.name==='Donald Trump')+1;const next=racePoint(((this.passed+1)%CHECKPOINTS)*SECTOR);return {assisted:this.assisted,turn:this.turn,countdown:Math.ceil(this.countdown),seconds:this.seconds,lap:Math.min(RACE_LAPS,Math.floor(this.passed/CHECKPOINTS)+1),gates:this.passed,rank:this.rank,finished:this.finished,offRoad:raceDeviation(p)>4.5,standings,next:{x:next.x,z:next.z},message:this.message,boost:Math.round(this.boost),boosting:this.boosting,item:this.item,effect:this.shield>0?'Shield':this.turbo>0?'Boost':'',airborne:this.airborne,speed:this.speed,length:Math.round(COURSE_LENGTH),route:MAP_PATH,itemName:this.item?POWERUPS[this.item].name:"Item",itemDescription:this.item?POWERUPS[this.item].detail:"Collect a gold mystery box"};}
  update(dt:number,p:T.Vector3){if(this.finished)return;if(this.countdown>0){this.countdown=Math.max(0,this.countdown-dt);return;}this.seconds+=dt;
   for(const r of this.rivals){if(r.angle>=TAU*RACE_LAPS)continue;r.slow=Math.max(0,r.slow-dt);const toPlayer=p.clone().sub(r.cart.object.position),heading=raceHeading(r.angle),forward=new T.Vector3(Math.sin(heading),0,-Math.cos(heading));if(toPlayer.length()<9&&toPlayer.dot(forward)>0){const side=p.clone().sub(racePoint(r.angle)).dot(new T.Vector3(Math.cos(heading),0,Math.sin(heading)));r.lane=T.MathUtils.damp(r.lane,side>0?-1.25:1.25,2,dt);}
    const pad=BOOST_PADS.some(a=>Math.abs(((r.angle-a)%TAU+TAU)%TAU)<.045),speed=r.speed*(r.slow>0?.45:pad?1.4:1),da=speed*dt/COURSE_LENGTH*TAU,next=racePoint(r.angle+da,r.lane);if(Math.hypot(next.x-p.x,next.z-p.z)<2.2&&p.y<2)continue;r.angle+=da;
