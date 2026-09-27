@@ -68,7 +68,7 @@ export function createAnimatedPlayer(scene:T.Group,clips:T.AnimationClip[]):Play
         for(const [i,side] of ['Left','Right'].entries()){
           aim(side+'UpLeg',new T.Vector3(i===0?.09:-.09,0,1));aim(side+'Leg',new T.Vector3(0,-1,.07));
           const foot=bones.get(side+'Foot')!;object.updateMatrixWorld(true);foot.quaternion.copy(foot.parent!.getWorldQuaternion(new T.Quaternion()).invert().multiply(feet[i]));
-          aim(side+'Arm',new T.Vector3(i===0?.12:-.12,-1,posed==='drive'?.5:.14));aim(side+'ForeArm',new T.Vector3(0,posed==='drive'?.35:-.15,1));
+          aim(side+'Arm',new T.Vector3(i===0?.12:-.12,-1,posed==='drive'?.9:.14));aim(side+'ForeArm',new T.Vector3(0,posed==='drive'?-.2:-.15,1));
         }
       }else{
         aim('RightArm',new T.Vector3(-.2,-1,.18));aim('RightForeArm',new T.Vector3(-.12,.2+Math.sin(poseTime*1.9)*.15,1));

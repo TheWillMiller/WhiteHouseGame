@@ -24,3 +24,9 @@ https://creativecommons.org/licenses/by/3.0/
 Changes: gold body finish, saddle leather, polished trim, metre-scale adaptation,
 wheel pivots, compressed geometry and batched static parts. Driving and seated
 character behavior are game additions. Original download: 2026-09-21.
+
+GOLDEN PRESIDENTIAL GOLF CART
+User-provided Meshy model: Meshy_AI_Golden_Presidential_G_0927005603_texture.glb.
+Received 2026-09-26. Simplified to 29,964 triangles, textures optimized,
+scaled to metres, wheels separated and rigged, driver seat fitted for gameplay.
+Original source retained locally outside the repository.

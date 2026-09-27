@@ -12,9 +12,9 @@ globalThis.ResizeObserver=class{constructor(fn){this.fn=fn;}observe(){this.fn();
 globalThis.requestAnimationFrame=()=>1;globalThis.cancelAnimationFrame=()=>{};
 globalThis.__testRenderer=()=>({domElement:Object.assign(new EventTarget(),{setAttribute(){},focus(){},remove(){},setPointerCapture(){}}),shadowMap:{},setPixelRatio(){},setSize(){},dispose(){},render(scene,camera){scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);}});
 const {Game}=await import('../.qa/game.mjs'),{GolfCart}=await import('../.qa/golf-cart.mjs'),{CartMotor,LocomotionMotor}=await import('../.qa/locomotion.mjs');
-const bytes=readFileSync('public/models/gold-golf-cart.glb'),gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+const bytes=readFileSync('public/models/presidential-golf-cart-v1.glb'),gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).register(()=>({name:'EXT_texture_webp',loadTexture:()=>Promise.resolve(new T.Texture())})).parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
 assert.equal(['fl','fr','rl','rr'].filter(id=>gltf.scene.getObjectByName('wheel-'+id)).length,4,'four preserved wheel pivots');
-let draws=0,triangles=0;gltf.scene.traverse(o=>{if(o.isMesh){draws++;triangles+=o.geometry.index.count/3;}});assert(draws<=24,'cart geometry batches within the mobile draw-call budget');assert(triangles<8000);
+let draws=0,triangles=0;gltf.scene.traverse(o=>{if(o.isMesh){draws++;triangles+=o.geometry.index.count/3;}});assert(draws<=24,'cart geometry batches within the mobile draw-call budget');assert(triangles<=30000);assert(draws<=5);assert(bytes.length<3_000_000,'mobile download budget');
 const game=new Game({appendChild(){},clientWidth:1280,clientHeight:800},()=>{},()=>{},()=>{});let now=1000;const frame=(n=1)=>{for(let i=0;i<n;i++)game.loop(now+=1000/60);};frame();
 // Walking, jumping and looking can all remain active in the same frame.
 game.moveStick(.5,.8);frame(18);const start=game.player.position.clone();game.jump();game.orbit.looking=true;game.orbit.manualLook();game.yaw+=.55;frame(8);

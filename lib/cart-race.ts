@@ -1,5 +1,5 @@
 import * as T from 'three';
-import {GolfCart} from './golf-cart';
+import {GolfCart,cartDriverSeat} from './golf-cart';
 import type {StaffActor} from './npc-model';
 import {racePoint,raceHeading,raceDeviation,courseMap,projectCourse,courseGround,buildTrackSurface,rampAt,COURSE_LENGTH,TAU,CHECKPOINTS,RAMPS,BOOST_PADS,ITEM_BOXES} from './race-course';
 export {racePoint,raceHeading,raceDeviation} from './race-course';
@@ -18,7 +18,7 @@ export function seatRaceDriver(actor:StaffActor,cart:T.Group){
  const root=actor.object;cart.add(root);root.scale.multiplyScalar(1.9/3);cart.updateMatrixWorld(true);
  const aim=(boneName:string,childName:string,dir:T.Vector3)=>{const bone=root.getObjectByName(boneName),child=root.getObjectByName(childName);if(!bone?.parent||!child)return;cart.updateMatrixWorld(true);const a=bone.getWorldPosition(new T.Vector3()),b=child.getWorldPosition(new T.Vector3()),target=dir.applyQuaternion(cart.getWorldQuaternion(new T.Quaternion())).normalize(),delta=new T.Quaternion().setFromUnitVectors(b.sub(a).normalize(),target),world=bone.getWorldQuaternion(new T.Quaternion());bone.quaternion.copy(bone.parent.getWorldQuaternion(new T.Quaternion()).invert().multiply(delta.multiply(world)));};
  for(const side of ['L','R']){aim(`Bip01_${side}_Thigh`,`Bip01_${side}_Calf`,new T.Vector3(0,0,-1));aim(`Bip01_${side}_Calf`,`Bip01_${side}_Foot`,new T.Vector3(0,-1,.03));aim(`Bip01_${side}_UpperArm`,`Bip01_${side}_Forearm`,new T.Vector3(0,-1,-.35));aim(`Bip01_${side}_Forearm`,`Bip01_${side}_Hand`,new T.Vector3(0,.1,-1));}
- cart.updateMatrixWorld(true);const hip=root.getObjectByName('Bip01_Pelvis');if(hip){const p=cart.worldToLocal(hip.getWorldPosition(new T.Vector3()));root.position.add(new T.Vector3(-.27-p.x,.78-p.y,.12-p.z));}cart.updateMatrixWorld(true);
+ cart.updateMatrixWorld(true);const hip=root.getObjectByName('Bip01_Pelvis');if(hip){const p=cart.worldToLocal(hip.getWorldPosition(new T.Vector3()));root.position.add(new T.Vector3(...cartDriverSeat(cart)).sub(p));}cart.updateMatrixWorld(true);
 }
 
 export class CartRace {
