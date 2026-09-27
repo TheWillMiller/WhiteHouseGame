@@ -82,6 +82,6 @@ export function hallDetails(g:T.Group,d:Destination){const r=d.room!,rx=r.w/2,rz
  const northDoors=r.doors?.north??[],southDoors=r.doors?.south??[];
  for(const side of [-1,1]){const doors=side<0?northDoors:southDoors;for(let x=d.x-rx+1.2;x<d.x+rx-1;x+=3.2){if(doors.some(v=>Math.abs(v-x)<2.5))continue;const z=d.z+side*(rz-.27);const mount=new T.Group();mount.position.set(x,0,z);mount.rotation.y=side>0?Math.PI:0;g.add(mount);if(d.id==='west-lobby'){box(mount,0,2.55,0,1.8,1.16,.09,0xc8a75b);const art=new T.Mesh(new T.PlaneGeometry(1.63,1),landscapeMaterial());art.position.set(0,2.55,.06);mount.add(art);}else historicalPicture(mount,Math.abs(Math.round(x))%4);}}
  if(d.id==='west-lobby'){box(g,-11.85,1.2,-8,.55,2.4,3.0,0x69412d);for(let y=.5;y<2.4;y+=.55)for(let z=-9.2;z<-6.8;z+=.28)box(g,-11.52,y,z,.1,.4,.18,0x647062);const clock=new T.Mesh(new T.CircleGeometry(.48,32),material(0xe2d8b6));clock.rotation.y=Math.PI/2;clock.position.set(-11.48,3.15,-8);g.add(clock);box(g,-11.45,3.3,-8,.03,.3,.025,0x33352f);box(g,-11.44,3.15,-7.83,.025,.03,.34,0x33352f);}
- if(d.id==='cross-hall'){for(const x of [-4.5,4.5]){box(g,x,.8,-2.45,1.8,1.6,.45,0x78563b);lamp(g,x,1.64,-2.45);} }
+ if(d.id==='cross-hall'){for(const x of [-4.5,4.5]){box(g,x,.53,-2.45,1.4,.84,.40,0x78563b);lamp(g,x,.95,-2.45);} }
 }
 export function clearInteriorDetails(){for(const m of resources){(m as T.MeshStandardMaterial).map?.dispose();m.dispose();}resources.length=0;gallery=undefined;labels=undefined;landscape=undefined;historicalPhotos=undefined;}

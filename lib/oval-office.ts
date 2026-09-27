@@ -1,3 +1,4 @@
+import {furniturePiece} from './furniture-scale';
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { material, detailedFlag, deskDetails, lamp } from './visuals';
@@ -13,9 +14,9 @@ export const OVAL_SEATS = [
   { name: 'East fireplace armchair', x: 1.05, z: -5.4, rotation: Math.PI, kind: 'wing' },
   { name: 'West desk guest chair', x: -.65, z: 1.55, rotation: Math.PI, kind: 'guest' },
   { name: 'East desk guest chair', x: .65, z: 1.55, rotation: Math.PI, kind: 'guest' },
-  { name: 'President chair', x: 0, z: 5.25, rotation: 0, kind: 'president' },
+  { name: 'President chair', x: 0, z: 4.25, rotation: 0, kind: 'president' },
 ] as const;
-type Solid = { x: number; z: number; w: number; d: number };
+type Solid = { x: number; z: number; w: number; d: number; height?:number;seatId?:string };
 const C = { wall: 0xf0ece1, white: 0xf5f0df, gold: 0xd9b458, darkGold: 0xa78340,
   cream: 0xe8dfc6, cushion: 0xf0e7d0, walnut: 0x69412d, mahogany: 0x815434 };
 export function ovalDoor(a: number) { return [OVAL.door,OVAL.studyDoor].some(([start,end])=>a>start&&a<end); }
@@ -141,6 +142,7 @@ function windows(g: T.Group) {
 }
 function seating(g: T.Group, solids: Solid[]) {
   for (const seat of OVAL_SEATS) {
+    furniturePiece(g,solids,seat.name,seat.x,seat.z,seat.kind==='sofa'?[.78,.54,.78]:[.65,.54,.65],()=>{
     const s = new T.Group(); s.name = seat.name; s.position.set(seat.x, 0, seat.z); s.rotation.y = seat.rotation; g.add(s);
     if (seat.kind === 'sofa') {
       box(s, 0, .43, 0, 3.1, .52, 1.12, C.cream, .13); box(s, 0, 1.0, .45, 2.94, 1.10, .38, C.cream, .13);
@@ -158,21 +160,27 @@ function seating(g: T.Group, solids: Solid[]) {
       if (president) for (const x of [-.28, 0, .28]) for (const y of [1.03, 1.33, 1.63]) orb(s, x, y, .172, .025, .025, .012, 0x2c211c);
       solids.push({ x: seat.x, z: seat.z, w: 1.04, d: 1.01 });
     }
+    });
   }
 }
 function coffeeTable(g: T.Group, solids: Solid[]) {
+ furniturePiece(g,solids,'Oval coffee table',0,-.75,[.70,.66,.70],()=>{
   box(g, 0, .63, -.75, 1.55, .12, 2.15, C.mahogany, .035); box(g, 0, .55, -.75, 1.36, .16, 1.95, C.walnut);
   for (const x of [-.57, .57]) for (const z of [-1.58, .08]) cyl(g, x, .29, z, .055, .54, C.walnut, .075);
   solids.push({ x: 0, z: -.75, w: 1.55, d: 2.15 });
   const vase = cyl(g, 0, .85, -.75, .24, .30, C.white, .3);
   for (let i = 0; i < 19; i++) { const a = i * 2.399, r = .34 * Math.sqrt(i / 19), x = Math.cos(a) * r, z = -.75 + Math.sin(a) * r; orb(g, x, 1.03 + .10 * (1 - r), z, .14, .10, .13, i % 3 ? 0xf1ecdc : 0x6687ba); }
   vase.name = 'Flower arrangement';
+ });
 }
 function resoluteDesk(g: T.Group, solids: Solid[]) {
   const z = 3.25;
+  // Original White House record: 72 × 48 × 32½ inches; tabletop, not props.
+  furniturePiece(g,solids,'Resolute desk',0,z,[1.8288/4.65,.8255/1.325,1.2192/1.75],()=>{
   box(g, 0, 1.17, z, 4.55, .19, 1.67, C.walnut, .03); box(g, 0, 1.28, z, 4.65, .09, 1.75, C.mahogany, .025);
   for (const side of [-1, 1]) { box(g, side * 1.66, .62, z, 1.0, 1.08, 1.48, C.walnut); for (const dx of [-.39, .39]) { cyl(g, side * 1.66 + dx, .64, z - .79, .065, .90, C.mahogany); for (const y of [.20, 1.07]) box(g, side * 1.66 + dx, y, z - .80, .17, .09, .15, C.mahogany); } }
-  deskDetails(g, 0, z, 4.75, 1.67, true); solids.push({ x: 0, z, w: 4.65, d: 1.75 });
+  deskDetails(g, 0, z, 4.55, 1.67, true); solids.push({ x: 0, z, w: 4.65, d: 1.75, height:1.325 });
+  });
 }
 function fireplace(g: T.Group, solids: Solid[]) {
   const p = anchor(g, Math.PI * 1.5, .18); p.name = 'North centered fireplace';
@@ -182,7 +190,7 @@ function fireplace(g: T.Group, solids: Solid[]) {
   for (const side of [-1, 1]) { cyl(p, side * .50, .15, -.49, .06, .27, C.gold); orb(p, side * .5, .35, -.49, .12, .12, .09, C.gold); }
   for (let i = 0; i < 5; i++) { cyl(p, -.93 + i * .46, 1.78, -.25, .055, .27, C.gold); cyl(p, -.93 + i * .46, 1.94, -.25, .13, .14, C.gold, .17); }
   portrait(p, 'washington', 1.38, 2.22, 3.04); solids.push({ x: 0, z: -OVAL.rz + .5, w: 3.0, d: .8 });
-  for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.4, 0, -6.5); g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut); lamp(table, 0, 1.04, 0); solids.push({ x: side * 2.4, z: -6.5, w: 1.03, d: .82 }); }
+  for (const side of [-1, 1]) { const table = new T.Group(); table.position.set(side * 2.4, 0, -6.5); furniturePiece(g,solids,'Oval side table',side*2.4,-6.5,[.75,.71,.75],()=>{g.add(table); box(table, 0, .97, 0, 1.03, .12, .82, C.mahogany); for (const x of [-.4, .4]) for (const z of [-.3, .3]) cyl(table, x, .47, z, .04, .91, C.walnut); lamp(table, 0, 1.04, 0); solids.push({ x: side * 2.4, z: -6.5, w: 1.03, d: .82 }); }); }
 }
 function wallDecor(g: T.Group) {
   portrait(anchor(g, 4.39, .17), 'franklin', .93, 1.14, 3.14);

@@ -1,5 +1,5 @@
 import * as T from 'three';
-export type Footprint={x:number;z:number;w:number;d:number;height?:number;y?:number};
+export type Footprint={x:number;z:number;w:number;d:number;height?:number;y?:number;seatId?:string};
 export class CameraObstacles {
  readonly meshes:T.Mesh[]=[];
  private records:{mesh:T.Mesh;box:Footprint;ovalWall:boolean}[]=[];
@@ -12,7 +12,7 @@ export class CameraObstacles {
    const mesh=new T.Mesh(geometry,material);mesh.position.set(box.x,(box.y??0)+height/2,box.z);mesh.scale.set(box.w+(narrow?.12:0),height,box.d+(narrow?.12:0));mesh.updateMatrixWorld(true);this.meshes.push(mesh);this.records.push({mesh,box,ovalWall});
   }
  }
- nearby(x:number,z:number,ovalOnly=false){return this.records.filter(r=>(!ovalOnly||r.ovalWall)&&Math.abs(x-r.box.x)<r.box.w/2+10&&Math.abs(z-r.box.z)<r.box.d/2+10).map(r=>r.mesh);}
+ nearby(x:number,z:number,ovalOnly=false,ignoreSeat?:string){return this.records.filter(r=>(!ignoreSeat||r.box.seatId!==ignoreSeat)&&(!ovalOnly||r.ovalWall)&&Math.abs(x-r.box.x)<r.box.w/2+10&&Math.abs(z-r.box.z)<r.box.d/2+10).map(r=>r.mesh);}
  dispose(){this.meshes[0]?.geometry.dispose();(this.meshes[0]?.material as T.Material|undefined)?.dispose();}
 }
 

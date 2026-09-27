@@ -1,3 +1,4 @@
+import {furniturePiece,SEATED_HIP} from './furniture-scale';
 import {BLUE_ROOM} from './residence-layout';
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -21,15 +22,15 @@ function mark(g:T.Group,kind:string,x:number,z:number){const a=new T.Group();a.n
 
 /** Furniture faces local -Z, matching the character's seated heading. */
 function settee(w:World,x:number,z:number,yaw:number,color:number,width=2.5,gilt=false){
- const g=anchor(w.group,x,z,yaw),frame=gilt?GOLD:WOOD;
+ furniturePiece(w.group,w.solids,'State room seating',x,z,[.78,.64,.78],()=>{const g=anchor(w.group,x,z,yaw),frame=gilt?GOLD:WOOD;
  box(g,0,.42,0,width,.13,.85,frame);soft(g,0,.60,0,width-.10,.24,.82,color);
  soft(g,0,1.08,.38,width-.08,.86,.16,color);box(g,0,1.53,.39,width+.04,.065,.19,frame);
  for(const s of [-1,1]){box(g,s*(width/2-.03),.89,0,.09,.09,.82,frame);cyl(g,s*(width/2-.06),.7,-.30,.042,.40,frame);for(const end of [-.3,.3])cyl(g,s*(width/2-.16),.25,end,.045,.45,frame,.055);}
  for(let i=0;i<Math.floor(width/.55);i++){const px=-width/2+.28+i*.55;box(g,px,1.05,.28,.028,.72,.025,gilt?GOLD:CREAM);}
- footprint(w,x,z,width+.1,.94,yaw,1.58);mark(w.group,'State room settee',x,z);
+ footprint(w,x,z,width+.1,.94,yaw,1.58);mark(w.group,'State room settee',x,z);});
 }
 function chair(w:World,x:number,z:number,yaw:number,color:number,gilt=false){settee(w,x,z,yaw,color,.72,gilt);}
-function table(w:World,x:number,z:number,r=.65){const g=w.group;cyl(g,x,1.02,z,r,.11,WOOD);cyl(g,x,.57,z,.13,.88,WOOD,.19);for(let i=0;i<3;i++){const a=i*Math.PI*2/3;const foot=box(g,x+Math.cos(a)*.22,.18,z+Math.sin(a)*.22,.58,.12,.12,WOOD);foot.rotation.y=-a;}footprint(w,x,z,r*2,r*2,0,1.08);}
+function table(w:World,x:number,z:number,r=.65){furniturePiece(w.group,w.solids,'State room round table',x,z,[.85,.72,.85],()=>{const g=w.group;cyl(g,x,1.02,z,r,.11,WOOD);cyl(g,x,.57,z,.13,.88,WOOD,.19);for(let i=0;i<3;i++){const a=i*Math.PI*2/3;const foot=box(g,x+Math.cos(a)*.22,.18,z+Math.sin(a)*.22,.58,.12,.12,WOOD);foot.rotation.y=-a;}footprint(w,x,z,r*2,r*2,0,1.08);});}
 function bouquet(g:T.Group,x:number,y:number,z:number){cyl(g,x,y+.15,z,.16,.30,WHITE,.22);for(let i=0;i<9;i++){const a=i*2.4,r=.12+Math.sin(i)*.08,px=x+Math.cos(a)*r,pz=z+Math.sin(a)*r;const stem=cyl(g,px,y+.4,pz,.012,.35,0x46623c);stem.rotation.z=Math.sin(a)*.3;for(let p=0;p<5;p++){const flower=mesh(g,new T.SphereGeometry(.075,6,4),i%3?0xf2e6d0:0x9eafc7,px+Math.cos(p*1.256)*.055,y+.57,pz+Math.sin(p*1.256)*.055);flower.scale.y=.35;}}}
 function rug(g:T.Group,x:number,z:number,w:number,d:number,color:number,oval=false){
  for(const [inset,y,c]of [[0,.079,0xbea377],[.12,.084,CREAM],[.23,.089,color]] as const){if(oval){const m=cyl(g,x,y,z,w/2-inset,.012,c);m.geometry.dispose();m.geometry=new T.CylinderGeometry(w/2-inset,w/2-inset,.012,96);m.scale.z=(d/2-inset)/(w/2-inset);}else box(g,x,y,z,w-inset*2,.012,d-inset*2,c);}
@@ -104,10 +105,10 @@ export function furnishStateRoom(w:World,d:Destination){
   rug(g,x,z,d.room!.w-1,d.room!.d-1,0x41627a,true);chandelier(g,x,z,.72);
   // The blue is in the textiles; the tour shows cream upper walls and white lower panels.
   for(const a of [Math.PI/2-.47,Math.PI/2,Math.PI/2+.47]){const px=Math.cos(a)*(rx-.25),pz=z+Math.sin(a)*(rz-.25);windowBay(g,px,pz,Math.atan2(-px/rx**2,-(pz-z)/rz**2),0x41627a,1.17);}
-  table(w,0,7.55,.61);bouquet(g,0,1.08,7.55);
+  table(w,0,7.55,.61);bouquet(g,0,.8876,7.55);
   chair(w,3.3,6.1,Math.PI/2,0x41627a,true);chair(w,-3,10.6,0,0x41627a,true);
   const ma=4;mantel(w,Math.cos(ma)*(rx-.45),z+Math.sin(ma)*(rz-.45),Math.atan2(-Math.cos(ma)/rx,-Math.sin(ma)/rz),false,undefined,1.5);
-  w.spots.push({id:'sit-blue',label:'Sit in the Blue Room',kind:'seat',hipHeight:.8,x:2.1,z:6.1,pose:[3.3,6.1,Math.PI/2]});
+  w.spots.push({id:'sit-blue',label:'Sit in the Blue Room',kind:'seat',hipHeight:SEATED_HIP,x:2.1,z:6.1,pose:[3.3,6.1,Math.PI/2]});
   return;
  }
  if(d.id==='green'||d.id==='red'){
@@ -116,19 +117,19 @@ export function furnishStateRoom(w:World,d:Destination){
   for(const dx of [-1.65,1.65])windowBay(g,x+dx,14.73,Math.PI,green?0xc9a146:0xe0cf9e,1.4);
   cabinet(w,x,14.32);settee(w,x+side*2.55,11.8,side*Math.PI/2,color,2.4);
   chair(w,x-side*2.05,12.1,-side*Math.PI/2,green?0xa76545:0x953a39);
-  table(w,x,11.7,.62);bouquet(g,x,1.08,11.7);
+  table(w,x,11.7,.62);bouquet(g,x,.8876,11.7);
   mantel(w,x-side*3.23,5.75,side*Math.PI/2,false,undefined,1.85);
-  w.spots.push({id:'sit-'+d.id,label:'Sit in the '+d.name,kind:'seat',hipHeight:.8,x:x+side*1.3,z:11.8,pose:[x+side*2.55,11.8,side*Math.PI/2]});
+  w.spots.push({id:'sit-'+d.id,label:'Sit in the '+d.name,kind:'seat',hipHeight:SEATED_HIP,x:x+side*1.3,z:11.8,pose:[x+side*2.55,11.8,side*Math.PI/2]});
   return;
  }
  // State Dining: west-wall fireplace and Healy's Lincoln, rather than an office table and flag.
  rug(g,x,z,10.2,12.7,0xc7c6b8);chandelier(g,x,z,1.0);
  mantel(w,x-6.22,7.5,Math.PI/2,false,'lincoln',3.2);
  for(const dz of [3.05,11.95])windowBay(g,x-6.23,dz,Math.PI/2,0xd2bd81,1.65);
- const top=soft(g,x,1.07,z,2.65,.16,8.5,WOOD);top.name='State Dining banquet table';
- for(const dz of [-2.9,2.9]){box(g,x,.55,z+dz,1.7,1.0,.38,WOOD);box(g,x,.15,z+dz,2.05,.13,.64,WOOD);}footprint(w,x,z,2.65,8.5,0,1.16);
- for(let i=0;i<5;i++)for(const side of [-1,1]){const pz=z-3.3+i*1.65;chair(w,x+side*2.05,pz,side*Math.PI/2,0xb7b19b);cyl(g,x+side*.79,1.166,pz,.21,.018,WHITE);cyl(g,x+side*1.01,1.25,pz-.35,.055,.16,0xc7d2ce);}
- for(const dz of [-2,0,2])bouquet(g,x,1.16,z+dz);
+ const top=soft(g,x,.81,z,1.85,.10,8.5,WOOD);top.name='State Dining banquet table';
+ for(const dz of [-2.9,2.9]){box(g,x,.46,z+dz,1.2,.72,.3,WOOD);box(g,x,.16,z+dz,1.45,.11,.52,WOOD);}footprint(w,x,z,1.85,8.5,0,.86);
+ for(let i=0;i<5;i++)for(const side of [-1,1]){const pz=z-3.3+i*1.65;chair(w,x+side*1.36,pz,side*Math.PI/2,0xb7b19b);cyl(g,x+side*.55,.88,pz,.17,.012,WHITE);cyl(g,x+side*.73,.95,pz-.3,.045,.13,0xc7d2ce);}
+ for(const dz of [-2,0,2])bouquet(g,x,.86,z+dz);
  // Three eagle-base pier tables, placed against walls clear of both door approaches.
  for(const [px,pz,yaw]of [[x-4.1,.65,0],[x+3.9,.65,0],[x,14.25,Math.PI]]){const a=anchor(g,px,pz,yaw);box(a,0,1.03,0,1.95,.13,.69,WHITE);cyl(a,0,.5,0,.13,.8,GOLD,.2);for(const s of [-1,1]){const wing=mesh(a,new T.SphereGeometry(1,10,6),GOLD,s*.35,.68,0);wing.scale.set(.44,.11,.12);wing.rotation.z=s*.4;}cyl(a,0,.90,.13,.09,.19,GOLD);box(a,0,.15,0,1.18,.12,.51,WOOD);footprint(w,px,pz,1.95,.69,yaw,1.1);mark(g,'Eagle pier table',px,pz);}
 }
